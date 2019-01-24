@@ -73,7 +73,7 @@ cd $builddir
 if [ ! "x$EXISTING_MINETEST_DIR" = "x" ]; then
 	ln -s $EXISTING_MINETEST_DIR minetest
 else
-	[ -d minetest ] && (cd minetest && git pull) || (git clone https://github.com/minetest/minetest)
+	[ -d minetest ] && (cd minetest && git pull) || (git clone --branch Senior_Project_Setup https://github.com/edaff/minetest.git)
 fi
 cd minetest
 git_hash=$(git rev-parse --short HEAD)
@@ -81,7 +81,7 @@ git_hash=$(git rev-parse --short HEAD)
 # Get minetest_game
 cd games
 if [ "x$NO_MINETEST_GAME" = "x" ]; then
-	[ -d minetest_game ] && (cd minetest_game && git pull) || (git clone https://github.com/minetest/minetest_game)
+	[ -d minetest_game ] && (cd minetest_game && git pull) || (git clone --branch 0.4.17.1 https://github.com/edaff/minetest_game.git)
 fi
 cd ../..
 
@@ -150,9 +150,24 @@ cmake .. \
 	-DLEVELDB_LIBRARY=$libdir/leveldb/lib/libleveldb.dll.a \
 	-DLEVELDB_DLL=$libdir/leveldb/bin/libleveldb.dll
 
-make -j2
+make -j 4
 
 [ "x$NO_PACKAGE" = "x" ] && make package
+
+# unzip and rezip with missing DLLs added
+unzip minetest-windows-build.zip
+
+rm minetest-windows-build.zip
+
+cd minetest-windows-build
+
+cp ../../DLLs/libgcc_s_seh-1.dll ./bin/libgcc_s_seh-1.dll
+cp ../../DLLs/libstdc++-6.dll ./bin/libstdc++-6.dll
+cp ../../DLLs/libwinpthread-1.dll ./bin/libwinpthread-1.dll
+
+cd ..
+
+zip -r minetest-windows-build ./minetest-windows-build
 
 exit 0
 # EOF
