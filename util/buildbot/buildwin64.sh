@@ -2,15 +2,24 @@
 set -e
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-if [ $# -ne 1 ]; then
-	echo "Usage: $0 <build directory>"
+if [ $# -ne 2 ]; then
+	echo "Usage: $0 <build directory> <git_branch_name>"
 	exit 1
 fi
+
 builddir=$1
 mkdir -p $builddir
 builddir="$( cd "$builddir" && pwd )"
 packagedir=$builddir/packages
 libdir=$builddir/libs
+
+# Grab command line argument for the git repository branch
+if [ $2 -eq 0 ]
+	then
+		git_branch="Senior_Project_Setup"
+	else
+		git_branch=$2
+fi
 
 toolchain_file=$dir/toolchain_mingw64.cmake
 irrlicht_version=1.8.4
@@ -73,7 +82,7 @@ cd $builddir
 if [ ! "x$EXISTING_MINETEST_DIR" = "x" ]; then
 	ln -s $EXISTING_MINETEST_DIR minetest
 else
-	[ -d minetest ] && (cd minetest && git pull) || (git clone --branch Senior_Project_Setup https://github.com/edaff/minetest.git)
+	[ -d minetest ] && (cd minetest && git pull) || (git clone --branch "$git_branch" https://github.com/edaff/minetest.git)
 fi
 cd minetest
 git_hash=$(git rev-parse --short HEAD)
