@@ -1,10 +1,13 @@
 #!/bin/bash
 set -e
 
+# Usage:
+# ./buildwin64.sh <build_directory> <minetest_branch_name> <minetest_game_branch_name>
+# ./buildwin64.sh <build_directory>		// Will use Senior_Project_Master by default
+
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-if [ $# -ne 2 ]; then
-	echo "Usage: $0 <build directory> <git_branch_name>"
-	exit 1
+if [ $# -ne 3 ]; then
+	echo "Usage: $0 <build directory> <minetest_branch_name> <minetest_game_branch_name>"
 fi
 
 builddir=$1
@@ -16,9 +19,16 @@ libdir=$builddir/libs
 # Grab command line argument for the git repository branch
 if [ $2 -eq 0 ]
 	then
-		git_branch="Senior_Project_Setup"
+		minetest_branch="Senior_Project_Master"
 	else
-		git_branch=$2
+		minetest_branch=$2
+fi
+
+if [$3 -eq 0]
+	then
+		minetest_game_branch="Senior_Project_Master"
+	else
+		minetest_game_branch=$3
 fi
 
 toolchain_file=$dir/toolchain_mingw64.cmake
@@ -82,7 +92,7 @@ cd $builddir
 if [ ! "x$EXISTING_MINETEST_DIR" = "x" ]; then
 	ln -s $EXISTING_MINETEST_DIR minetest
 else
-	[ -d minetest ] && (cd minetest && git pull) || (git clone --branch "$git_branch" https://github.com/edaff/minetest.git)
+	[ -d minetest ] && (cd minetest && git pull) || (git clone --branch "$minetest_branch" https://github.com/edaff/minetest.git)
 fi
 cd minetest
 git_hash=$(git rev-parse --short HEAD)
@@ -90,7 +100,7 @@ git_hash=$(git rev-parse --short HEAD)
 # Get minetest_game
 cd games
 if [ "x$NO_MINETEST_GAME" = "x" ]; then
-	[ -d minetest_game ] && (cd minetest_game && git pull) || (git clone --branch 0.4.17.1 https://github.com/edaff/minetest_game.git)
+	[ -d minetest_game ] && (cd minetest_game && git pull) || (git clone --branch "$minetest_game_branch"  https://github.com/edaff/minetest_game.git)
 fi
 cd ../..
 
