@@ -183,8 +183,10 @@ cd minetest-windows-build
 cp ../../DLLs/libgcc_s_seh-1.dll ./bin/libgcc_s_seh-1.dll
 cp ../../DLLs/libstdc++-6.dll ./bin/libstdc++-6.dll
 cp ../../DLLs/libwinpthread-1.dll ./bin/libwinpthread-1.dll
-
-cd ..
+cp --recursive ../../wavm_bin ./wavm_bin
+cd ./wavm_bin
+unzip LLVMJIT.zip
+cd ../..
 
 zip -r minetest-windows-build ./minetest-windows-build
 
