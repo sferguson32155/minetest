@@ -17,14 +17,14 @@ packagedir=$builddir/packages
 libdir=$builddir/libs
 
 # Grab command line argument for the git repository branch
-if [ $2 -eq 0 ]
+if [ -z "$2" ]
 	then
 		minetest_branch="Senior_Project_Master"
 	else
 		minetest_branch=$2
 fi
 
-if [$3 -eq 0]
+if [ -z "$3" ]
 	then
 		minetest_game_branch="Senior_Project_Master"
 	else
