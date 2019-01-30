@@ -179,9 +179,6 @@ rm minetest-windows-build.zip
 
 cd minetest-windows-build
 
-# Insert the mod security setting into the minetest.conf file
-echo "secure.enable_security = false" >> minetest.conf
-
 # Copy over the missing DLLs to the bin folder
 cp ../../DLLs/libgcc_s_seh-1.dll ./bin/libgcc_s_seh-1.dll
 cp ../../DLLs/libstdc++-6.dll ./bin/libstdc++-6.dll
