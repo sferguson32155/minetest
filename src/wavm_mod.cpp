@@ -13,7 +13,7 @@
 
 std::string wavm_mod(std::string message) {
 	// Message contains the '-wavm' part, so just get the filename
-	std::string filename = message.substr(7);
+	std::string filename = message.substr(6);
 
 	// Find the path to the WAVM executable
         std::string wavm_exe = "C:/Users/xarga/Desktop/minetest-windows-build/wavm_bin/wavm-run.exe";
