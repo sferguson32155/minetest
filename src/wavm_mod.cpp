@@ -22,7 +22,7 @@ std::string wavm_mod(std::string message) {
         std::string path = "C:/Users/xarga/Desktop/minetest-windows-build/wavm_bin/WAST_files/" + filename;
 
 	// Run the executable and pipe the output to a text file
-        std::string command = wavm_exe + " " + filename + " > wavm_output.txt";
+        std::string command = wavm_exe + " " + path + " > wavm_output.txt";
         int result = system(command.c_str());
 
         // Citation: www.cplusplus.com/doc/tutorial/files/
