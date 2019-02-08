@@ -23,21 +23,20 @@ std::string wavm_mod(std::string message) {
 	std::string filename = message.substr(6);
 
 	// Set the command to be executed by cmd
-	std::string path_command = "cd > wavm_output.txt";
+	std::string path_command = "cd > " + output_file_name;
 
 	result = system(path_command.c_str());
 	std::string current_path = retrieve_output_from_file(output_file_name);
-
-	std::cout << current_path << std::endl;
+	current_path = current_path.substr(0, current_path.size()-3);
 
 	// Find the path to the WAVM executable
-        std::string wavm_exe = "C:/Users/edaff/Desktop/minetest-windows-build/wavm_bin/wavm-run.exe";
+        std::string wavm_exe = current_path + "\\wavm_bin\\wavm-run.exe";
 
 	// Find the path to the specified file
-        std::string path = "C:/Users/edaff/Desktop/minetest-windows-build/wavm_bin/WAST_files/" + filename;
+        std::string path = current_path + "\\wavm_bin\\WAST_files\\" + filename;
 
 	// Run the executable and pipe the output to a text file
-        std::string command = wavm_exe + " " + path + " > wavm_output.txt";
+        std::string command = wavm_exe + " " + path + " > " + output_file_name;
         result = system(command.c_str());
 
         return retrieve_output_from_file(output_file_name);
