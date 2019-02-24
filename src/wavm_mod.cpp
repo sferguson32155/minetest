@@ -10,6 +10,7 @@
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
+#include <strsafe.h>
 #include <windows.h>
 #include "stdafx.h"
 #include "wavm-run.h"
@@ -51,13 +52,13 @@ std::string get_dll_output(std::string dll_path, std::string wast_path) {
 	if(hinst != NULL) {
 		wavm_function = (DLLPROC)GetProcAddress(hinst, "mainWAVM");
 
-		if(wavm_funciton != NULL) {
+		if(wavm_function != NULL) {
 			// Define the different argument elements explicitly
 			char project_name[] = "project name";
 
 			int len = wast_path.length();
 			char* file = new char[len + 1];
-			strncpy(file, wast_path, len);
+			strncpy(file, wast_path.c_str(), len);
 			file[len] = 0;
 
 			char** arg = new char*[3];
@@ -65,7 +66,7 @@ std::string get_dll_output(std::string dll_path, std::string wast_path) {
 			arg[1] = file;
 			arg[2] = NULL;
 
-			wavm_function(1, &argument[0]);
+			wavm_function(1, &arg[0]);
 			result = "Successfully called WAVM DLL";
 		} else {
 			result = "Failed to open function";
