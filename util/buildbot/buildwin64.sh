@@ -185,7 +185,7 @@ cp ../../DLLs/libstdc++-6.dll ./bin/libstdc++-6.dll
 cp ../../DLLs/libwinpthread-1.dll ./bin/libwinpthread-1.dll
 
 # Copy over the WAVM bin folder to the Minetest bin folder
-cp --recursive ../../wavm_bin ./bin
+cp --recursive ../../wavm_bin/. ./bin
 cd ./bin
 
 # Extract LLVMJIT files (large)
