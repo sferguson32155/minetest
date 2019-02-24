@@ -10,7 +10,6 @@
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
-#include <strsafe.h>
 #include <windows.h>
 #include "stdafx.h"
 #include "wavm-run.h"
@@ -33,13 +32,13 @@ std::string wavm_mod(std::string message) {
         std::string wavm_dll = current_path + "\\bin\\wavm-run.dll";
 
 	// Find the path to the specified file
-        std::string path = current_path + "\\bin\\WAST_files\\" + filename;
+        std::string wast_path = current_path + "\\bin\\WAST_files\\" + filename;
 
-        return get_dll_output(wavm_dll, path);
+        return get_dll_output(wavm_dll, wast_path);
 }
 
 // Call the function from the DLL
-std::string get_dll_output(std::string dll_path, std::string wast_path) {
+std::string get_dll_output(std::string wavm_dll, std::string wast_path) {
 	typedef VOID(*DLLPROC) (int argc, char** argv);
 	HINSTANCE hinst;
 	DLLPROC wavm_function;
@@ -47,6 +46,7 @@ std::string get_dll_output(std::string dll_path, std::string wast_path) {
 	std::string result = "Inside Minetest DLL function";
 
 	// Load the DLL
+	LPSTR dll_path = const_cast<char *>(wavm_dll.c_str());
 	hinst = LoadLibrary(dll_path);
 
 	if(hinst != NULL) {
