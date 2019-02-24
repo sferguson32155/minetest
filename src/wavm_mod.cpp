@@ -18,6 +18,7 @@ std::string retrieve_output_from_file(std::string);
 // wavm_mod main function
 std::string wavm_mod(std::string message) {
 	std::string output_file_name = "wavm_output.txt";
+	int result;
 
 	// Message contains the '-wavm' part, so just get the filename
 	std::string filename = message.substr(6);
