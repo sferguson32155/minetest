@@ -10,6 +10,7 @@
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
+#include <windows.h>
 
 // Function Prototypes
 std::string retrieve_output_from_file(std::string);
@@ -17,16 +18,16 @@ std::string retrieve_output_from_file(std::string);
 // wavm_mod main function
 std::string wavm_mod(std::string message) {
 	std::string output_file_name = "wavm_output.txt";
-	int result;
 
 	// Message contains the '-wavm' part, so just get the filename
 	std::string filename = message.substr(6);
 
-	// Set the command to be executed by cmd
-	std::string path_command = "cd > " + output_file_name;
+	// Get the current path
+	char path_buffer[MAX_PATH];
+	GetCurrentDirectory(MAX_PATH, path_buffer);
 
-	result = system(path_command.c_str());
-	std::string current_path = retrieve_output_from_file(output_file_name);
+	//result = system(path_command.c_str());
+	std::string current_path = path_buffer;
 	current_path = current_path.substr(0, current_path.size()-3);
 
 	// Find the path to the WAVM executable
