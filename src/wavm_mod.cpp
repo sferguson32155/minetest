@@ -1,8 +1,8 @@
 // Contents of wavm_mod.cpp
-// Takes the chat message, parses it for the file specified, and runs the WAVM
+// Takes the chat message, parses it for the file specified, and runs the NodeJS
 // executable, returning that result
 // Written by Bryan Rooke and Eric Daff - 2/6/19
-// Last modified - 2/6/19
+// Last modified - 3/25/19
 // Senior Project
 
 #include <iostream>
@@ -15,12 +15,12 @@
 // Function Prototypes
 std::string retrieve_output_from_file(std::string);
 
-// wavm_mod main function
-std::string wavm_mod(std::string message) {
-	std::string output_file_name = "wavm_output.txt";
+// wasm_mod main function
+std::string wasm_mod(std::string message) {
+	std::string output_file_name = "node_output.txt";
 	int result;
 
-	// Message contains the '-wavm' part, so just get the filename
+	// Message contains the '-wasm' part, so just get the filename
 	std::string filename = message.substr(6);
 
 	// Get the current path
@@ -32,13 +32,13 @@ std::string wavm_mod(std::string message) {
 	current_path = current_path.substr(0, current_path.size()-3);
 
 	// Find the path to the WAVM executable
-        std::string wavm_exe = current_path + "\\wavm_bin\\wavm-run.exe";
+        std::string node_exe = current_path + "\\NodeJS\\node.exe";
 
 	// Find the path to the specified file
         std::string path = current_path + "\\wavm_bin\\WAST_files\\" + filename;
 
 	// Run the executable and pipe the output to a text file
-        std::string command = wavm_exe + " " + path + " > " + output_file_name;
+        std::string command = node_exe + " " + path + " > " + output_file_name;
         result = system(command.c_str());
 
         return retrieve_output_from_file(output_file_name);

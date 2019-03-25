@@ -6,5 +6,5 @@
 
 #ifndef WAVM_MOD_H
 #define WAVM_MOD_H
-std::string wavm_mod(std::string message);
+std::string wasm_mod(std::string message);
 #endif

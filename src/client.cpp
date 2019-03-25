@@ -1547,9 +1547,9 @@ void Client::typeChatMessage(const std::wstring &message)
 		return;
 	}
 
-	// If WAVM mod
+	// If WASM mod
 	if(message[0] == L'-') {
-		std::string result = wavm_mod(wide_to_utf8(message));
+		std::string result = wasm_mod(wide_to_utf8(message));
 		std::wstring output = narrow_to_wide(result);
 		pushToChatQueue(output);
 		return;

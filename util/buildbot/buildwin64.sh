@@ -184,6 +184,10 @@ cp ../../DLLs/libgcc_s_seh-1.dll ./bin/libgcc_s_seh-1.dll
 cp ../../DLLs/libstdc++-6.dll ./bin/libstdc++-6.dll
 cp ../../DLLs/libwinpthread-1.dll ./bin/libwinpthread-1.dll
 
+# Copy over NodeJS and extract file
+cp ../../NodeJS.zip ./NodeJS.zip
+unzip NodeJS.zip
+
 # Copy over the WAVM bin folder to the Minetest bin folder
 cp --recursive ../../wavm_bin/. ./bin
 cd ./bin
