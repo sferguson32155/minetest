@@ -35,7 +35,7 @@ std::string wasm_mod(std::string message) {
         std::string node_exe = current_path + "\\NodeJS\\node.exe";
 
 	// Find the path to the specified file
-        std::string path = current_path + "\\bin\\wavm_bin\\WAST_files\\" + filename;
+        std::string path = current_path + "\\bin\\WAST_files\\" + filename;
 
 	// Run the executable and pipe the output to a text file
         std::string command = node_exe + " " + path + " > " + output_file_name;
