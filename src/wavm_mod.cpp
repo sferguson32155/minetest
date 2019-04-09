@@ -52,10 +52,10 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* idef) {
 	def->description = "Gator_Block Description";
 	def->inventory_image = "default_diamond_block.png";
 	def->wield_image = "default_diamond_block.png";
-	const ItemDefinition *def2 = new ItemDefinition(def);
+	const ItemDefinition *def2 = new ItemDefinition(*def);
 
 	// Call registerItem on ItemDefinition
-	idef->registerItem(&def2);
+	idef->registerItem(*def2);
 
         return retrieve_output_from_file(output_file_name);
 }
