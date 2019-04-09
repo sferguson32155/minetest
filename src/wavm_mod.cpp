@@ -20,7 +20,7 @@
 std::string retrieve_output_from_file(std::string);
 
 // wasm_mod main function
-std::string wasm_mod(std::string message) {
+std::string wasm_mod(std::string message, IWritableItemDefManager* idef) {
 	std::string output_file_name = "node_output.txt";
 	int result;
 
@@ -45,19 +45,13 @@ std::string wasm_mod(std::string message) {
         std::string command = node_exe + " " + path + " > " + output_file_name;
         result = system(command.c_str());
 
-	// Get Server instance
-	Server *server = ServerEnvironment::getGameDef();
-
-	// Get IWritableItemDefManager instance
-	IWritableItemDefManager *idef = server.getWritableItemDefManager();
-
 	// Populate ItemDefinition instance with output of the text file
-	ItemDefinition def = new ItemDefinition();
-	def.name = "Gator_Block";
-	def.type = ITEM_NODE;
-	def.description = "Gator_Block Description";
-	def.inventory_image = "default_diamond_block.png";
-	def.wield_image = "default_diamond_block.png";
+	ItemDefinition *def = new ItemDefinition();
+	def->name = "Gator_Block";
+	def->type = ITEM_NODE;
+	def->description = "Gator_Block Description";
+	def->inventory_image = "default_diamond_block.png";
+	def->wield_image = "default_diamond_block.png";
 
 	// Call registerItem on ItemDefinition
 	idef->registerItem(def);
