@@ -2,7 +2,7 @@
 // Takes the chat message, parses it for the file specified, and runs the NodeJS
 // executable, returning that result
 // Written by Bryan Rooke and Eric Daff - 2/6/19
-// Last modified - 3/25/19
+// Last modified - 4/9/19
 // Senior Project
 
 #include <iostream>
@@ -11,6 +11,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
+#include <serverenvironment.h>
+#include <itemdef.h>
+#include <nodedef.h>
+#include <server.h>
 
 // Function Prototypes
 std::string retrieve_output_from_file(std::string);
@@ -40,6 +44,23 @@ std::string wasm_mod(std::string message) {
 	// Run the executable and pipe the output to a text file
         std::string command = node_exe + " " + path + " > " + output_file_name;
         result = system(command.c_str());
+
+	// Get Server instance
+	Server *server = ServerEnvironment::getGameDef();
+
+	// Get IWritableItemDefManager instance
+	IWritableItemDefManager *idef = server.getWritableItemDefManager();
+
+	// Populate ItemDefinition instance with output of the text file
+	ItemDefinition def = new ItemDefinition();
+	def.name = "Gator_Block";
+	def.type = ITEM_NODE;
+	def.description = "Gator_Block Description";
+	def.inventory_image = "default_diamond_block.png";
+	def.wield_image = "default_diamond_block.png";
+
+	// Call registerItem on ItemDefinition
+	idef->registerItem(def);
 
         return retrieve_output_from_file(output_file_name);
 }
