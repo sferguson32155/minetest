@@ -53,26 +53,24 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serverdef,
 
 	// Populate ItemDefinition instance with output of the text file
 	ItemDefinition *def = new ItemDefinition();
-	def->name = "default:gator_block_test";
+	def->name = "default:gator_block";
 	def->type = ITEM_NODE;
 	def->description = "Gator_Block";
-	def->inventory_image = "[inventorycube"
-		"{default_gator_blue.png"
-		"{default_gator_blue.png"
-		"{default_gator_blue.png";
+	def->inventory_image = "default_gator_blue.png";
 	def->wield_image = "default_gator_blue.png";
 	const ItemDefinition *def2 = new ItemDefinition(*def);
 
 	// Populate the ContentFeatures Struct
 	ContentFeatures f = ContentFeatures();
 	f.name = def->name;
-	for(int i = 0; i <6; i++) {
+	for(int i = 0; i < 6; i++) {
 		f.tiledef[i].name = "default_gator_blue.png";
 	}
-	ndef->set(f.name, f);
 
 	// Register the ItemDefinition and set the ContentFeature
 	serverdef->registerItem(*def2);
+	ndef->set(f.name, f);
+
         return retrieve_output_from_file(output_file_name);
 }
 
