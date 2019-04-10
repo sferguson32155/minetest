@@ -26,7 +26,8 @@ std::string retrieve_output_from_file(std::string);
 
 // wasm_mod main function
 std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
-		IWritableNodeDefManager *ndef, IItemDefManager *idef, LocalPlayer *player) {
+		IWritableNodeDefManager *ndef, IItemDefManager *idef,
+		IWritableItemDefManager *serverdef, LocalPlayer *player) {
 	std::string output_file_name = "node_output.txt";
 	int result;
 
@@ -69,6 +70,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
 	f.is_ground_content = true;
 
 	// Register the ItemDefinition and set the ContentFeature
+	serverdef->registerItem(*def2);
 	iwdef->registerItem(*def2);
 	ndef->set(f.name, f);
 

@@ -1639,7 +1639,8 @@ void Client::typeChatMessage(const std::wstring &message)
 	// so the player's inventory doesn't change due to the 2 not being in sync
 	if(message[0] == L'-') {
 		LocalPlayer *player = m_env.getLocalPlayer();
-		std::string result = wasm_mod(wide_to_utf8(message), m_itemdef, m_nodedef, m_itemdef, player);
+		IWritableItemDefManager *serverdef = server->getWritableItemDefManager();
+		std::string result = wasm_mod(wide_to_utf8(message), m_itemdef, m_nodedef, m_itemdef, serverdef, player);
 		m_inventory_from_server = new Inventory(player->inventory);
 		std::wstring output = narrow_to_wide(result);
 		pushToChatQueue(output);
