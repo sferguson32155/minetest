@@ -2,7 +2,7 @@
 // Takes the chat message, parses it for the file specified, and runs the NodeJS
 // executable, returning that result
 // Written by Bryan Rooke and Eric Daff - 2/6/19
-// Last modified - 4/9/19
+// Last modified - 4/10/19
 // Senior Project
 
 #include <iostream>
@@ -14,13 +14,19 @@
 #include <serverenvironment.h>
 #include <itemdef.h>
 #include <nodedef.h>
+#include <gamedef.h>
 #include <server.h>
+#include <inventory.h>
+#include <localplayer.h>
+#include <player.h>
+#include "util/numeric.h"
 
 // Function Prototypes
 std::string retrieve_output_from_file(std::string);
 
 // wasm_mod main function
-std::string wasm_mod(std::string message) {
+std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
+		IWritableNodeDefManager *ndef, IItemDefManager *idef, LocalPlayer *player) {
 	std::string output_file_name = "node_output.txt";
 	int result;
 
@@ -45,23 +51,32 @@ std::string wasm_mod(std::string message) {
         std::string command = node_exe + " " + path + " > " + output_file_name;
         result = system(command.c_str());
 
-	// Get Server instance
-	//Server *server = ServerEnvironment::getGameDef();
-
-	// Get IWritableItemDefManager instance
-	//IWritableItemDefManager *idef = server.getWritableItemDefManager();
-
 	// Populate ItemDefinition instance with output of the text file
-	//ItemDefinition def = new ItemDefinition();
-	//def.name = "Gator_Block";
-	//def.type = ITEM_NODE;
-	//def.description = "Gator_Block Description";
-	//def.inventory_image = "default_diamond_block.png";
-	//def.wield_image = "default_diamond_block.png";
+	ItemDefinition *def = new ItemDefinition();
+	def->name = "default:gator_block_test";
+	def->type = ITEM_NODE;
+	def->description = "Gator_Block";
+	def->inventory_image = "default_gator_blue.png";
+	def->wield_image = "default_gator_blue.png";
+	const ItemDefinition *def2 = new ItemDefinition(*def);
 
-	// Call registerItem on ItemDefinition
-	//idef->registerItem(def);
+	// Populate the ContentFeatures so block can be placed
+	ContentFeatures f = ContentFeatures();
+	f.name = def->name;
+	for(int i = 0; i < 6; i++) {
+		f.tiledef[i].name = "default_gator_blue.png";
+	}
+	f.is_ground_content = true;
 
+	// Register the ItemDefinition and set the ContentFeature
+	iwdef->registerItem(*def2);
+	ndef->set(f.name, f);
+
+	// Create a new ItemStack for new Item
+	ItemStack *item = new ItemStack(def->name, (u16)1, (u16)0, idef);
+
+	// Add new item to player's inventory
+	player->inventory.addItem("main", *item);
         return retrieve_output_from_file(output_file_name);
 }
 
