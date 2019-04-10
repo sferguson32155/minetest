@@ -56,6 +56,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *iwdef,
 	// Get server from Server Environment
 	ServerEnvironment *m_env;
 	Server *m_server = m_env->getGameDef();
+	IWritableItemDefManager *m_idef = m_server->getWritableItemDefManager();
 
 	// Populate ItemDefinition instance with output of the text file
 	ItemDefinition *def = new ItemDefinition();
@@ -77,13 +78,13 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *iwdef,
 	// Register the ItemDefinition and set the ContentFeature
 	iwdef->registerItem(*def2);
 	ndef->set(f.name, f);
+	m_idef->registerItem(def);
 
 	// Create a new ItemStack for new Item
 	ItemStack *item = new ItemStack(def->name, (u16)1, (u16)0, idef);
 
 	// Add new item to player's inventory
 	player->inventory.addItem("main", *item);
-	m_server->addItem("main", *item);
 	return retrieve_output_from_file(output_file_name);
 }
 
