@@ -21,7 +21,7 @@ public:
 	void registerCommand();
 
 private:
-	ItemDefinition *m_def;
+	const ItemDefinition *m_def;
 	IWritableItemDefManager *m_idef;
 	Server *server;
 };
