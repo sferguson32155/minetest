@@ -11,11 +11,11 @@
 RegisterWasm::RegisterWasm(ItemDefinition *def) :
 	ScriptApiBase()
 {
-	m_def(*def);
+	m_def = new ItemDefinition(*def);
 	server = getServer();
 	m_idef = server->getWritableItemDefManager();
 }
 
-void RegisterWasm::register() {
+void RegisterWasm::registerCommand() {
 	m_idef->registerItem(*def);
 }
