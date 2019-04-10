@@ -25,7 +25,7 @@ std::string retrieve_output_from_file(std::string);
 
 // wasm_mod main function
 std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
-		IItemDefManager *idef, LocalPlayer *player) {
+		IWritableNodeDefManager *ndef, IItemDefManager *idef, LocalPlayer *player) {
 	std::string output_file_name = "node_output.txt";
 	int result;
 
@@ -59,11 +59,17 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
 	def->wield_image = "default_diamond_block.png";
 	const ItemDefinition *def2 = new ItemDefinition(*def);
 
-	// Call registerItem on ItemDefinition
-	iwdef->registerItem(*def2);
+	// Populate the ContentFeatures so block can be placed
+	ContentFeatures f = ContentFeatures();
+	f.name = def->name;
+	for(int i = 0; i < 6; i++) {
+		f.tiledef[i].name = "default_diamond_block.png";
+	}
+	f.is_ground_content = true;
 
-	// Check to see if the new ItemDefinition is found - Returned true
-	bool isKnown = iwdef->isKnown("default:gator_block_test");
+	// Register the ItemDefinition and set the ContentFeature
+	iwdef->registerItem(*def2);
+	ndef->set(f.name, f);
 
 	// Create a new ItemStack for new Item
 	ItemStack *item = new ItemStack(def->name, (u16)1, (u16)0, idef);
