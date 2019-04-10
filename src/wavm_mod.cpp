@@ -57,7 +57,12 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* idef) {
 	// Call registerItem on ItemDefinition
 	idef->registerItem(*def2);
 
-        return retrieve_output_from_file(output_file_name);
+	// Check to see if the new ItemDefinition is found
+	bool isKnown = idef->isKnown("default:gator_block_test");
+	if(isKnown)
+		return "The name default:gator_block_test was found";
+	else
+        	return retrieve_output_from_file(output_file_name);
 }
 
 // Citation: www.cplusplus.com/doc/tutorial/files/
