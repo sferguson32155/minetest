@@ -20,7 +20,8 @@
 #include <localplayer.h>
 #include <player.h>
 #include "util/numeric.h"
-//#include "serverenvironment.h"
+#include "serverenvironment.h"
+#include "server.h"
 
 // Function Prototypes
 std::string retrieve_output_from_file(std::string);
@@ -54,8 +55,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *iwdef,
 	result = system(command.c_str());
 
 	// Get server from Server Environment
-	ServerEnvironment *env;
-	ServerEnvironment *m_env = env->getEnv();
+	ServerEnvironment *m_env;
 	Server *m_server = m_env->getGameDef();
 	IWritableItemDefManager *m_idef = m_server->getWritableItemDefManager();
 
