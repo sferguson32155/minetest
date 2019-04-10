@@ -14,6 +14,7 @@
 #include <serverenvironment.h>
 #include <itemdef.h>
 #include <nodedef.h>
+#include <gamedef.h>
 #include <server.h>
 #include <inventory.h>
 #include <localplayer.h>
