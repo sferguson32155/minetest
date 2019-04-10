@@ -55,7 +55,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *iwdef,
 
 	// Get server from Server Environment
 	ServerEnvironment *m_env;
-	Server m_server = m_env->getGameDef();
+	Server *m_server = m_env->getGameDef();
 
 	// Populate ItemDefinition instance with output of the text file
 	ItemDefinition *def = new ItemDefinition();
