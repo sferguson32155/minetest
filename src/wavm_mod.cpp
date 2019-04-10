@@ -69,7 +69,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
 	ItemStack *item = new ItemStack(def->name, (u16)1, (u16)0, idef);
 
 	// Add new item to player's inventory
-	player->inventory.addItem("main", item);
+	player->inventory.addItem("main", *item);
         return retrieve_output_from_file(output_file_name);
 }
 
