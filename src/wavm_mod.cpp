@@ -20,6 +20,7 @@
 #include <localplayer.h>
 #include <player.h>
 #include "util/numeric.h"
+#include "cpp_api/s_register.h"
 
 // Function Prototypes
 std::string retrieve_output_from_file(std::string);
