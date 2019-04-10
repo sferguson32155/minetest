@@ -20,7 +20,6 @@
 #include <localplayer.h>
 #include <player.h>
 #include "util/numeric.h"
-#include "cpp_api/s_register.h"
 
 // Function Prototypes
 std::string retrieve_output_from_file(std::string);
@@ -70,8 +69,6 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
 	f.is_ground_content = true;
 
 	// Register the ItemDefinition and set the ContentFeature
-	RegisterWasm rw(def2);
-	rw.registerCommand();
 	iwdef->registerItem(*def2);
 	ndef->set(f.name, f);
 
