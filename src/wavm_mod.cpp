@@ -25,6 +25,13 @@
 
 // Function Prototypes
 std::string retrieve_output_from_file(std::string);
+ServerEnvironment *env;
+
+// get Server Env
+void setServerEnvironment(ServerEnvironment *env)
+{
+	m_env = env;
+}
 
 // wasm_mod main function
 std::string wasm_mod(std::string message, IWritableItemDefManager *iwdef,
@@ -55,7 +62,6 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *iwdef,
 	result = system(command.c_str());
 
 	// Get server from Server Environment
-	ServerEnvironment *m_env;
 	Server *m_server = m_env->getGameDef();
 	IWritableItemDefManager *m_idef = m_server->getWritableItemDefManager();
 
@@ -65,6 +71,11 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *iwdef,
 	def->type = ITEM_NODE;
 	def->description = "Gator_Block";
 	def->inventory_image = "default_gator_blue.png";
+	itemdef.groups["cracky"] = 3;
+	itemdef.inventory_image = "[inventorycube"
+				  "{default_gator_blue.png"
+				  "{default_gator_blue.png"
+				  "{default_gator_blue.png";
 	def->wield_image = "default_gator_blue.png";
 	const ItemDefinition *def2 = new ItemDefinition(*def);
 
@@ -84,8 +95,6 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *iwdef,
 	// Create a new ItemStack for new Item
 	ItemStack *item = new ItemStack(def->name, (u16)1, (u16)0, idef);
 
-	// Add new item to player's inventory
-	player->inventory.addItem("main", *item);
 	return retrieve_output_from_file(output_file_name);
 }
 
