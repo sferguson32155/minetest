@@ -20,13 +20,15 @@
 #include <localplayer.h>
 #include <player.h>
 #include "util/numeric.h"
+#include "serverenvironment.h"
 
 // Function Prototypes
 std::string retrieve_output_from_file(std::string);
 
 // wasm_mod main function
-std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
-		IWritableNodeDefManager *ndef, IItemDefManager *idef, LocalPlayer *player) {
+std::string wasm_mod(std::string message, IWritableItemDefManager *iwdef,
+		IWritableNodeDefManager *ndef, IItemDefManager *idef, LocalPlayer *player)
+{
 	std::string output_file_name = "node_output.txt";
 	int result;
 
@@ -37,19 +39,23 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
 	char path_buffer[MAX_PATH];
 	GetCurrentDirectory(MAX_PATH, path_buffer);
 
-	//result = system(path_command.c_str());
+	// result = system(path_command.c_str());
 	std::string current_path = path_buffer;
-	current_path = current_path.substr(0, current_path.size()-3);
+	current_path = current_path.substr(0, current_path.size() - 3);
 
 	// Find the path to the WAVM executable
-        std::string node_exe = current_path + "\\NodeJS\\node.exe";
+	std::string node_exe = current_path + "\\NodeJS\\node.exe";
 
 	// Find the path to the specified file
-        std::string path = current_path + "\\bin\\WAST_files\\" + filename;
+	std::string path = current_path + "\\bin\\WAST_files\\" + filename;
 
 	// Run the executable and pipe the output to a text file
-        std::string command = node_exe + " " + path + " > " + output_file_name;
-        result = system(command.c_str());
+	std::string command = node_exe + " " + path + " > " + output_file_name;
+	result = system(command.c_str());
+
+	// Get server from Server Environment
+	ServerEnvironment *m_env;
+	Server m_server = m_env->getGameDef();
 
 	// Populate ItemDefinition instance with output of the text file
 	ItemDefinition *def = new ItemDefinition();
@@ -63,7 +69,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
 	// Populate the ContentFeatures so block can be placed
 	ContentFeatures f = ContentFeatures();
 	f.name = def->name;
-	for(int i = 0; i < 6; i++) {
+	for (int i = 0; i < 6; i++) {
 		f.tiledef[i].name = "default_gator_blue.png";
 	}
 	f.is_ground_content = true;
@@ -77,16 +83,18 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
 
 	// Add new item to player's inventory
 	player->inventory.addItem("main", *item);
-        return retrieve_output_from_file(output_file_name);
+	m_server->addItem("main", *item);
+	return retrieve_output_from_file(output_file_name);
 }
 
 // Citation: www.cplusplus.com/doc/tutorial/files/
-// Below code to read from a file was influenced by the sample code provided by the above link
-// Grab the content of the text file and return it
-std::string retrieve_output_from_file(std::string filename) {
+// Below code to read from a file was influenced by the sample code provided by the above
+// link Grab the content of the text file and return it
+std::string retrieve_output_from_file(std::string filename)
+{
 	std::string content;
 	std::ifstream output(filename.c_str());
-	if(output.is_open()){
+	if (output.is_open()) {
 		std::getline(output, content);
 	}
 	output.close();
