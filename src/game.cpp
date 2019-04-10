@@ -2096,7 +2096,7 @@ bool Game::connectToServer(const std::string &playername,
 			playername.c_str(), password, *address,
 			*draw_control, texture_src, shader_src,
 			itemdef_manager, nodedef_manager, sound, eventmgr,
-			connect_address.isIPv6(), &flags);
+			connect_address.isIPv6(), &flags, server);
 
 	if (!client)
 		return false;

@@ -141,6 +141,94 @@ Client::Client(
 	m_script->setEnv(&m_env);
 }
 
+Client::Client(
+		IrrlichtDevice *device,
+		const char *playername,
+		const std::string &password,
+		const std::string &address_name,
+		MapDrawControl &control,
+		IWritableTextureSource *tsrc,
+		IWritableShaderSource *shsrc,
+		IWritableItemDefManager *itemdef,
+		IWritableNodeDefManager *nodedef,
+		ISoundManager *sound,
+		MtEventManager *event,
+		bool ipv6,
+		GameUIFlags *game_ui_flags,
+		Server *server
+):
+	m_packetcounter_timer(0.0),
+	m_connection_reinit_timer(0.1),
+	m_avg_rtt_timer(0.0),
+	m_playerpos_send_timer(0.0),
+	m_tsrc(tsrc),
+	m_shsrc(shsrc),
+	m_itemdef(itemdef),
+	m_nodedef(nodedef),
+	m_sound(sound),
+	m_event(event),
+	m_mesh_update_thread(this),
+	m_env(
+		new ClientMap(this, control,
+			device->getSceneManager()->getRootSceneNode(),
+			device->getSceneManager(), 666),
+		device->getSceneManager(),
+		tsrc, this, device
+	),
+	m_particle_manager(&m_env),
+	m_con(PROTOCOL_ID, 512, CONNECTION_TIMEOUT, ipv6, this),
+	m_address_name(address_name),
+	m_device(device),
+	m_camera(NULL),
+	m_minimap(NULL),
+	m_minimap_disabled_by_server(false),
+	m_server_ser_ver(SER_FMT_VER_INVALID),
+	m_proto_ver(0),
+	m_playeritem(0),
+	m_inventory_updated(false),
+	m_inventory_from_server(NULL),
+	m_inventory_from_server_age(0.0),
+	m_animation_time(0),
+	m_crack_level(-1),
+	m_crack_pos(0,0,0),
+	m_last_chat_message_sent(time(NULL)),
+	m_chat_message_allowance(5.0f),
+	m_map_seed(0),
+	m_password(password),
+	m_chosen_auth_mech(AUTH_MECHANISM_NONE),
+	m_auth_data(NULL),
+	m_access_denied(false),
+	m_access_denied_reconnect(false),
+	m_itemdef_received(false),
+	m_nodedef_received(false),
+	m_media_downloader(new ClientMediaDownloader()),
+	m_time_of_day_set(false),
+	m_last_time_of_day_f(-1),
+	m_time_of_day_update_timer(0),
+	m_recommended_send_interval(0.1),
+	m_removed_sounds_check_timer(0),
+	m_state(LC_Created),
+	m_localdb(NULL),
+	m_script(NULL),
+	m_mod_storage_save_timer(10.0f),
+	m_game_ui_flags(game_ui_flags),
+	m_shutdown(false)
+{
+	// Add local player
+	m_env.setLocalPlayer(new LocalPlayer(this, playername));
+
+	if (g_settings->getBool("enable_minimap")) {
+		m_minimap = new Minimap(device, this);
+	}
+	m_cache_save_interval = g_settings->getU16("server_map_save_interval");
+
+	m_modding_enabled = g_settings->getBool("enable_client_modding");
+	m_script = new ClientScripting(this);
+	m_env.setScript(m_script);
+	m_script->setEnv(&m_env);
+	this->server = server;
+}
+
 void Client::initMods()
 {
 	m_script->loadMod(getBuiltinLuaPath() + DIR_DELIM "init.lua", BUILTIN_MOD_NAME);
@@ -1549,7 +1637,10 @@ void Client::typeChatMessage(const std::wstring &message)
 
 	// If WASM mod
 	if(message[0] == L'-') {
-		std::string result = wasm_mod(wide_to_utf8(message));
+		//std::string result = wasm_mod(wide_to_utf8(message));
+		//std::wstring output = narrow_to_wide(result);
+		//pushToChatQueue(output);
+		std::string result = server->getBuiltinLuaPath();
 		std::wstring output = narrow_to_wide(result);
 		pushToChatQueue(output);
 		return;

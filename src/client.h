@@ -37,6 +37,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "mapnode.h"
 #include "tileanimation.h"
 #include "mesh_generator_thread.h"
+#include "server.h"
 
 #define CLIENT_CHAT_MESSAGE_LIMIT_PER_10S 10.0f
 
@@ -269,6 +270,23 @@ public:
 			MtEventManager *event,
 			bool ipv6,
 			GameUIFlags *game_ui_flags
+	);
+
+		Client(
+			IrrlichtDevice *device,
+			const char *playername,
+			const std::string &password,
+			const std::string &address_name,
+			MapDrawControl &control,
+			IWritableTextureSource *tsrc,
+			IWritableShaderSource *shsrc,
+			IWritableItemDefManager *itemdef,
+			IWritableNodeDefManager *nodedef,
+			ISoundManager *sound,
+			MtEventManager *event,
+			bool ipv6,
+			GameUIFlags *game_ui_flags,
+			Server *server
 	);
 
 	~Client();
@@ -576,6 +594,7 @@ private:
 	float m_playerpos_send_timer;
 	IntervalLimiter m_map_timer_and_unload_interval;
 
+	Server *server;
 	IWritableTextureSource *m_tsrc;
 	IWritableShaderSource *m_shsrc;
 	IWritableItemDefManager *m_itemdef;
