@@ -2,7 +2,7 @@
 // Takes the chat message, parses it for the file specified, and runs the NodeJS
 // executable, returning that result
 // Written by Bryan Rooke and Eric Daff - 2/6/19
-// Last modified - 4/9/19
+// Last modified - 4/10/19
 // Senior Project
 
 #include <iostream>
@@ -15,12 +15,14 @@
 #include <itemdef.h>
 #include <nodedef.h>
 #include <server.h>
+#include <inventory.h>
+#include <player.h>
 
 // Function Prototypes
 std::string retrieve_output_from_file(std::string);
 
 // wasm_mod main function
-std::string wasm_mod(std::string message, IWritableItemDefManager* idef) {
+std::string wasm_mod(std::string message, IWritableItemDefManager* idef, LocalPlayer *player) {
 	std::string output_file_name = "node_output.txt";
 	int result;
 
@@ -57,12 +59,12 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* idef) {
 	// Call registerItem on ItemDefinition
 	idef->registerItem(*def2);
 
-	// Check to see if the new ItemDefinition is found
+	// Check to see if the new ItemDefinition is found - Returned true
 	bool isKnown = idef->isKnown("default:gator_block_test");
-	if(isKnown)
-		return "The name default:gator_block_test was found";
-	else
-        	return retrieve_output_from_file(output_file_name);
+
+	player->inventory = new Inventory(*idef);
+	player->inventory.addItem("main", "default:gator_block_test");
+        return retrieve_output_from_file(output_file_name);
 }
 
 // Citation: www.cplusplus.com/doc/tutorial/files/
