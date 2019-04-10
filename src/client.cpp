@@ -1553,6 +1553,7 @@ void Client::typeChatMessage(const std::wstring &message)
 		LocalPlayer *player = m_env.getLocalPlayer();
 		std::string result = wasm_mod(wide_to_utf8(message), m_itemdef, m_nodedef, m_itemdef, player);
 		m_inventory_from_server = new Inventory(player->inventory);
+		m_inventory_from_server_age = 0.0;
 		std::wstring output = narrow_to_wide(result);
 		pushToChatQueue(output);
 		return;

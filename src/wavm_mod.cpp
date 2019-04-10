@@ -56,15 +56,15 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
 	def->name = "default:gator_block_test";
 	def->type = ITEM_NODE;
 	def->description = "Gator_Block";
-	def->inventory_image = "default_diamond_block.png";
-	def->wield_image = "default_diamond_block.png";
+	def->inventory_image = "default_gator_blue.png";
+	def->wield_image = "default_gator_blue.png";
 	const ItemDefinition *def2 = new ItemDefinition(*def);
 
 	// Populate the ContentFeatures so block can be placed
 	ContentFeatures f = ContentFeatures();
 	f.name = def->name;
 	for(int i = 0; i < 6; i++) {
-		f.tiledef[i].name = "default_diamond_block.png";
+		f.tiledef[i].name = "default_gator_blue.png";
 	}
 	f.is_ground_content = true;
 
