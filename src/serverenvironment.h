@@ -65,7 +65,7 @@ public:
 	// This is called usually at interval for 1/chance of the nodes
 	virtual void trigger(ServerEnvironment *env, v3s16 p, MapNode n){};
 	virtual void trigger(ServerEnvironment *env, v3s16 p, MapNode n,
-		u32 active_object_count, u32 active_object_count_wider){};
+			u32 active_object_count, u32 active_object_count_wider){};
 };
 
 struct ABMWithState
@@ -89,7 +89,8 @@ struct LoadingBlockModifierDef
 
 struct LBMContentMapping
 {
-	typedef std::map<content_t, std::vector<LoadingBlockModifierDef *> > container_map;
+	typedef std::map<content_t, std::vector<LoadingBlockModifierDef *> >
+			container_map;
 	container_map map;
 
 	std::vector<LoadingBlockModifierDef *> lbm_list;
@@ -105,17 +106,14 @@ struct LBMContentMapping
 class LBMManager
 {
 public:
-	LBMManager():
-		m_query_mode(false)
-	{}
+	LBMManager() : m_query_mode(false) {}
 
 	~LBMManager();
 
 	// Don't call this after loadIntroductionTimes() ran.
 	void addLBMDef(LoadingBlockModifierDef *lbm_def);
 
-	void loadIntroductionTimes(const std::string &times,
-		IGameDef *gamedef, u32 now);
+	void loadIntroductionTimes(const std::string &times, IGameDef *gamedef, u32 now);
 
 	// Don't call this before loadIntroductionTimes() ran.
 	std::string createIntroductionTimesString();
@@ -144,7 +142,9 @@ private:
 	// after the given time. This is guaranteed to return
 	// valid values for everything
 	lbm_lookup_map::const_iterator getLBMsIntroducedAfter(u32 time)
-	{ return m_lbm_lookup.lower_bound(time); }
+	{
+		return m_lbm_lookup.lower_bound(time);
+	}
 };
 
 /*
@@ -154,18 +154,12 @@ private:
 class ActiveBlockList
 {
 public:
-	void update(std::vector<v3s16> &active_positions,
-		s16 radius,
-		std::set<v3s16> &blocks_removed,
-		std::set<v3s16> &blocks_added);
+	void update(std::vector<v3s16> &active_positions, s16 radius,
+			std::set<v3s16> &blocks_removed, std::set<v3s16> &blocks_added);
 
-	bool contains(v3s16 p){
-		return (m_list.find(p) != m_list.end());
-	}
+	bool contains(v3s16 p) { return (m_list.find(p) != m_list.end()); }
 
-	void clear(){
-		m_list.clear();
-	}
+	void clear() { m_list.clear(); }
 
 	std::set<v3s16> m_list;
 	std::set<v3s16> m_forceloaded_list;
@@ -176,13 +170,14 @@ private:
 /*
 	Operation mode for ServerEnvironment::clearObjects()
 */
-enum ClearObjectsMode {
+enum ClearObjectsMode
+{
 	// Load and go through every mapblock, clearing objects
-		CLEAR_OBJECTS_MODE_FULL,
+	CLEAR_OBJECTS_MODE_FULL,
 
 	// Clear objects immediately in loaded mapblocks;
 	// clear objects in unloaded mapblocks only when the mapblocks are next activated.
-		CLEAR_OBJECTS_MODE_QUICK,
+	CLEAR_OBJECTS_MODE_QUICK,
 };
 
 /*
@@ -191,36 +186,33 @@ enum ClearObjectsMode {
 	This is not thread-safe. Server uses an environment mutex.
 */
 
-typedef UNORDERED_MAP<u16, ServerActiveObject *> ActiveObjectMap;
+typedef UNORDERED_MAP<u16, ServrActiveObject *> ActiveObjectMap;
 
 class ServerEnvironment : public Environment
 {
 public:
-	ServerEnvironment(ServerMap *map, ServerScripting *scriptIface,
-		Server *server, const std::string &path_world);
+	ServerEnvironment(ServerMap *map, ServerScripting *scriptIface, Server *server,
+			const std::string &path_world);
 	~ServerEnvironment();
 
-	Map & getMap();
+	Map &getMap();
 
-	ServerMap & getServerMap();
+	ServerMap &getServerMap();
 
-	//TODO find way to remove this fct!
-	ServerScripting* getScriptIface()
-	{ return m_script; }
+	// TODO find way to remove this fct!
+	ServerScripting *getScriptIface() { return m_script; }
 
-	Server *getGameDef()
-	{ return m_server; }
+	Server *getGameDef() { return m_server; }
 
-	float getSendRecommendedInterval()
-	{ return m_recommended_send_interval; }
+	float getSendRecommendedInterval() { return m_recommended_send_interval; }
 
-	void kickAllPlayers(AccessDeniedCode reason,
-		const std::string &str_reason, bool reconnect);
+	void kickAllPlayers(AccessDeniedCode reason, const std::string &str_reason,
+			bool reconnect);
 	// Save players
 	void saveLoadedPlayers();
 	void savePlayer(RemotePlayer *player);
 	PlayerSAO *loadPlayer(RemotePlayer *player, bool *new_player, u16 peer_id,
-		bool is_singleplayer);
+			bool is_singleplayer);
 	void addPlayer(RemotePlayer *player);
 	void removePlayer(RemotePlayer *player);
 	bool removePlayerFromDatabase(const std::string &name);
@@ -243,7 +235,7 @@ public:
 		-------------------------------------------
 	*/
 
-	ServerActiveObject* getActiveObject(u16 id);
+	ServerActiveObject *getActiveObject(u16 id);
 
 	/*
 		Add an active object to the environment.
@@ -262,25 +254,21 @@ public:
 		Return value: true if succeeded, false if failed.
 		(note:  not used, pending removal from engine)
 	*/
-	//bool addActiveObjectAsStatic(ServerActiveObject *object);
+	// bool addActiveObjectAsStatic(ServerActiveObject *object);
 
 	/*
 		Find out what new objects have been added to
 		inside a radius around a position
 	*/
-	void getAddedActiveObjects(PlayerSAO *playersao, s16 radius,
-		s16 player_radius,
-		std::set<u16> &current_objects,
-		std::queue<u16> &added_objects);
+	void getAddedActiveObjects(PlayerSAO *playersao, s16 radius, s16 player_radius,
+			std::set<u16> &current_objects, std::queue<u16> &added_objects);
 
 	/*
 		Find out what new objects have been removed from
 		inside a radius around a position
 	*/
-	void getRemovedActiveObjects(PlayerSAO *playersao, s16 radius,
-		s16 player_radius,
-		std::set<u16> &current_objects,
-		std::queue<u16> &removed_objects);
+	void getRemovedActiveObjects(PlayerSAO *playersao, s16 radius, s16 player_radius,
+			std::set<u16> &current_objects, std::queue<u16> &removed_objects);
 
 	/*
 		Get the next message emitted by some active object.
@@ -292,7 +280,7 @@ public:
 		Activate objects and dynamically modify for the dtime determined
 		from timestamp and additional_dtime
 	*/
-	void activateBlock(MapBlock *block, u32 additional_dtime=0);
+	void activateBlock(MapBlock *block, u32 additional_dtime = 0);
 
 	/*
 		{Active,Loading}BlockModifiers
@@ -321,28 +309,31 @@ public:
 	// This makes stuff happen
 	void step(f32 dtime);
 
-	//check if there's a line of sight between two positions
-	bool line_of_sight(v3f pos1, v3f pos2, float stepsize=1.0, v3s16 *p=NULL);
+	// check if there's a line of sight between two positions
+	bool line_of_sight(v3f pos1, v3f pos2, float stepsize = 1.0, v3s16 *p = NULL);
 
 	u32 getGameTime() const { return m_game_time; }
 
 	void reportMaxLagEstimate(float f) { m_max_lag_estimate = f; }
 	float getMaxLagEstimate() { return m_max_lag_estimate; }
 
-	std::set<v3s16>* getForceloadedBlocks() { return &m_active_blocks.m_forceloaded_list; };
+	std::set<v3s16> *getForceloadedBlocks()
+	{
+		return &m_active_blocks.m_forceloaded_list;
+	};
 
 	// Sets the static object status all the active objects in the specified block
 	// This is only really needed for deleting blocks from the map
-	void setStaticForActiveObjectsInBlock(v3s16 blockpos,
-		bool static_exists, v3s16 static_block=v3s16(0,0,0));
+	void setStaticForActiveObjectsInBlock(v3s16 blockpos, bool static_exists,
+			v3s16 static_block = v3s16(0, 0, 0));
 
 	RemotePlayer *getPlayer(const u16 peer_id);
-	RemotePlayer *getPlayer(const char* name);
+	RemotePlayer *getPlayer(const char *name);
 
-	static bool migratePlayersDatabase(const GameParams &game_params,
-			const Settings &cmd_args);
+	static bool migratePlayersDatabase(
+			const GameParams &game_params, const Settings &cmd_args);
+
 private:
-
 	static PlayerDatabase *openPlayerDatabase(const std::string &name,
 			const std::string &savedir, const Settings &conf);
 	/*
@@ -388,8 +379,8 @@ private:
 	*/
 	void deleteStaticFromBlock(
 			ServerActiveObject *obj, u16 id, u32 mod_reason, bool no_emerge);
-	bool saveStaticToBlock(v3s16 blockpos, u16 store_id,
-			ServerActiveObject *obj, const StaticObject &s_obj, u32 mod_reason);
+	bool saveStaticToBlock(v3s16 blockpos, u16 store_id, ServerActiveObject *obj,
+			const StaticObject &s_obj, u32 mod_reason);
 
 	/*
 		Member variables
@@ -398,7 +389,7 @@ private:
 	// The map
 	ServerMap *m_map;
 	// Lua state
-	ServerScripting* m_script;
+	ServerScripting *m_script;
 	// Server definition
 	Server *m_server;
 	// World path
@@ -434,7 +425,7 @@ private:
 	float m_max_lag_estimate;
 
 	// peer_ids in here should be unique, except that there may be many 0s
-	std::vector<RemotePlayer*> m_players;
+	std::vector<RemotePlayer *> m_players;
 
 	PlayerDatabase *m_player_database;
 
