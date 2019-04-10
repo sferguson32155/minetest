@@ -47,7 +47,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* idef) {
 
 	// Populate ItemDefinition instance with output of the text file
 	ItemDefinition *def = new ItemDefinition();
-	def->name = "default:gator_block";
+	def->name = "default:gator_block_test";
 	def->type = ITEM_NODE;
 	def->description = "Gator_Block";
 	def->inventory_image = "default_diamond_block.png";
