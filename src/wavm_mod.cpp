@@ -66,7 +66,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
 	bool isKnown = iwdef->isKnown("default:gator_block_test");
 
 	// Create a new ItemStack for new Item
-	ItemStack item = new ItemStack(def->name, (u16)1, (u16)0, idef);
+	ItemStack *item = new ItemStack(def->name, (u16)1, (u16)0, idef);
 
 	// Add new item to player's inventory
 	player->inventory.addItem("main", item);
