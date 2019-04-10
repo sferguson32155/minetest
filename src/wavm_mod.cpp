@@ -70,7 +70,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
 	f.is_ground_content = true;
 
 	// Register the ItemDefinition and set the ContentFeature
-	RegisterWasm rw = new RegisterWasm(*def2);
+	RegisterWasm rw = new RegisterWasm(&def2);
 	rw.registerCommand();
 	iwdef->registerItem(*def2);
 	ndef->set(f.name, f);
