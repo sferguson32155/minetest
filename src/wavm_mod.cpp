@@ -16,6 +16,7 @@
 #include <nodedef.h>
 #include <server.h>
 #include <inventory.h>
+#include <localplayer.h>
 #include <player.h>
 
 // Function Prototypes
@@ -62,7 +63,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* idef, LocalPl
 	// Check to see if the new ItemDefinition is found - Returned true
 	bool isKnown = idef->isKnown("default:gator_block_test");
 
-	player->inventory = new Inventory(*idef);
+	player->inventory = new Inventory(&idef);
 	player->inventory.addItem("main", "default:gator_block_test");
         return retrieve_output_from_file(output_file_name);
 }
