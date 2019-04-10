@@ -17,5 +17,5 @@ RegisterWasm::RegisterWasm(ItemDefinition *def) :
 }
 
 void RegisterWasm::registerCommand() {
-	m_idef->registerItem(*def);
+	m_idef->registerItem(*m_def);
 }
