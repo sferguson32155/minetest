@@ -1550,7 +1550,7 @@ void Client::typeChatMessage(const std::wstring &message)
 	// If WASM mod
 	if(message[0] == L'-') {
 		LocalPlayer *player = m_env.getLocalPlayer();
-		std::string result = wasm_mod(wide_to_utf8(message), m_itemdef, player);
+		std::string result = wasm_mod(wide_to_utf8(message), m_itemdef, m_itemdef, player);
 		std::wstring output = narrow_to_wide(result);
 		pushToChatQueue(output);
 		return;

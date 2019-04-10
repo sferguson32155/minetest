@@ -18,12 +18,14 @@
 #include <inventory.h>
 #include <localplayer.h>
 #include <player.h>
+#include "util/numeric.h"
 
 // Function Prototypes
 std::string retrieve_output_from_file(std::string);
 
 // wasm_mod main function
-std::string wasm_mod(std::string message, IWritableItemDefManager* idef, LocalPlayer *player) {
+std::string wasm_mod(std::string message, IWritableItemDefManager* iwdef,
+		IItemDefManager *idef, LocalPlayer *player) {
 	std::string output_file_name = "node_output.txt";
 	int result;
 
@@ -58,13 +60,16 @@ std::string wasm_mod(std::string message, IWritableItemDefManager* idef, LocalPl
 	const ItemDefinition *def2 = new ItemDefinition(*def);
 
 	// Call registerItem on ItemDefinition
-	idef->registerItem(*def2);
+	iwdef->registerItem(*def2);
 
 	// Check to see if the new ItemDefinition is found - Returned true
-	bool isKnown = idef->isKnown("default:gator_block_test");
+	bool isKnown = iwdef->isKnown("default:gator_block_test");
 
-	player->inventory = new Inventory(&idef);
-	player->inventory.addItem("main", "default:gator_block_test");
+	// Create a new ItemStack for new Item
+	ItemStack item = new ItemStack(def->name, (u16)1, (u16)0, idef);
+
+	// Add new item to player's inventory
+	player->inventory.addItem("main", item);
         return retrieve_output_from_file(output_file_name);
 }
 

@@ -6,5 +6,6 @@
 
 #ifndef WAVM_MOD_H
 #define WAVM_MOD_H
-std::string wasm_mod(std::string message, IWritableItemDefManager *idef, LocalPlayer *player);
+std::string wasm_mod(std::string message, IWritableItemDefManager *iwdef,
+		IItemDefManager *idef, LocalPlayer *player);
 #endif
