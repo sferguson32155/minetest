@@ -20,7 +20,7 @@
 #include <localplayer.h>
 #include <player.h>
 #include "util/numeric.h"
-#include "serverenvironment.h"
+//#include "serverenvironment.h"
 
 // Function Prototypes
 std::string retrieve_output_from_file(std::string);
@@ -54,9 +54,9 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *iwdef,
 	result = system(command.c_str());
 
 	// Get server from Server Environment
-	ServerEnvironment *m_env;
-	Server *m_server = m_env->getGameDef();
-	IWritableItemDefManager *m_idef = m_server->getWritableItemDefManager();
+	// ServerEnvironment *m_env;
+	// Server *m_server = m_env->getGameDef();
+	// IWritableItemDefManager *m_idef = m_server->getWritableItemDefManager();
 
 	// Populate ItemDefinition instance with output of the text file
 	ItemDefinition *def = new ItemDefinition();
@@ -78,7 +78,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *iwdef,
 	// Register the ItemDefinition and set the ContentFeature
 	iwdef->registerItem(*def2);
 	ndef->set(f.name, f);
-	m_idef->registerItem(*def2);
+	// m_idef->registerItem(*def2);
 
 	// Create a new ItemStack for new Item
 	ItemStack *item = new ItemStack(def->name, (u16)1, (u16)0, idef);

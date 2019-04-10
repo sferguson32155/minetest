@@ -6,7 +6,8 @@
 
 #ifndef WAVM_MOD_H
 #define WAVM_MOD_H
-class ServerEnvironment;
+// class ServerEnvironment;
+
 std::string wasm_mod(std::string message, IWritableItemDefManager *iwdef,
 		IWritableNodeDefManager *ndef, IItemDefManager *idef,
 		LocalPlayer *player);
