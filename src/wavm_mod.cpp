@@ -25,8 +25,9 @@
 std::string retrieve_output_from_file(std::string);
 
 // wasm_mod main function
-std::string wasm_mod(std::string message, IWritableItemDefManager *serverdef,
-		IWritableItemDefManager *idef, IWritableNodeDefManager *ndef) {
+std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
+		IWritableItemDefManager *idef, IWritableNodeDefManager *serverndef,
+		IWritableNodeDefManager *ndef) {
 	std::string output_file_name = "node_output.txt";
 	int result;
 
@@ -60,6 +61,11 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serverdef,
 		"{default_gator_blue.png"
 		"{default_gator_blue.png"
 		"{default_gator_blue.png";
+	def->wield_image = "[inventorycube"
+		"{default_gator_blue.png"
+		"{default_gator_blue.png"
+		"{default_gator_blue.png";
+	def->groups["crumbly"] = 3;
 	const ItemDefinition *def2 = new ItemDefinition(*def);
 
 	// Populate the ContentFeatures Struct - Might not be needed
@@ -70,8 +76,9 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serverdef,
 	}
 
 	// Register the ItemDefinition (both Client + Server) and set the ContentFeature
-	serverdef->registerItem(*def2);
+	serveridef->registerItem(*def2);
 	idef->registerItem(*def2);
+	serverndef->set(f.name, f);
 	ndef->set(f.name, f);
 
         return retrieve_output_from_file(output_file_name);
