@@ -64,6 +64,9 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 	def->wield_image = "[inventorycube"
 		"{default_gator_blue.png"
 		"{default_gator_blue.png"
+		"{default_gator_blue.png"
+		"{default_gator_blue.png"
+		"{default_gator_blue.png"
 		"{default_gator_blue.png";
 	def->groups["crumbly"] = 3;
 	const ItemDefinition *def2 = new ItemDefinition(*def);
