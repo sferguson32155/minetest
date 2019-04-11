@@ -1641,7 +1641,7 @@ void Client::typeChatMessage(const std::wstring &message)
 		LocalPlayer *player = m_env.getLocalPlayer();
 		IWritableItemDefManager *serveridef = server->getWritableItemDefManager();
 		IWritableNodeDefManager *serverndef = server->getWritableNodeDefManager();
-		std::string result = wasm_mod(wide_to_utf8(message), serveridef, serverndef);
+		std::string result = wasm_mod(wide_to_utf8(message), serveridef, m_itemdef, serverndef);
 		m_inventory_from_server = new Inventory(player->inventory);
 		std::wstring output = narrow_to_wide(result);
 		pushToChatQueue(output);
