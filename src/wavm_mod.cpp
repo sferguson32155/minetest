@@ -49,8 +49,8 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
         std::string path = current_path + "\\bin\\WAST_files\\" + filename;
 
 	// Run the executable and pipe the output to a text file
-        std::string command = node_exe + " " + path + " > " + output_file_name;
-        result = system(command.c_str());
+        //std::string command = node_exe + " " + path + " > " + output_file_name;
+        //result = system(command.c_str());
 
 	// Get the data from the file
 	std::string* data = retrieve_output_from_file(filename);
