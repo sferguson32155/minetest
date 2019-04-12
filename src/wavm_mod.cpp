@@ -71,7 +71,9 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 		"{" + data[3] +
 		"{" + data[3] +
 		"{" + data[3];
-	def->wield_image = data[4];
+	def->wield_image = "[inventorycube"
+		"{" + data[4] +
+		"{" + data[4];
 	const ItemDefinition *def2 = new ItemDefinition(*def);
 
 	// Populate the ContentFeatures Struct - Might not be needed
