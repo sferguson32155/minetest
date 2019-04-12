@@ -22,7 +22,7 @@
 #include "util/numeric.h"
 
 // Function Prototypes
-std::string retrieve_output_from_file(std::string);
+std::string* retrieve_output_from_file(std::string);
 
 // wasm_mod main function
 std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
@@ -52,22 +52,33 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
         std::string command = node_exe + " " + path + " > " + output_file_name;
         result = system(command.c_str());
 
+	// Get the data from the file
+	std::string* data = retrieve_output_from_file(filename);
+
+	if(data[0].compare("Empty") == 0)
+		return "New Item Not Added";
+
 	// Populate ItemDefinition instance with output of the text file
 	ItemDefinition *def = new ItemDefinition();
-	def->name = "default:gator_block_test";
-	def->type = ITEM_NODE;
-	def->description = "Gator_Block";
+	def->name = data[0];
+	if(data[2].compare("ITEM_NODE") == 0)
+		def->type = ITEM_NODE;
+	else if(data[2].compare("ITEM_CRAFT") == 0)
+		def->type = ITEM_CRAFT;
+	else if (data[2].compare("ITEM_TOOL") == 0)
+		def->type = ITEM_TOOL;
+	def->description = data[2];
 	def->inventory_image = "[inventorycube"
-		"{default_gator_blue.png"
-		"{default_gator_blue.png"
-		"{default_gator_blue.png";
+		"{" + data[3]
+		"{" + data[3]
+		"{" + data[3];
 	def->wield_image = "[inventorycube"
-		"{default_gator_blue.png"
-		"{default_gator_blue.png"
-		"{default_gator_blue.png"
-		"{default_gator_blue.png"
-		"{default_gator_blue.png"
-		"{default_gator_blue.png";
+		"{" + data[4]
+		"{" + data[4]
+		"{" + data[4]
+		"{" + data[4]
+		"{" + data[4]
+		"{" + data[4];
 	def->groups["crumbly"] = 3;
 	const ItemDefinition *def2 = new ItemDefinition(*def);
 
@@ -75,7 +86,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 	ContentFeatures f = ContentFeatures();
 	f.name = def->name;
 	for(int i = 0; i < 6; i++) {
-		f.tiledef[i].name = "default_gator_blue.png";
+		f.tiledef[i].name = data[3];
 	}
 
 	// Register the ItemDefinition (both Client + Server) and set the ContentFeature
@@ -84,19 +95,35 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 	serverndef->set(f.name, f);
 	ndef->set(f.name, f);
 
-        return retrieve_output_from_file(output_file_name);
+        return "New Block Added";
 }
 
 // Citation: www.cplusplus.com/doc/tutorial/files/
 // Below code to read from a file was influenced by the sample code provided by the above link
 // Grab the content of the text file and return it
-std::string retrieve_output_from_file(std::string filename) {
-	std::string content;
-	std::ifstream output(filename.c_str());
-	if(output.is_open()){
-		std::getline(output, content);
-	}
-	output.close();
+std::string* retrieve_output_from_file(std::string filename) {
+	std::string data[5];
+	std::string temp;
+	int i = 0;
 
-	return content;
+	// Read in the text file, removing undefined values
+	std::ifstream output(filename.c_str());
+	while(true) {
+                if(output.eof()) {
+                        break;
+                }
+
+                std::getline(output, temp);
+                if(temp.compare("undefined") != 0 && i < 5) {
+                        data[i] = temp;
+                        i++;
+                }
+        }
+        output.close();
+
+	// If an empty file was provided, set the first value to Empty
+	if(i == 0)
+		data[0] = "Empty";
+
+	return data;
 }
