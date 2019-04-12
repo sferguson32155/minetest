@@ -38,7 +38,6 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 	char path_buffer[MAX_PATH];
 	GetCurrentDirectory(MAX_PATH, path_buffer);
 
-	//result = system(path_command.c_str());
 	std::string current_path = path_buffer;
 	current_path = current_path.substr(0, current_path.size()-3);
 
@@ -72,14 +71,6 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 		"{" + data[3] +
 		"{" + data[3] +
 		"{" + data[3];
-	def->wield_image = "[inventorycube"
-		"{" + data[4] +
-		"{" + data[4] +
-		"{" + data[4] +
-		"{" + data[4] +
-		"{" + data[4] +
-		"{" + data[4];
-	def->groups["crumbly"] = 3;
 	const ItemDefinition *def2 = new ItemDefinition(*def);
 
 	// Populate the ContentFeatures Struct - Might not be needed
@@ -102,7 +93,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 // Below code to read from a file was influenced by the sample code provided by the above link
 // Grab the content of the text file and return it
 std::string* retrieve_output_from_file(std::string filename) {
-	std::string* data = new std::string[5];
+	std::string* data = new std::string[4];
 	std::string temp;
 	int i = 0;
 
@@ -114,7 +105,7 @@ std::string* retrieve_output_from_file(std::string filename) {
                 }
 
                 std::getline(output, temp);
-                if(temp.compare("undefined") != 0 && i < 5) {
+                if(temp.compare("undefined") != 0 && i < 4) {
                         data[i] = temp;
                         i++;
                 }
