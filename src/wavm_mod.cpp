@@ -69,15 +69,15 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 		def->type = ITEM_TOOL;
 	def->description = data[2];
 	def->inventory_image = "[inventorycube"
-		"{" + data[3]
-		"{" + data[3]
+		"{" + data[3] +
+		"{" + data[3] +
 		"{" + data[3];
 	def->wield_image = "[inventorycube"
-		"{" + data[4]
-		"{" + data[4]
-		"{" + data[4]
-		"{" + data[4]
-		"{" + data[4]
+		"{" + data[4] +
+		"{" + data[4] +
+		"{" + data[4] +
+		"{" + data[4] +
+		"{" + data[4] +
 		"{" + data[4];
 	def->groups["crumbly"] = 3;
 	const ItemDefinition *def2 = new ItemDefinition(*def);
@@ -102,7 +102,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 // Below code to read from a file was influenced by the sample code provided by the above link
 // Grab the content of the text file and return it
 std::string* retrieve_output_from_file(std::string filename) {
-	std::string data[5];
+	std::string* data = new std::string[5];
 	std::string temp;
 	int i = 0;
 
