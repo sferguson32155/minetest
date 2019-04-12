@@ -54,12 +54,13 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 
 	// Get the data from the file
 	std::string* data = retrieve_output_from_file(filename);
+	return "We made it";
 
-	if(data[0].compare("Empty") == 0)
-		return "New Item Not Added";
+	//if(data[0].compare("Empty") == 0)
+	//	return "New Item Not Added";
 
 	// Populate ItemDefinition instance with output of the text file
-	ItemDefinition *def = new ItemDefinition();
+	/*ItemDefinition *def = new ItemDefinition();
 	def->name = data[0];
 	if(data[1].compare("ITEM_NODE") == 0)
 		def->type = ITEM_NODE;
@@ -94,8 +95,8 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 	idef->registerItem(*def2);
 	serverndef->set(f.name, f);
 	ndef->set(f.name, f);
-
-        return "New Block Added";
+*/
+        //return "New Block Added";
 	}
 
 // Citation: www.cplusplus.com/doc/tutorial/files/
