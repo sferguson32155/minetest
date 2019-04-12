@@ -71,6 +71,10 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 		"{" + data[3] +
 		"{" + data[3] +
 		"{" + data[3];
+	def->wield_image = "[inventorycube"
+		"{" + data[4] +
+		"{" + data[4] +
+		"{" + data[4];
 	const ItemDefinition *def2 = new ItemDefinition(*def);
 
 	// Populate the ContentFeatures Struct - Might not be needed
@@ -93,7 +97,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 // Below code to read from a file was influenced by the sample code provided by the above link
 // Grab the content of the text file and return it
 std::string* retrieve_output_from_file(std::string filename) {
-	std::string* data = new std::string[4];
+	std::string* data = new std::string[5];
 	std::string temp;
 	int i = 0;
 
@@ -105,7 +109,7 @@ std::string* retrieve_output_from_file(std::string filename) {
                 }
 
                 std::getline(output, temp);
-                if(temp.compare("undefined") != 0 && i < 4) {
+                if(temp.compare("undefined") != 0 && i < 5) {
                         data[i] = temp;
                         i++;
                 }
