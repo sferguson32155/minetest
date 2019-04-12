@@ -109,7 +109,7 @@ std::string* retrieve_output_from_file(std::string filename) {
 	// Read in the text file, removing undefined values
 	std::ifstream output(filename.c_str());
 	while(true) {
-                if(output.eof()) {
+                if(i == 5) {
                         break;
                 }
 
