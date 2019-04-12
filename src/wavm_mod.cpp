@@ -116,7 +116,7 @@ std::string* retrieve_output_from_file(std::string filename) {
                 }
 
                 std::getline(output, temp);
-		std::command = "echo " + temp + " > temp_output.txt";
+		std::string command = "echo " + temp + " > temp_output.txt";
 		system(command.c_str());
                 if(temp.compare("undefined") != 0 && i < 5) {
                         data[i] = temp;
