@@ -49,13 +49,12 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
         std::string path = current_path + "\\bin\\WAST_files\\" + filename;
 
 	// Run the executable and pipe the output to a text file
-        //std::string command = node_exe + " " + path + " > " + output_file_name;
-        //result = system(command.c_str());
+        std::string command = node_exe + " " + path + " > " + output_file_name;
+        result = system(command.c_str());
 
 	// Get the data from the file
-	std::string* data = retrieve_output_from_file(filename);
-	return data[0];
-/*
+	std::string* data = retrieve_output_from_file(output_file_name);
+
 	if(data[0].compare("Empty") == 0)
 		return "New Item Not Added";
 
@@ -97,7 +96,6 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 	ndef->set(f.name, f);
 
         return "New Block Added";
-*/
 	}
 
 // Citation: www.cplusplus.com/doc/tutorial/files/
@@ -111,13 +109,11 @@ std::string* retrieve_output_from_file(std::string filename) {
 	// Read in the text file, removing undefined values
 	std::ifstream output(filename.c_str());
 	while(true) {
-                if(i == 5) {
+                if(output.eof()) {
                         break;
                 }
 
                 std::getline(output, temp);
-		std::string command = "echo " + temp + " > temp_output.txt";
-		system(command.c_str());
                 if(temp.compare("undefined") != 0 && i < 5) {
                         data[i] = temp;
                         i++;
