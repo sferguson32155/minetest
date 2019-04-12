@@ -61,11 +61,11 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 	// Populate ItemDefinition instance with output of the text file
 	ItemDefinition *def = new ItemDefinition();
 	def->name = data[0];
-	if(data[2].compare("ITEM_NODE") == 0)
+	if(data[1].compare("ITEM_NODE") == 0)
 		def->type = ITEM_NODE;
-	else if(data[2].compare("ITEM_CRAFT") == 0)
+	else if(data[1].compare("ITEM_CRAFT") == 0)
 		def->type = ITEM_CRAFT;
-	else if (data[2].compare("ITEM_TOOL") == 0)
+	else if (data[1].compare("ITEM_TOOL") == 0)
 		def->type = ITEM_TOOL;
 	def->description = data[2];
 	def->inventory_image = "[inventorycube"
@@ -96,7 +96,7 @@ std::string wasm_mod(std::string message, IWritableItemDefManager *serveridef,
 	ndef->set(f.name, f);
 
         return "New Block Added";
-}
+	}
 
 // Citation: www.cplusplus.com/doc/tutorial/files/
 // Below code to read from a file was influenced by the sample code provided by the above link
