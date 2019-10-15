@@ -1,4 +1,4 @@
-﻿/*
+/*
 Minetest
 Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
 
@@ -16,20 +16,6 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-
-
-
-// inline javascript setup
-// auto src = u"function square(a) {return a*a}; function double(a) {return a*2};
-// square(double(3))";
-// or
-// auto src = u"'date: ' + new Date()";
-// auto length = std::char_traits<char16_t>::length(src);
-//
-// JS::SourceText<char16_t> srcBuf;
-// srcBuf.init(cx, src, length, JS::SourceOwnership::Borrowed);
-//
-// bool ok = JS::Evaluate(cx, opts, srcBuf, &rval);
 
 
 
@@ -94,13 +80,10 @@ typedef std::map<std::string, ValueSpec> OptionList;
 
 
 
-
 static JSClassOps global_ops = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 		nullptr, nullptr, nullptr, nullptr, JS_GlobalObjectTraceHook};
-
 /* The class of the global object. */
 static JSClass global_class = {"global", JSCLASS_GLOBAL_FLAGS, &global_ops};
-
 
 
 
@@ -289,14 +272,11 @@ int main(int argc, char *argv[])
 static int sm_hello_world()
 {
 	JS_Init();
-
 	JSContext *cx = JS_NewContext(8L * 1024 * 1024);
 	if (!cx)
 		return 1;
-
 	if (!JS::InitSelfHostedCode(cx))
 		return 1;
-
 	{
 		JS::RealmOptions options;
 		JS::RootedObject global(
@@ -304,34 +284,29 @@ static int sm_hello_world()
 						    JS::FireOnNewGlobalHook, options));
 		if (!global)
 			return 1;
-
 		JS::RootedValue rval(cx);
-
 		{
+			// "'hello'+'world, it is '+new Date()"
 			JSAutoRealm ar(cx, global);
-
-			if (!JS::InitRealmStandardClasses(cx))
-				return 1;
-
+			const char *srcRaw = "'hello'+'world'"; //, it is '+new Date()";
+			auto src = u"'hello'+'world'";		//, it is '+new Date()";
+			JS::SourceText<char16_t> srcBuf;
+			srcBuf.init(cx, src, strlen(srcRaw),
+					JS::SourceOwnership::Borrowed);
 			const char *filename = "noname";
 			int lineno = 1;
 			JS::CompileOptions opts(cx);
 			opts.setFileAndLine(filename, lineno);
-
-			bool ok = JS::EvaluateUtf8Path(cx, opts, "src/wasmtest.js", &rval);
+			bool ok = JS::Evaluate(cx, opts, srcBuf, &rval);
 			if (!ok)
 				return 1;
 		}
-		if (rval.isString()) {
-			JSString *str = rval.toString();
-			size_t size = JS_GetStringLength(str);
-			char *buffer = (char *)malloc(size);
-			if (JS_EncodeStringToBuffer(cx, str, buffer, size)) {
-				buffer[size] = '\0';
-				printf("%s\n", buffer);
-			}
-		} else {
-			printf("%d\n", rval.toInt32());
+		JSString *str = rval.toString();
+		size_t size = JS_GetStringLength(str);
+		char *buffer = (char *)malloc(size);
+		if (JS_EncodeStringToBuffer(cx, str, buffer, size)) {
+			buffer[size] = '\0';
+			printf("%s\n", buffer);
 		}
 	}
 	JS_DestroyContext(cx);
