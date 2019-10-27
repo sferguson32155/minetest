@@ -40,6 +40,7 @@ struct ModSpec
 	std::string path;
 	std::string desc;
 	int release = 0;
+	bool wasm = false;
 
 	// if normal mod:
 	std::unordered_set<std::string> depends;

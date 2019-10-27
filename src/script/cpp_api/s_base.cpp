@@ -16,6 +16,7 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+#include "WasmLoader.h"
 
 #include "cpp_api/s_base.h"
 #include "cpp_api/s_internal.h"
@@ -42,6 +43,7 @@ extern "C" {
 
 #include <cstdio>
 #include <cstdarg>
+#include <vector>
 #include "script/common/c_content.h"
 #include "content_sao.h"
 #include <sstream>
@@ -160,12 +162,51 @@ void ScriptApiBase::clientOpenLibs(lua_State *L)
 	}
 }
 
-void ScriptApiBase::loadMod(const std::string &script_path,
-		const std::string &mod_name)
+void ScriptApiBase::loadModWasm(std::string mod_path, const std::string &mod_name)
+{
+	ModNameStorer mod_name_storer(getStack(), mod_name);
+
+	loadScriptWasm(mod_path);
+}
+
+void ScriptApiBase::loadMod(const std::string &script_path, const std::string &mod_name)
 {
 	ModNameStorer mod_name_storer(getStack(), mod_name);
 
 	loadScript(script_path);
+}
+
+void ScriptApiBase::loadScriptWasm(std::string mod_path)
+{
+	verbosestream << "Loading and running wasm mod script from " << mod_path << std::endl;
+
+	lua_State *L = getStack();
+
+	int error_handler = PUSH_ERROR_HANDLER(L);
+
+	std::string lua_path = mod_path + DIR_DELIM + "init.lua";
+	std::string js_path = mod_path + DIR_DELIM + "mod.js";
+	// loading mod name, description, texture, and crafting material (all specified in js/wasm)
+	std::vector<std::string> mod_data = WasmLoader::loadWasmData(mod_path);
+
+	bool ok;
+	// loading init.lua which holds only a function definition, no function calls
+	ok = !luaL_loadfile(L, lua_path.c_str());
+	lua_call(L, 0, 0);
+	// pushing the function and wasm data strings onto the lua stack
+	lua_getglobal(L, "register_wasm_mod");
+	for (auto s : mod_data) {
+		lua_pushstring(L, s.c_str());
+	}
+	//executing the function with the wasm data strings
+	ok = ok && !lua_pcall(L, mod_data.size(), 0, error_handler);
+	if (!ok) {
+		std::string error_msg = readParam<std::string>(L, -1);
+		lua_pop(L, 2); // Pop error message and error handler
+		throw ModError("Failed to load and run wasm mod from " + mod_path +
+				":\n" + error_msg);
+	}
+	lua_pop(L, 1); // Pop error handler
 }
 
 void ScriptApiBase::loadScript(const std::string &script_path)

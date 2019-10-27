@@ -88,7 +88,9 @@ public:
 
 	// These throw a ModError on failure
 	void loadMod(const std::string &script_path, const std::string &mod_name);
+	void loadModWasm(std::string mod_path, const std::string &mod_name);
 	void loadScript(const std::string &script_path);
+	void loadScriptWasm(const std::string mod_path);
 
 #ifndef SERVER
 	void loadModFromMemory(const std::string &mod_name);

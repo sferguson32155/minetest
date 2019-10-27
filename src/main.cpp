@@ -16,15 +16,7 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-
-#include "jsapi.h"
-#include "js/Initialization.h"
-#include "js/CompilationAndEvaluation.h"
-#include "js/SourceText.h"
-#include "js/Utility.h"
-#include "js/CompileOptions.h"
-
-#include "WasmInjector.h"
+#include "WasmLoader.h"
 
 #include "irrlicht.h" // createDevice
 #include "irrlichttypes_extrabloated.h"
@@ -74,13 +66,6 @@ typedef std::map<std::string, ValueSpec> OptionList;
  * Private functions
  **********************************************************************/
 
-static JSClassOps global_ops = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-		nullptr, nullptr, nullptr, nullptr, JS_GlobalObjectTraceHook};
-/* The class of the global object. */
-static JSClass global_class = {"global", JSCLASS_GLOBAL_FLAGS, &global_ops};
-
-static int sm_hello_world();
-
 static bool get_cmdline_opts(int argc, char *argv[], Settings *cmd_args);
 static void set_allowed_options(OptionList *allowed_options);
 
@@ -124,9 +109,6 @@ static OptionList allowed_options;
 
 int main(int argc, char *argv[])
 {
-
-	int sm_status = sm_hello_world();
-	std::cout << "SpiderMonkey Status: " << sm_status << std::endl;
 
 	int retval;
 	debug_set_exception_handler();
@@ -251,68 +233,6 @@ int main(int argc, char *argv[])
 /*****************************************************************************
  * Startup / Init
  *****************************************************************************/
-
-static int sm_hello_world()
-{
-	JS_Init();
-
-	JSContext *cx = JS_NewContext(8L * 1024 * 1024);
-	if (!cx)
-		return 1;
-
-	if (!JS::InitSelfHostedCode(cx))
-		return 1;
-
-	{
-		JS::RealmOptions options;
-		JS::RootedObject global(
-				cx, JS_NewGlobalObject(cx, &global_class, nullptr,
-						    JS::FireOnNewGlobalHook, options));
-		if (!global)
-			return 1;
-
-		JS::RootedValue rval(cx);
-
-		{
-			JSAutoRealm ar(cx, global);
-
-			if (!JS::InitRealmStandardClasses(cx))
-				return 1;
-
-			const char *filename = "noname";
-			auto src = u"'hello world ' + new Date()";
-			int lineno = 1;
-			JS::CompileOptions opts(cx);
-			opts.setFileAndLine(filename, lineno);
-
-			auto length = std::char_traits<char16_t>::length(src);
-
-			JS::SourceText<char16_t> srcBuf;
-			srcBuf.init(cx, src, length, JS::SourceOwnership::Borrowed);
-
-			// bool ok = JS::Evaluate(cx, opts, srcBuf, &rval);
-			WasmInjector::inject_wasm("../../minetest/src/wasmtest.js");
-			auto filepath = "../../minetest/src/wasmtest.js";
-			bool ok = JS::EvaluateUtf8Path(cx, opts, filepath, &rval);
-			if (!ok)
-				return 1;
-		}
-		if (rval.isString()) {
-			JSString *str = rval.toString();
-			size_t size = JS_GetStringLength(str);
-			char *buffer = (char *)malloc(size);
-			if (JS_EncodeStringToBuffer(cx, str, buffer, size)) {
-				buffer[size] = '\0';
-				printf("%s\n", buffer);
-			}
-		} else {
-			printf("%d\n", rval.toInt32());
-		}
-	}
-	JS_DestroyContext(cx);
-	JS_ShutDown();
-	return 0;
-}
 
 static bool get_cmdline_opts(int argc, char *argv[], Settings *cmd_args)
 {
