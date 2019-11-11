@@ -1,0 +1,40 @@
+﻿MineTest Modding Basics
+General Syntax / Standard Practice
+* Mods are supposed to be shorter than 90 chars per line
+* Mods need commas after every statement or the mod will not work
+* Use.png most of the time for textures (lossless)
+* Depends file = loads dependencies. Use default to load default minetest libraries etc.
+Recipes
+* A Minetest recipe is equivalent to a table in Lua
+* Recipe - list of items needed (no more than 9)
+* NOTE: There is no automation tool to find conflicts, so be careful when making new recipes
+Crafts
+* Crafts can make things cookable, burnable, etc. 
+* Crafts change behavior of objects
+* Craft type “fuel” makes things burn
+* Shapeless crafts can easily create conflicts with other crafts (not recommended)
+Minetest methods
+Register_node
+Creates new object type
+minetest.register_node("mod_1:first", {
+  description = "Our very first node ever!",
+  tiles = {"mod_1_first.png"},
+  groups = {oddly_breakable_by_hand = 2},
+})
+* Name of mod within register_node
+* Description - descriptive text that will be represented in game when hovering over node
+* Tiles - texture mapped to all sides of the node
+* Groups - TODO
+Register_craft
+Creates new crafting recipe
+minetest.register_craft({
+  output = "mod_1:first",
+  recipe = {{"default:dirt", "default:dirt"}}
+})
+
+
+* Output - node that results from new recipe
+* Recipe - formula to create node
+
+References:
+Minetest Videos, director. The First Mod | 02-01 | Minetest Modding Course. YouTube, Minetest Videos, 18 Apr. 2018, www.youtube.com/watch?v=xpUsmL5TCr4&t=1s.
