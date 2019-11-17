@@ -16,7 +16,19 @@
 ## Nick Ruspantini ##
 
 ## Luke Stumpf ##
-
+* Project management through Trello
+* Assisted other team members with initial compilation and build of Minetest
+* Research into basic emscripten examples
+* Researched Lua and how it interfaces with C/C++, including the following topics:
+   * Lua data types
+   * Lua stack
+   * Passing functions and parameters between Lua and C
+   * Tables, Metatables, and Metamethods
+   * Started research on object orientation
+* Researched how Lua works within the Minetest engine
+   * Mapped out File System and contextual modding files in Minetest
+   * Wrote a sample mod that loads in custom texture data and represents it in-game
+* Documented and shared Lua research and diagrams from our work to this repo
 ## Gabriel Guzman ##
 
 ## Miranda Craghead ##
