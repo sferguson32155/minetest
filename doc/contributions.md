@@ -14,6 +14,14 @@
 * Created initial wasm mod
 
 ## Nick Ruspantini ##
+* Research in WebAssembly, Spidermonkey and Emscripten
+* Helped in initially building of Minetest
+* Compiled Spidermonkey library
+* Helped create Spidermonkey hello world example
+* Linked Spidermonkey to Minetest
+* Executed Spidermonkey example inside Minetest
+* Documented linking process of Spidermonkey
+* Helped group link Spidermonkey to Minetest
 
 ## Luke Stumpf ##
 * Project management through Trello
