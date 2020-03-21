@@ -16,6 +16,20 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+<<<<<<< Updated upstream
+=======
+
+
+
+#include "jsapi.h"
+#include "js/Initialization.h"
+#include "js/CompilationAndEvaluation.h"
+#include "js/SourceText.h"
+#include "js/Utility.h"
+#include "js/CompileOptions.h"
+
+
+>>>>>>> Stashed changes
 
 #include "irrlicht.h" // createDevice
 #include "irrlichttypes_extrabloated.h"
@@ -67,6 +81,19 @@ typedef std::map<std::string, ValueSpec> OptionList;
  * Private functions
  **********************************************************************/
 
+
+
+static JSClassOps global_ops = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr, JS_GlobalObjectTraceHook};
+/* The class of the global object. */
+static JSClass global_class = {"global", JSCLASS_GLOBAL_FLAGS, &global_ops};
+
+
+
+static int sm_hello_world();
+
+
+
 static bool get_cmdline_opts(int argc, char *argv[], Settings *cmd_args);
 static void set_allowed_options(OptionList *allowed_options);
 
@@ -111,6 +138,15 @@ static OptionList allowed_options;
 
 int main(int argc, char *argv[])
 {
+<<<<<<< Updated upstream
+=======
+
+
+	int sm_status = sm_hello_world();
+	std::cout << "SpiderMonkey Status: " << sm_status << std::endl;
+
+
+>>>>>>> Stashed changes
 	int retval;
 	debug_set_exception_handler();
 
@@ -239,6 +275,55 @@ int main(int argc, char *argv[])
  *****************************************************************************/
 
 
+<<<<<<< Updated upstream
+=======
+static int sm_hello_world()
+{
+	JS_Init();
+	JSContext *cx = JS_NewContext(8L * 1024 * 1024);
+	if (!cx)
+		return 1;
+	if (!JS::InitSelfHostedCode(cx))
+		return 1;
+	{
+		JS::RealmOptions options;
+		JS::RootedObject global(
+				cx, JS_NewGlobalObject(cx, &global_class, nullptr,
+						    JS::FireOnNewGlobalHook, options));
+		if (!global)
+			return 1;
+		JS::RootedValue rval(cx);
+		{
+			// "'hello'+'world, it is '+new Date()"
+			JSAutoRealm ar(cx, global);
+			const char *srcRaw = "'hello'+'world'"; //, it is '+new Date()";
+			auto src = u"'hello'+'world'";		//, it is '+new Date()";
+			JS::SourceText<char16_t> srcBuf;
+			srcBuf.init(cx, src, strlen(srcRaw),
+					JS::SourceOwnership::Borrowed);
+			const char *filename = "noname";
+			int lineno = 1;
+			JS::CompileOptions opts(cx);
+			opts.setFileAndLine(filename, lineno);
+			bool ok = JS::Evaluate(cx, opts, srcBuf, &rval);
+			if (!ok)
+				return 1;
+		}
+		JSString *str = rval.toString();
+		size_t size = JS_GetStringLength(str);
+		char *buffer = (char *)malloc(size);
+		if (JS_EncodeStringToBuffer(cx, str, buffer, size)) {
+			buffer[size] = '\0';
+			printf("%s\n", buffer);
+		}
+	}
+	JS_DestroyContext(cx);
+	//JS_ShutDown();
+	return 0;
+}
+
+
+>>>>>>> Stashed changes
 static bool get_cmdline_opts(int argc, char *argv[], Settings *cmd_args)
 {
 	set_allowed_options(&allowed_options);

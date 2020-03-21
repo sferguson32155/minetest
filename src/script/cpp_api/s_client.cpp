@@ -25,6 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "common/c_content.h"
 #include "s_item.h"
 
+
 void ScriptApiClient::on_mods_loaded()
 {
 	SCRIPTAPI_PRECHECKHEADER
@@ -54,6 +55,7 @@ bool ScriptApiClient::on_sending_message(const std::string &message)
 	// Get core.registered_on_chat_messages
 	lua_getglobal(L, "core");
 	lua_getfield(L, -1, "registered_on_sending_chat_message");
+
 	// Call callbacks
 	lua_pushstring(L, message.c_str());
 	runCallbacks(1, RUN_CALLBACKS_MODE_OR_SC);

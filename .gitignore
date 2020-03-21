@@ -51,6 +51,7 @@ gtags.files
 /clientmods/*
 !/clientmods/preview/
 /client/mod_storage/
+/build/*
 
 ## Configuration/log files
 minetest.conf
