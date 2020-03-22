@@ -126,13 +126,13 @@ static int wasmExecute(lua_State *L)
 			if (rval.isObject()) {
 				JSObject *res = rval.toObjectOrNull();
 
-				 returnString = WasmLoader::getModProperty(
+				returnString = WasmLoader::getModProperty(
 						cx, res, "resultString");
 			}
 		}
 	}
 	JS_DestroyContext(cx);
-	std::cout << returnString;
+
 	//push return values on stack
 	lua_pushstring(L, returnString.c_str());
 

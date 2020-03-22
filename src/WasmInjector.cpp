@@ -28,14 +28,16 @@ std::string WasmInjector::get_wasm_bytes(const char* path) {
 
 std::vector<std::string> WasmInjector::get_js_contents(const char* path) {
 
-	std::cout << path << std::endl;
-    std::ifstream fin(path, std::ios::binary);
-
+    std::ifstream fin;
+    fin.open(path, std::ios::binary);
+    if (fin.fail()) {
+	    std::string err = "Could not open: " + std::string(path);
+	    throw std::runtime_error(err);
+    }
     std::vector<std::string> contents;
     std::string raw;
     while (!fin.eof()) {
         std::getline(fin, raw);
-	    std::cout << raw << std::endl;
         contents.push_back(raw);
     }
 
@@ -55,7 +57,7 @@ bool WasmInjector::write_js(std::vector<std::string> js, const char *path) {
 }
 
 bool WasmInjector::inject_wasm(const char *path) {
-	std::cout << path << std::endl;
+
     auto js = WasmInjector::get_js_contents(path);
     int begin, end, line;
     std::string wasm_path = "";
