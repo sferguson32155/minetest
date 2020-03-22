@@ -13,6 +13,5 @@ class WasmLoader
 	public:
 		WasmLoader() {};
 		static std::vector<std::string> loadWasmData(const std::string &path);
-	private:
 		static std::string getModProperty(JSContext *cx, JSObject *source, const char *prop);
 };

@@ -17,6 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 #include "WasmLoader.h"
+#include "WasmInjector.h"
 
 #include "cpp_api/s_base.h"
 #include "cpp_api/s_internal.h"
@@ -79,41 +80,63 @@ static int loadWasmTest(lua_State *L)
 
 	return 0;
 }
-
-static JSClassOps global_ops = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+static JSClassOps global_ops1 = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 		nullptr, nullptr, nullptr, nullptr, JS_GlobalObjectTraceHook};
-static JSClass global_class = {"global", JSCLASS_GLOBAL_FLAGS, &global_ops};
+/* The class of the global object. */
+static JSClass global_class1 = {"global", JSCLASS_GLOBAL_FLAGS, &global_ops1};
 
-
-static int wasmCalc(lua_State *L)
+static int wasmExecute(lua_State *L)
 {
+
 	const std::string path = lua_tostring(L, 1);
+	std::string returnString;
 
 	JSContext *cx = JS_NewContext(8L * 1024 * 1024);
+	if (!cx)
+		return 0;
 
 	if (!JS::InitSelfHostedCode(cx))
 		return 0;
 
-	JS::RealmOptions options;
-	JS::RootedObject global(cx, JS_NewGlobalObject(cx, &global_class, nullptr,
-						    JS::FireOnNewGlobalHook, options));
-
-	JS::RootedValue rval(cx);
 	{
-		JSAutoRealm ar(cx, global);
-		if (!JS::InitRealmStandardClasses(cx))
+		JS::RealmOptions options;
+		JS::RootedObject global(
+				cx, JS_NewGlobalObject(cx, &global_class1, nullptr,
+						    JS::FireOnNewGlobalHook, options));
+		if (!global)
 			return 0;
 
-		JS::CompileOptions opts(cx);
+		JS::RootedValue rval(cx);
+		{
+			JSAutoRealm ar(cx, global);
+			if (!JS::InitRealmStandardClasses(cx))
+				return 0;
 
-		bool ok = JS::EvaluateUtf8Path(cx, opts, path.c_str(), &rval);
+			const char *filename = "noname";
+			int lineno = 1;
+			JS::CompileOptions opts(cx);
+			opts.setFileAndLine(filename, lineno);
 
-		if (rval.isObject()) {
-			JSObject *res = rval.toObjectOrNull();
+			std::string js_path = path + "\\mod.js";
+			WasmInjector::inject_wasm(js_path.c_str());
+			bool ok = JS::EvaluateUtf8Path(cx, opts, js_path.c_str(), &rval);
+			if (!ok)
+				return 0;
+			
+			if (rval.isObject()) {
+				JSObject *res = rval.toObjectOrNull();
+
+				 returnString = WasmLoader::getModProperty(
+						cx, res, "resultString");
+			}
 		}
 	}
-
 	JS_DestroyContext(cx);
+	std::cout << returnString;
+	//push return values on stack
+	lua_pushstring(L, returnString.c_str());
+
+	return 1;
 }
 
 
@@ -262,7 +285,7 @@ void ScriptApiBase::loadScript(const std::string &script_path)
 
 	lua_State *L = getStack();
 
-	lua_register(L, "wasmCalc", loadWasmTest);
+	lua_register(L, "wasmExecute", wasmExecute);
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
 

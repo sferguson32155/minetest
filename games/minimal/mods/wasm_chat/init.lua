@@ -3,7 +3,6 @@ minetest.register_chatcommand("wasm", {
         interact = true,
     },
     func = function(name, param)
-        wasmCalc("C:\\minetest19\\games\\minimal\\mods\\simple_wasm")
-        return true
+        return true, wasmExecute("C:\\minetest\\bin\\Debug\\..\\..\\games\\minimal\\mods\\wasm_chat")
     end,
 })
