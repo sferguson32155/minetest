@@ -47,7 +47,7 @@ std::string WasmLoader::getModProperty(JSContext *cx, JSObject *source, const ch
 
 std::vector<std::string> WasmLoader::loadWasmData(const std::string &path)
 {
-	JS_Init();
+
 	std::vector<std::string> ret_vec;
 	JSContext *cx = JS_NewContext(8L * 1024 * 1024);
 	if (!cx)
@@ -90,6 +90,6 @@ std::vector<std::string> WasmLoader::loadWasmData(const std::string &path)
 		}
 	}
 	JS_DestroyContext(cx);
-	JS_ShutDown();
+
 	return ret_vec;
 }

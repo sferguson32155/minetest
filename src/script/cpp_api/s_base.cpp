@@ -70,6 +70,53 @@ public:
 };
 
 
+static int loadWasmTest(lua_State *L)
+{
+	const std::string path = lua_tostring(L, 1);
+	std::vector<std::string> ret_vec = WasmLoader::loadWasmData(path);
+
+	std::cout << "blah\n";
+
+	return 0;
+}
+
+static JSClassOps global_ops = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr, JS_GlobalObjectTraceHook};
+static JSClass global_class = {"global", JSCLASS_GLOBAL_FLAGS, &global_ops};
+
+
+static int wasmCalc(lua_State *L)
+{
+	const std::string path = lua_tostring(L, 1);
+
+	JSContext *cx = JS_NewContext(8L * 1024 * 1024);
+
+	if (!JS::InitSelfHostedCode(cx))
+		return 0;
+
+	JS::RealmOptions options;
+	JS::RootedObject global(cx, JS_NewGlobalObject(cx, &global_class, nullptr,
+						    JS::FireOnNewGlobalHook, options));
+
+	JS::RootedValue rval(cx);
+	{
+		JSAutoRealm ar(cx, global);
+		if (!JS::InitRealmStandardClasses(cx))
+			return 0;
+
+		JS::CompileOptions opts(cx);
+
+		bool ok = JS::EvaluateUtf8Path(cx, opts, path.c_str(), &rval);
+
+		if (rval.isObject()) {
+			JSObject *res = rval.toObjectOrNull();
+		}
+	}
+
+	JS_DestroyContext(cx);
+}
+
+
 /*
 	ScriptApiBase
 */
@@ -214,6 +261,8 @@ void ScriptApiBase::loadScript(const std::string &script_path)
 	verbosestream << "Loading and running script from " << script_path << std::endl;
 
 	lua_State *L = getStack();
+
+	lua_register(L, "wasmCalc", loadWasmTest);
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
 
