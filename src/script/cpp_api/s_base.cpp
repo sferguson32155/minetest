@@ -117,9 +117,8 @@ static int wasmExecute(lua_State *L)
 			JS::CompileOptions opts(cx);
 			opts.setFileAndLine(filename, lineno);
 
-			std::string js_path = path + "\\mod.js";
-			WasmInjector::inject_wasm(js_path.c_str());
-			bool ok = JS::EvaluateUtf8Path(cx, opts, js_path.c_str(), &rval);
+			WasmInjector::inject_wasm(path.c_str());
+			bool ok = JS::EvaluateUtf8Path(cx, opts, path.c_str(), &rval);
 			if (!ok)
 				return 0;
 			
