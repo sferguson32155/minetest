@@ -3,6 +3,15 @@ minetest.register_chatcommand("wasm", {
         interact = true,
     },
     func = function(name, param)
-        return true, wasmExecute("\\..\\..\\games\\minimal\\mods\\wasm_chat\\mod.js")
+	returnVal = wasmExecute("\\..\\..\\games\\minimal\\mods\\wasm_chat\\mod.js")
+	if type(returnVal) == "boolean" then
+		if returnVal then
+			returnVal = "True"
+		else
+			returnVal = "False"
+		end
+	end
+	
+        return true, returnVal
     end,
 })

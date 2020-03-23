@@ -86,7 +86,18 @@ static JSClassOps global_ops1 = {nullptr, nullptr, nullptr, nullptr, nullptr, nu
 /* The class of the global object. */
 static JSClass global_class1 = {"global", JSCLASS_GLOBAL_FLAGS, &global_ops1};
 
-static int getJSInt(JSContext *cx, JSObject *source, const char *prop)
+struct anyType
+{
+	double n;
+	std::string s;
+	bool b;
+
+	// gets type index. 3 = string, 4 = int, 5 = Bool
+	int type;
+};
+
+
+static anyType getJSValue(JSContext *cx, JSObject *source, const char *prop)
 {
 	JS::HandleObject object = JS::HandleObject::fromMarkedLocation(&source);
 
@@ -96,37 +107,49 @@ static int getJSInt(JSContext *cx, JSObject *source, const char *prop)
 
 	JS_GetProperty(cx, object, prop, prop_value);
 
-	//gets type index. 3 = string, 4 = int, 5 = Bool
-	JSType type = JS_TypeOfValue(cx, prop_value);
-
-	std::cout << type << std::endl;
-
-
-	int r = prop_value.toNumber();
 	
-	std::cout << r << std::endl;
+	anyType value;
+	value.type = JS_TypeOfValue(cx, prop_value);
+	
+	// gets type index. 3 = string, 4 = int, 5 = Bool
+	switch (value.type) 
+	{
+	case 3: {
 
-	return r;
+		JSString *str = prop_value.toString();
+		size_t size = JS_GetStringLength(str);
+		char *buffer = (char *)malloc(size);
+		JS_EncodeStringToBuffer(cx, str, buffer, size);
+
+		value.s = "";
+		for (int i = 0; i < size; i++) {
+			value.s += buffer[i];
+		}
+		free(buffer);
+	}
+		break;
+	case 4:
+		value.n = prop_value.toNumber();
+		break;
+	case 5:
+		value.b = prop_value.toBoolean();
+		break;
+	}
+
+	return value;
 
 }
 
-static int wasmExecute(lua_State *L)
+anyType executeJS(std::string path)
 {
-	int returner = 0;
-	char buff[FILENAME_MAX];
-	getcwd(buff, FILENAME_MAX);
-	std::string path(buff);
-
-	path.append(lua_tostring(L, 1));
-
-	std::string returnString;
+	anyType returnValue;
 
 	JSContext *cx = JS_NewContext(8L * 1024 * 1024);
 	if (!cx)
-		return 0;
+		throw std::runtime_error("Failed Context Creation");
 
 	if (!JS::InitSelfHostedCode(cx))
-		return 0;
+		throw std::runtime_error("Failed InitSelfHostedCode");
 
 	{
 		JS::RealmOptions options;
@@ -134,13 +157,13 @@ static int wasmExecute(lua_State *L)
 				cx, JS_NewGlobalObject(cx, &global_class1, nullptr,
 						    JS::FireOnNewGlobalHook, options));
 		if (!global)
-			return 0;
+			throw std::runtime_error("Failed Global check");
 
 		JS::RootedValue rval(cx);
 		{
 			JSAutoRealm ar(cx, global);
 			if (!JS::InitRealmStandardClasses(cx))
-				return 0;
+				throw std::runtime_error("Failed InitRealmStandardClasses");
 
 			const char *filename = "noname";
 			int lineno = 1;
@@ -150,19 +173,43 @@ static int wasmExecute(lua_State *L)
 			WasmInjector::inject_wasm(path.c_str());
 			bool ok = JS::EvaluateUtf8Path(cx, opts, path.c_str(), &rval);
 			if (!ok)
-				return 0;
+				throw std::runtime_error("Failed EvaluateUtf8Path");
 
 			if (rval.isObject()) {
 				JSObject *res = rval.toObjectOrNull();
 
-				returner = getJSInt(cx, res, "resultString");
+				returnValue = getJSValue(cx, res, "resultString");
 			}
 		}
 	}
 	JS_DestroyContext(cx);
 
-	// push return values on stack
-	lua_pushinteger(L, returner);
+	return returnValue;
+
+}
+
+static int wasmExecute(lua_State *L)
+{
+	
+	char buff[FILENAME_MAX];
+	getcwd(buff, FILENAME_MAX);
+	std::string path(buff);
+
+	path.append(lua_tostring(L, 1));
+
+	anyType returnValue = executeJS(path);	
+
+	// gets type index. 3 = string, 4 = int, 5 = Bool
+	switch (returnValue.type) {
+	case 3:
+		lua_pushstring(L, returnValue.s.c_str());
+		break;
+	case 4:
+		lua_pushnumber(L, returnValue.n);
+		break;
+	case 5:
+		lua_pushboolean(L, returnValue.b);
+	}
 
 	return 1;
 }
