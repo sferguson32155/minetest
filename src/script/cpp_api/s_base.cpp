@@ -107,8 +107,14 @@ static anyType getJSValue(JSContext *cx, JSObject *source, const char *prop)
 
 	JS_GetProperty(cx, object, prop, prop_value);
 
-	
 	anyType value;
+
+	if (prop_value.isUndefined()) {
+		//property not found
+		value.type = -1;
+		return value;
+	}
+
 	value.type = JS_TypeOfValue(cx, prop_value);
 	
 	// gets type index. 3 = string, 4 = int, 5 = Bool
@@ -134,15 +140,18 @@ static anyType getJSValue(JSContext *cx, JSObject *source, const char *prop)
 	case 5:
 		value.b = prop_value.toBoolean();
 		break;
+	default:
+		throw std::runtime_error("Invalid Return Type");
+		break;
 	}
 
 	return value;
 
 }
 
-anyType executeJS(std::string path)
+std::vector<anyType> executeJS(std::string path)
 {
-	anyType returnValue;
+	std::vector<anyType> returnValues;
 
 	JSContext *cx = JS_NewContext(8L * 1024 * 1024);
 	if (!cx)
@@ -177,15 +186,38 @@ anyType executeJS(std::string path)
 
 			if (rval.isObject()) {
 				JSObject *res = rval.toObjectOrNull();
-
-				returnValue = getJSValue(cx, res, "resultString");
+				anyType nextValue;
+				int i = 1;
+				do {
+					std::string key = "return" + std::to_string(i++);
+					nextValue = getJSValue(cx, res, key.c_str());
+					if (nextValue.type != -1)
+						returnValues.push_back(nextValue);
+					else
+						break;
+				} while (true);
 			}
 		}
 	}
 	JS_DestroyContext(cx);
 
-	return returnValue;
+	return returnValues;
 
+}
+
+void pushOnStack(lua_State *L, anyType value)
+{
+	switch (value.type) {
+	case 3:
+		lua_pushstring(L, value.s.c_str());
+		break;
+	case 4:
+		lua_pushnumber(L, value.n);
+		break;
+	case 5:
+		lua_pushboolean(L, value.b);
+		break;
+	}
 }
 
 static int wasmExecute(lua_State *L)
@@ -197,21 +229,24 @@ static int wasmExecute(lua_State *L)
 
 	path.append(lua_tostring(L, 1));
 
-	anyType returnValue = executeJS(path);	
+	std::vector<anyType> returnValues = executeJS(path);	
 
 	// gets type index. 3 = string, 4 = int, 5 = Bool
-	switch (returnValue.type) {
-	case 3:
-		lua_pushstring(L, returnValue.s.c_str());
-		break;
-	case 4:
-		lua_pushnumber(L, returnValue.n);
-		break;
-	case 5:
-		lua_pushboolean(L, returnValue.b);
+	for (auto value : returnValues) {
+		switch (value.type) {
+		case 3:
+			lua_pushstring(L, value.s.c_str());
+			break;
+		case 4:
+			lua_pushnumber(L, value.n);
+			break;
+		case 5:
+			lua_pushboolean(L, value.b);
+			break;
+		}
 	}
 
-	return 1;
+	return returnValues.size();
 }
 
 /*
