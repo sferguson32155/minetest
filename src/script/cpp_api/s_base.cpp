@@ -48,6 +48,7 @@ extern "C" {
 #include "script/common/c_content.h"
 #include "content_sao.h"
 #include <sstream>
+#include <direct.h>
 
 
 class ModNameStorer
@@ -88,7 +89,12 @@ static JSClass global_class1 = {"global", JSCLASS_GLOBAL_FLAGS, &global_ops1};
 static int wasmExecute(lua_State *L)
 {
 
-	const std::string path = lua_tostring(L, 1);
+	char buff[FILENAME_MAX];
+	getcwd(buff, FILENAME_MAX);
+	std::string path(buff);
+
+	path.append(lua_tostring(L, 1));
+	
 	std::string returnString;
 
 	JSContext *cx = JS_NewContext(8L * 1024 * 1024);
