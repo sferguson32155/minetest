@@ -3,7 +3,7 @@ minetest.register_chatcommand("wasm", {
         interact = true,
     },
     func = function(name, param)
-	returnVal = wasmExecute("\\..\\..\\games\\minimal\\mods\\wasm_chat\\mod.js")
+	returnVal = wasmExecute("\\..\\..\\games\\minimal\\mods\\wasm_chat\\mod.js", 6)
 	if type(returnVal) == "boolean" then
 		if returnVal then
 			returnVal = "True"
@@ -15,6 +15,61 @@ minetest.register_chatcommand("wasm", {
         return true, returnVal
     end,
 })
+
+minetest.register_chatcommand("add5", {
+    privs = {
+        interact = true,
+    },
+    func = function(name, param)
+	returnVal = wasmExecute("\\..\\..\\games\\minimal\\mods\\wasm_chat\\mod.js", param)
+	if type(returnVal) == "boolean" then
+		if returnVal then
+			returnVal = "True"
+		else
+			returnVal = "False"
+		end
+	end
+
+        return true, returnVal
+    end,
+})
+
+minetest.register_chatcommand("reverse", {
+    privs = {
+        interact = true,
+    },
+    func = function(name, param)
+	a, b = wasmExecute("\\..\\..\\games\\minimal\\mods\\wasm_chat\\reverseStrings.js", "string1", "string2")
+	if type(returnVal) == "boolean" then
+		if returnVal then
+			returnVal = "True"
+		else
+			returnVal = "False"
+		end
+	end
+
+        return true, a .. b
+    end,
+})
+
+minetest.register_chatcommand("add5and3", {
+    privs = {
+        interact = true,
+    },
+    func = function(name, param)
+	returnVal = wasmExecute("\\..\\..\\games\\minimal\\mods\\wasm_chat\\add2nums.js", 5, 3)
+	if type(returnVal) == "boolean" then
+		if returnVal then
+			returnVal = "True"
+		else
+			returnVal = "False"
+		end
+	end
+
+        return true, returnVal
+    end,
+})
+
 
 minetest.register_chatcommand("sixreturn", {
     privs = {

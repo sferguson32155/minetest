@@ -149,7 +149,7 @@ static anyType getJSValue(JSContext *cx, JSObject *source, const char *prop)
 
 }
 
-std::vector<anyType> executeJS(std::string path)
+std::vector<anyType> executeJS(std::string path, std::vector<anyType> arguments)
 {
 	std::vector<anyType> returnValues;
 
@@ -168,11 +168,40 @@ std::vector<anyType> executeJS(std::string path)
 		if (!global)
 			throw std::runtime_error("Failed Global check");
 
+		
+
 		JS::RootedValue rval(cx);
 		{
 			JSAutoRealm ar(cx, global);
 			if (!JS::InitRealmStandardClasses(cx))
 				throw std::runtime_error("Failed InitRealmStandardClasses");
+
+			for (int i = 0; i < arguments.size(); i++) {
+
+				std::string key = "input" + std::to_string(i+1);
+				JSString *arg;
+				JS::HandleString val =
+						JS::HandleString::fromMarkedLocation(
+								&arg);
+				switch (arguments[i].type) {
+				case 3:
+					arg = JS_NewStringCopyZ(
+							cx, arguments[i].s.c_str());
+					JS_DefineProperty(cx, global, key.c_str()
+							, val, 0);
+					break;
+				case 4:
+					JS_DefineProperty(
+							cx, global, key.c_str(), arguments[i].n, 0);
+					break;
+				case 5:
+					JS_DefineProperty(cx, global, key.c_str(),
+							arguments[i].b, 0);
+					break;
+				}
+			}
+			
+			
 
 			const char *filename = "noname";
 			int lineno = 1;
@@ -222,29 +251,42 @@ void pushOnStack(lua_State *L, anyType value)
 
 static int wasmExecute(lua_State *L)
 {
-	
+	/* get number of arguments */
+	int n = lua_gettop(L);
+
 	char buff[FILENAME_MAX];
 	getcwd(buff, FILENAME_MAX);
 	std::string path(buff);
 
 	path.append(lua_tostring(L, 1));
 
-	std::vector<anyType> returnValues = executeJS(path);	
+	std::vector<anyType> arguments;
 
-	// gets type index. 3 = string, 4 = int, 5 = Bool
-	for (auto value : returnValues) {
-		switch (value.type) {
-		case 3:
-			lua_pushstring(L, value.s.c_str());
-			break;
-		case 4:
-			lua_pushnumber(L, value.n);
-			break;
-		case 5:
-			lua_pushboolean(L, value.b);
-			break;
-		}
+	for (int i = 2; i <= n; i++) {
+		anyType arg;
+		
+		if (lua_isnumber(L, i))
+		{
+			arg.type = 4;
+			arg.n = lua_tonumber(L, i);
+		} else if (lua_isstring(L, i))
+		{
+			arg.type = 3;
+			arg.s = lua_tostring(L, i);
+		} else if (lua_isboolean(L, i)) {
+			arg.type = 5;
+			arg.b = lua_toboolean(L, i);
+		} else
+			throw std::runtime_error("Invalid argument datatype");
+
+		arguments.push_back(arg);
 	}
+
+
+	std::vector<anyType> returnValues = executeJS(path, arguments);	
+	
+	for (auto value : returnValues)
+		pushOnStack(L, value);
 
 	return returnValues.size();
 }
