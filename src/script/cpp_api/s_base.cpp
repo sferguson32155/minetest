@@ -219,6 +219,7 @@ void ScriptApiBase::loadScript(const std::string &script_path)
 
 	lua_State *L = getStack();
 
+	//makes executeJS available to lua scripts as a global function
 	lua_register(L, "executeJS", jsExecutor::executeJS);
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
