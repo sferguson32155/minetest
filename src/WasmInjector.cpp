@@ -57,6 +57,9 @@ bool WasmInjector::write_js(std::vector<std::string> js, const char *path) {
 }
 
 bool WasmInjector::inject_wasm(const char *path) {
+    // Replaces path to .wasm file in .js file being executed with raw wasm data
+    // If .wasm is changed, path must be replaced so that .wasm is reparsed (fix this!)
+    // in .js file the path is between %wb and wb%
 
     auto js = WasmInjector::get_js_contents(path);
     int begin, end, line;

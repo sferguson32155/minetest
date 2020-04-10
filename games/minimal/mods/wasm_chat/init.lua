@@ -1,72 +1,37 @@
-minetest.register_chatcommand("wasm", {
-    privs = {
-        interact = true,
-    },
-    func = function(name, param)
-	returnVal = wasmExecute("\\..\\..\\games\\minimal\\mods\\wasm_chat\\add5.js", 6)
-	if type(returnVal) == "boolean" then
-		if returnVal then
-			returnVal = "True"
-		else
-			returnVal = "False"
-		end
-	end
-
-        return true, returnVal
-    end,
-})
 
 minetest.register_chatcommand("add5", {
     privs = {
         interact = true,
     },
     func = function(name, param)
-	returnVal = wasmExecute("\\..\\..\\games\\minimal\\mods\\wasm_chat\\add5.js", param)
-	if type(returnVal) == "boolean" then
-		if returnVal then
-			returnVal = "True"
-		else
-			returnVal = "False"
-		end
-	end
+    -- console input: /add5 param
+    -- param is assumed to be a number
+	     returnVal = executeJS("\\..\\..\\games\\minimal\\mods\\wasm_chat\\add5.js", param)
+
 
         return true, returnVal
     end,
 })
 
-minetest.register_chatcommand("reverse", {
+
+minetest.register_chatcommand("math", {
     privs = {
         interact = true,
     },
     func = function(name, param)
-	a, b = wasmExecute("\\..\\..\\games\\minimal\\mods\\wasm_chat\\reverseStrings.js", "string1", "string2")
-	if type(returnVal) == "boolean" then
-		if returnVal then
-			returnVal = "True"
-		else
-			returnVal = "False"
-		end
-	end
+       -- console input: /add param
+       -- param is split into 2 numbers with lua regex
+       local s1, s2 = param:match("(%d*%.?%d*) (%d*%.?%d*)")
+       local n1, n2 = tonumber(s1), tonumber(s2)
 
-        return true, a .. b
-    end,
-})
+	     add, sub, mul, div = executeJS("\\..\\..\\games\\minimal\\mods\\wasm_chat\\math.js", n1, n2)
 
-minetest.register_chatcommand("add5and3", {
-    privs = {
-        interact = true,
-    },
-    func = function(name, param)
-	returnVal = wasmExecute("\\..\\..\\games\\minimal\\mods\\wasm_chat\\add2nums.js", 5, 3)
-	if type(returnVal) == "boolean" then
-		if returnVal then
-			returnVal = "True"
-		else
-			returnVal = "False"
-		end
-	end
+       returnString = tostring(n1) .. " + " .. tostring(n2) .. " = " .. tostring(add) .. "\n"
+       returnString = returnString .. tostring(n1) .. " - " .. tostring(n2) .. " = " .. tostring(sub) .. "\n"
+       returnString = returnString .. tostring(n1) .. " * " .. tostring(n2) .. " = " .. tostring(mul) .. "\n"
+       returnString = returnString .. tostring(n1) .. " / " .. tostring(n2) .. " = " .. tostring(div)
 
-        return true, returnVal
+       return true, returnString
     end,
 })
 
@@ -76,7 +41,9 @@ minetest.register_chatcommand("sixreturn", {
         interact = true,
     },
     func = function(name, param)
+       -- console input: /sixreturn
 
+      -- converts boolean to string to print on console
       function stringify(Val)
         if type(Val) == "boolean" then
           if Val then
@@ -88,15 +55,12 @@ minetest.register_chatcommand("sixreturn", {
         return Val
       end
 
-	    a, b, c, d, e, f = wasmExecute("\\..\\..\\games\\minimal\\mods\\wasm_chat\\6return.js")
-	    returnString = stringify(a) .. "\n" .. stringify(b) .. "\n" .. stringify(c) .. "\n" .. stringify(d) .. "\n" .. stringify(e) .. "\n" .. stringify(f)
-      print(stringify(a))
-      print(stringify(b))
-	    print(stringify(c))
-	    print(stringify(d))
-	    print(stringify(e))
-	    print(stringify(f))
+      -- gets 6 return values
+      a, b, c, d, e, f = executeJS("\\..\\..\\games\\minimal\\mods\\wasm_chat\\6return.js")
 
-        return true, returnString
+      -- converts each if necessary and builds return string.   '..' is Lua concatenate
+      returnString = stringify(a) .. "\n" .. stringify(b) .. "\n" .. stringify(c) .. "\n" .. stringify(d) .. "\n" .. stringify(e) .. "\n" .. stringify(f)
+
+      return true, returnString
     end,
 })
