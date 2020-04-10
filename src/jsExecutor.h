@@ -8,8 +8,11 @@ extern "C" {
 #endif
 }
 
+
 class jsExecutor
 {
+	
+
 	//For moving around arguments and return values
 	struct jsTypeWrapper
 	{
@@ -23,18 +26,28 @@ class jsExecutor
 	};
 
 	private:
-	static void runSpidermonkey(const std::string path,
-			const std::vector<jsTypeWrapper> &arguments,
-			std::vector<jsTypeWrapper> &returnValues);
-		static jsTypeWrapper getJSValue(JSContext *cx, JSObject *source, const char *prop);
+		static jsExecutor *instance;
+		
+
+		jsExecutor();
+
+		void runSpidermonkey(const std::string path,
+				const std::vector<jsTypeWrapper> &arguments,
+				std::vector<jsTypeWrapper> &returnValues);
+		jsTypeWrapper getJSValue(JSObject *source, const char *prop);
 		static void pushOnStack(lua_State *L, jsTypeWrapper value);
 		static void getArguments(lua_State *L,
 				std::vector<jsExecutor::jsTypeWrapper> &arguments);
-		static void jsExecutor::insertArguments(JSContext *cx, JS::RootedObject *global,
+		void jsExecutor::insertArguments(
 				const std::vector<jsExecutor::jsTypeWrapper> &arguments);
-		static void jsExecutor::getReturnValues(JSContext *cx, JSObject *res,
+		void jsExecutor::getReturnValues(JSObject *res,
 				std::vector<jsTypeWrapper> &returnValues);
 	
 	public:
+		JSContext *cx;
+		JS::PersistentRootedObject global;
+		static jsExecutor *getInstance();
 		static int executeJS(lua_State *L);
+
+		JSObject *getGlobalObject();
 };

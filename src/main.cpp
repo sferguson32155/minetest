@@ -23,6 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "js/SourceText.h"
 #include "js/Utility.h"
 #include "js/CompileOptions.h"
+#include "jsExecutor.h"
 
 #include "irrlicht.h" // createDevice
 #include "irrlichttypes_extrabloated.h"
@@ -122,9 +123,10 @@ static OptionList allowed_options;
 
 int main(int argc, char *argv[])
 {
+	
 
-	int sm_status = sm_hello_world();
-	std::cout << "SpiderMonkey Status: " << sm_status << std::endl;
+	//int sm_status = sm_hello_world();
+	//std::cout << "SpiderMonkey Status: " << sm_status << std::endl;
 
 	int retval;
 	debug_set_exception_handler();
@@ -252,19 +254,21 @@ int main(int argc, char *argv[])
 
 static int sm_hello_world()
 {
-	JS_Init();
-	JSContext *cx = JS_NewContext(8L * 1024 * 1024);
-	if (!cx)
-		return 1;
-	if (!JS::InitSelfHostedCode(cx))
-		return 1;
+	jsExecutor *executor = jsExecutor::getInstance();
+	JSContext *cx = executor->cx;
+	
+
 	{
-		JS::RealmOptions options;
-		JS::RootedObject global(
-				cx, JS_NewGlobalObject(cx, &global_class, nullptr,
-						    JS::FireOnNewGlobalHook, options));
-		if (!global)
-			return 1;
+		//JS::RealmOptions options;
+		//JS::RootedObject global(
+		//		cx, JS_NewGlobalObject(cx, &global_class, nullptr,
+		//				    JS::FireOnNewGlobalHook, options));
+		//if (!global)
+		//	return 1;
+
+		JS::RootedObject global(cx, executor->getGlobalObject());
+
+
 		JS::RootedValue rval(cx);
 		{
 			// "'hello'+'world, it is '+new Date()"
@@ -290,7 +294,7 @@ static int sm_hello_world()
 			printf("%s\n", buffer);
 		}
 	}
-	JS_DestroyContext(cx);
+	//JS_DestroyContext(cx);
 
 	return 0;
 }

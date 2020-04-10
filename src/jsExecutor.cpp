@@ -14,6 +14,16 @@
 
 #include "jsExecutor.h"
 
+jsExecutor *jsExecutor::instance = NULL;
+
+jsExecutor *jsExecutor::getInstance()
+{
+	if (!instance)
+		instance = new jsExecutor;
+
+	return instance;
+}
+
 int jsExecutor::executeJS(lua_State *L)
 {
 	char buff[FILENAME_MAX];
@@ -24,14 +34,22 @@ int jsExecutor::executeJS(lua_State *L)
 	std::vector<jsTypeWrapper> arguments;
 	getArguments(L, arguments);
 
+	jsExecutor * executor = getInstance();
 	std::vector<jsTypeWrapper> returnValues;
-	runSpidermonkey(path, arguments, returnValues);
+	executor->runSpidermonkey(path, arguments, returnValues);
 
 	// put return values on lua stack
 	for (auto value : returnValues)
 		pushOnStack(L, value);
 
 	return returnValues.size();
+}
+
+JSObject *jsExecutor::getGlobalObject()
+{
+	JSObject *gNR = JS::CurrentGlobalOrNull(cx);
+
+	return gNR;
 }
 
 void jsExecutor::pushOnStack(lua_State *L, jsTypeWrapper value)
@@ -81,33 +99,45 @@ static JSClassOps global_ops1 = {nullptr, nullptr, nullptr, nullptr, nullptr, nu
 static JSClass global_class1 = {"global", JSCLASS_GLOBAL_FLAGS, &global_ops1};
 
 
-void jsExecutor::runSpidermonkey(const std::string path,
-		const std::vector<jsTypeWrapper> &arguments, std::vector<jsTypeWrapper> &returnValues)
+jsExecutor::jsExecutor()
 {
-	JSContext *cx = JS_NewContext(8L * 1024 * 1024);
+	JS_Init();
+	cx = JS_NewContext(8L * 1024 * 1024);
+
 	if (!cx)
 		throw std::runtime_error("Failed Context Creation");
 
 	if (!JS::InitSelfHostedCode(cx))
 		throw std::runtime_error("Failed InitSelfHostedCode");
 
+	JS::RealmOptions options;
+	//::RootedObject g(cx, JS_NewGlobalObject(cx, &global_class1, nullptr,
+	//					    JS::FireOnNewGlobalHook, options));
+	global.init(cx, JS_NewGlobalObject(cx, &global_class1, nullptr,
+					JS::FireOnNewGlobalHook, options));
+
+	if (!global)
+		throw std::runtime_error("Failed Global check");
+	
+	JSAutoRealm ar(cx, global);
+			if (!JS::InitRealmStandardClasses(cx))
+				throw std::runtime_error(
+						"Failed InitRealmStandardClasses");
+}
+
+void jsExecutor::runSpidermonkey(const std::string path,
+		const std::vector<jsTypeWrapper> &arguments, std::vector<jsTypeWrapper> &returnValues)
+{
+	//JSContext *cx = JS_NewContext(8L * 1024 * 1024);
+	
+
 	{
-		JS::RealmOptions options;
-		JS::RootedObject global(
-				cx, JS_NewGlobalObject(cx, &global_class1, nullptr,
-						    JS::FireOnNewGlobalHook, options));
-		if (!global)
-			throw std::runtime_error("Failed Global check");
+			
 
 		JS::RootedValue rval(cx);
 
 		{
-			JSAutoRealm ar(cx, global);
-			if (!JS::InitRealmStandardClasses(cx))
-				throw std::runtime_error(
-						"Failed InitRealmStandardClasses");
-
-			insertArguments(cx, &global, arguments);
+			insertArguments(arguments);
 
 			const char *filename = "noname";
 			int lineno = 1;
@@ -122,22 +152,22 @@ void jsExecutor::runSpidermonkey(const std::string path,
 
 			if (rval.isObject()) {
 				JSObject *res = rval.toObjectOrNull();
-				getReturnValues(cx, res, returnValues);
+				getReturnValues(res, returnValues);
 			}
 				
 		}
 	}
-	JS_DestroyContext(cx);
+	//JS_DestroyContext(cx);
 }
 
 
-void jsExecutor::getReturnValues(JSContext *cx, JSObject *res, std::vector<jsTypeWrapper> &returnValues)
+void jsExecutor::getReturnValues(JSObject *res, std::vector<jsTypeWrapper> &returnValues)
 {
 	jsTypeWrapper nextValue;
 	int i = 1;
 	do {
 		std::string key = "return" + std::to_string(i++);
-		nextValue = getJSValue(cx, res, key.c_str());
+		nextValue = getJSValue(res, key.c_str());
 		if (nextValue.type != -1)
 			returnValues.push_back(nextValue);
 		else
@@ -146,9 +176,11 @@ void jsExecutor::getReturnValues(JSContext *cx, JSObject *res, std::vector<jsTyp
 }
 
 
-void jsExecutor::insertArguments(JSContext *cx, JS::RootedObject *global,
+void jsExecutor::insertArguments(
 		const std::vector<jsTypeWrapper> &arguments)
 {
+	JS::RootedObject obj(cx,global.get());
+
 	for (int i = 0; i < arguments.size(); i++) {
 
 		std::string key = "input" + std::to_string(i + 1);
@@ -157,13 +189,15 @@ void jsExecutor::insertArguments(JSContext *cx, JS::RootedObject *global,
 		switch (arguments[i].type) {
 		case 3:
 			arg = JS_NewStringCopyZ(cx, arguments[i].s.c_str());
-			JS_DefineProperty(cx, *global, key.c_str(), val, 0);
+			JS_DefineProperty(cx, obj, key.c_str(), val, 0);
 			break;
 		case 4:
-			JS_DefineProperty(cx, *global, key.c_str(), arguments[i].n, 0);
+			JS_DefineProperty(cx, obj,
+					key.c_str(), arguments[i].n, 0);
 			break;
 		case 5:
-			JS_DefineProperty(cx, *global, key.c_str(), arguments[i].b, 0);
+			JS_DefineProperty(cx, obj,
+					key.c_str(), arguments[i].b, 0);
 			break;
 		}
 	}
@@ -172,7 +206,7 @@ void jsExecutor::insertArguments(JSContext *cx, JS::RootedObject *global,
 
 
 jsExecutor::jsTypeWrapper jsExecutor::getJSValue(
-		JSContext *cx, JSObject *source, const char *prop)
+		JSObject *source, const char *prop)
 {
 	JS::HandleObject object = JS::HandleObject::fromMarkedLocation(&source);
 
