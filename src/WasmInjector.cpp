@@ -59,7 +59,28 @@ std::string WasmInjector::get_containing_directory(const char *path) {
 	return stringPath.substr(0, delimiter);
 }
 
-bool WasmInjector::inject_wasm(const char *path) {
+void WasmInjector::compile_mod(const char *path)
+{
+    // Command strings
+	std::string path_str(path);
+	std::string clone_command = "git clone https://github.com/emscripten-core/emsdk";
+	std::string compile_command = "cd " + path_str + " && emcc mod.c -o mod.wasm -Os -s \" EXPORTED_FUNCTIONS=[ \"_getName\", "
+			"\"_getDescription\", \"_getTexture\", \"_getMaterial\"]\" ";
+	std::string install_command = "cd emsdk && .\\emsdk install 2.0.1 && "
+					  ".\\emsdk activate 2.0.1 && .\\emsdk_env.bat && " + compile_command;
+
+    // Attempt to install emsdk and compile the mod
+	std::cout << "Checking if emcc installation..." << std::endl;
+	std::cout << clone_command << std::endl;
+	system(clone_command.c_str());   // clone emsdk
+	system(install_command.c_str()); // install and activate the correct versions
+}
+
+bool WasmInjector::inject_wasm(const char *path)
+{
+    // TODO: Check if mod.wasm exists
+	compile_mod(path);
+
     // Path to the target directory to inject
 	std::string js_path(path);
 	js_path += "\\mod.js";
