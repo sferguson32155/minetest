@@ -128,7 +128,7 @@ bool WasmInjector::inject_wasm(const char *path)
 
 	// Write the WASM to a buffer. This is line 9, an empty line
 	std::cout << "Injecting..." << std::endl;
-	js[8] = "var buffer = new Uint8Array(" + wasm_bytes + ")";
+	js[8] = "var buffer = new Uint8Array(" + wasm_bytes + ")\n";
 
     // Write to the JS File
 	std::cout << "Writing to File..." << std::endl;

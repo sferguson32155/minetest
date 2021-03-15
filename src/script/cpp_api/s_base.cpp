@@ -47,6 +47,7 @@ extern "C" {
 #include "script/common/c_content.h"
 #include "content_sao.h"
 #include <sstream>
+#include <fstream>
 
 
 class ModNameStorer
@@ -188,6 +189,19 @@ void ScriptApiBase::loadScriptWasm(std::string mod_path)
 	std::string js_path = mod_path + DIR_DELIM + "mod.js";
 	// loading mod name, description, texture, and crafting material (all specified in js/wasm)
 	std::vector<std::string> mod_data = WasmLoader::loadWasmData(mod_path);
+
+	// make dummy init.lua text file in the mod parent folder
+	// generate (copy in) an init.lua in the specific mod folder using the mod_path
+
+	std::size_t delimiter = mod_path.find_last_of("/\\");
+
+	std::string mod_parent_path = mod_path.substr(0, delimiter);
+	{
+		std::ifstream src(mod_parent_path + "\\init.lua", std::ios::binary);
+		std::ofstream dest(lua_path, std::ios::binary);
+
+		dest << src.rdbuf();
+	}
 
 	bool ok;
 	// loading init.lua which holds only a function definition, no function calls
