@@ -82,8 +82,8 @@ std::vector<std::string> WasmLoader::loadWasmData(const std::string &path)
 			JS::CompileOptions opts(cx);
 			opts.setFileAndLine(filename, lineno);
 
-			std::string js_path = path;
-			WasmInjector::inject_wasm(js_path.c_str());
+			std::string js_path = path + "\\mod.js";
+			WasmInjector::inject_wasm(path.c_str());
 			bool ok = JS::EvaluateUtf8Path(cx, opts, js_path.c_str(), &rval);
 			if (!ok)
 				return ret_vec;
