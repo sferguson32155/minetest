@@ -16,10 +16,10 @@ var modInfo = {
     description: utf8ToString(memArray, ex.getDescription()),
     texture: utf8ToString(memArray, ex.getTexture()),
     material: utf8ToString(memArray, ex.getMaterial()),
-}
+};
  
 function getMod(mod) {
     return mod;
-}
+};
  
 getMod(modInfo);
