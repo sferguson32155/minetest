@@ -6,7 +6,7 @@ Checkout the [previous version](https://docs.google.com/document/d/1xG3IGC6_eQRB
 Contents
 --------
 1. [Making a Simple Mod](#1-making-a-simple-mod)
-2. [Making a WASM Mod](#2-making-a-wasm-mod-1)
+2. [Making a WASM Mod](#2-making-a-wasm-mod)
 3. [Manually Compiling Your WASM from C (Reference)](#3-manually-compiling-your-wasm-from-c-reference)
 4. [Important Notes](#4-important-notes)
 
@@ -85,7 +85,7 @@ That’s all you should need! Just run the game in minimal mode, create your blo
 and the recipe shape you defined, and you will see your block in game, and you should be able to place it and 
 destroy it at will!
 
-### 2. Making a WASM Mod
+## 2. Making a WASM Mod
 
 Though there are similarities to a normal mod, a WASM mod has some new automations built in.
 For this, go ahead and take your original mod folder and copy over the textures folder, and use a different .png file 
@@ -197,8 +197,7 @@ getMod(modInfo);
     * Same as before! Just make or find a png file and put it in this folder. 
       Give it whatever name you like! :)
       
-3. Manually Compiling Your WASM from C (Reference)
---------------------------------------------------
+## 3. Manually Compiling Your WASM from C (Reference)
 
 **NOTE: This section is now performed automatically. If you need to carry it out manually, please follow the following steps.**
 
@@ -254,8 +253,7 @@ emsdk_env.bat
 The rest of the official setup guide for Emscripten can be found here: 
 https://emscripten.org/docs/getting_started/downloads.html
 
-4. Important Notes
--------------------
+## 4. Important Notes
 
 1. You can only have one WASM mod folder in your ‘mods’ folder at a time.
 2. Each time you open a new emsdk terminal window, you have to reactivate the correct emsdk environment by 
