@@ -74,7 +74,7 @@ bool WasmInjector::file_exists(const std::string &name)
 void WasmInjector::compile_mod(const char *path) {
     // Check for a file to be compiled
 	std::string mod_name = "";
-	std::string mod_names[] = {"\\mod.c", "\\mod.cpp", "\\mod.js"};
+	std::string mod_names[] = {"\\mod.c", "\\mod.cpp", "\\mod.rs"};
 	for (std::string name : mod_names) {
 		if (file_exists(path + name)) {
 			mod_name = path + name;

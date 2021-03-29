@@ -119,3 +119,5 @@ build/android/obj
 build/android/local.properties
 build/android/.gradle
 timestamp
+
+games/minimal/mods/simple_wasm/
