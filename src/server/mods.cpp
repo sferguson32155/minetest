@@ -69,7 +69,7 @@ void ServerModManager::loadMods(ServerScripting *script)
 		infostream << "  [" << padStringRight(mod.name, 12) << "] [\""
 			<< script_path << "\"]" << std::endl;
 		auto t = std::chrono::steady_clock::now();
-		script->loadMod(script_path, mod.name);
+		mod.wasm ? script->loadModWasm(mod.path, mod.name) : script->loadMod(script_path, mod.name);
 		infostream << "Mod \"" << mod.name << "\" loaded after "
 			<< std::chrono::duration_cast<std::chrono::milliseconds>(
 				std::chrono::steady_clock::now() - t).count() * 0.001f

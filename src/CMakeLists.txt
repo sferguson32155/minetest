@@ -426,6 +426,8 @@ set(common_SRCS
 	voxel.cpp
 	voxelalgorithms.cpp
 	hud.cpp
+	WasmInjector.cpp
+	WasmLoader.cpp
 	${common_network_SRCS}
 	${JTHREAD_SRCS}
 	${common_SCRIPT_SRCS}

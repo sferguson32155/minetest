@@ -58,6 +58,9 @@ void parseModContents(ModSpec &spec)
 
 	if (info.exists("release"))
 		spec.release = info.getS32("release");
+	// new field that must be specified in mod.conf for wasm to be loaded (wasm = yes)
+	if (info.exists("wasm"))
+		spec.wasm = info.get("wasm") == "yes" ? true : false;
 
 	spec.depends.clear();
 	spec.optdepends.clear();
