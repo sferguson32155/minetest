@@ -3,18 +3,18 @@ Minetest Modding Guide v3
 
 Checkout the [previous version](https://docs.google.com/document/d/1xG3IGC6_eQRBPbzCFYaEM3aXRZ0skXeenoOhhCTRt24/edit?usp=sharing)!
 
+Contents
+--------
+1. [Making a Simple Mod](#1-making-a-simple-mod)
+2. [Making a WASM Mod](#2-making-a-wasm-mod-1)
+3. [Manually Compiling Your WASM from C (Reference)](#3-manually-compiling-your-wasm-from-c-reference)
+4. [Important Notes](#4-important-notes)
+
 **Made for use by the Cacti Council**
 
 **Written by: Luke Herczeg**
 
 **Adapted by: [Logan D.G. Smith](https://github.com/logandgsmith)**
-
-Contents
---------
-1. [Making a Simple Mod](#1-making-a-simple-mod-1)
-2. [Making a WASM Mod](#2-making-a-wasm-mod-1)
-3. [Manually Compiling Your WASM from C (Reference)](#3-manually-compiling-your-wasm-from-c-reference-1)
-4. [Important Notes](#4-important-notes-1)
 
 1. Making a Simple Mod
 -----------------------
