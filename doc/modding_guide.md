@@ -1,4 +1,5 @@
-# Minetest Modding Guide v3
+Minetest Modding Guide v3
+=========================
 
 Checkout the [previous version](https://docs.google.com/document/d/1xG3IGC6_eQRBPbzCFYaEM3aXRZ0skXeenoOhhCTRt24/edit?usp=sharing)!
 
@@ -8,13 +9,15 @@ Checkout the [previous version](https://docs.google.com/document/d/1xG3IGC6_eQRB
 
 **Adapted by: [Logan D.G. Smith](https://github.com/logandgsmith)**
 
-## Contents
-### 1. Making a Simple Mod
-### 2. Making a WASM Mod
-### 3. Manually Compiling Your WASM from C (Reference)
-### 4. Important Notes
+Contents
+--------
+1. [Making a Simple Mod](#1-making-a-simple-mod-1)
+2. [Making a WASM Mod](#2-making-a-wasm-mod-1)
+3. [Manually Compiling Your WASM from C (Reference)](#3-manually-compiling-your-wasm-from-c-reference-1)
+4. [Important Notes](#4-important-notes-1)
 
-## 1. Making a Simple Mod
+1. Making a Simple Mod
+-----------------------
 
 ### Elements of a Basic Mod
 We will be making a mod in the ‘minimal’ folder. You can make a new folder inside that one, and call it whatever you like!
@@ -195,7 +198,8 @@ getMod(modInfo);
     * Same as before! Just make or find a png file and put it in this folder. 
       Give it whatever name you like! :)
       
-### 3. Manually Compiling Your WASM from C (Reference)
+3. Manually Compiling Your WASM from C (Reference)
+--------------------------------------------------
 
 **NOTE: This section is now performed automatically. If you need to carry it out manually, please follow the following steps.**
 
@@ -251,7 +255,8 @@ emsdk_env.bat
 The rest of the official setup guide for Emscripten can be found here: 
 https://emscripten.org/docs/getting_started/downloads.html
 
-### Important Notes
+4. Important Notes
+-------------------
 
 1. You can only have one WASM mod folder in your ‘mods’ folder at a time.
 2. Each time you open a new emsdk terminal window, you have to reactivate the correct emsdk environment by 
