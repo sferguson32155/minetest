@@ -16,8 +16,7 @@ Contents
 
 **Adapted by: [Logan D.G. Smith](https://github.com/logandgsmith)**
 
-1. Making a Simple Mod
------------------------
+## 1. Making a Simple Mod
 
 ### Elements of a Basic Mod
 We will be making a mod in the ‘minimal’ folder. You can make a new folder inside that one, and call it whatever you like!
