@@ -17,11 +17,13 @@ function register_wasm_mod(name, description, texture, material)
         groups = {oddly_breakable_by_hand=2},
         tiles = {texture},
     })
-    
+
     minetest.register_craft({
         output = name,
         recipe = {
-            {material, material},
+            {material, '', ''},
+            {material, '', ''},
+            {material, material, ''},
         },
     })
 end
