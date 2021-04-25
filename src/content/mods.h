@@ -40,6 +40,7 @@ struct ModSpec
 	std::string path;
 	std::string desc;
 	int release = 0;
+	bool wasm = false;
 
 	// if normal mod:
 	std::unordered_set<std::string> depends;
@@ -68,7 +69,7 @@ std::map<std::string, ModSpec> getModsInPath(
 		const std::string &path, bool part_of_modpack = false);
 
 // replaces modpack Modspecs with their content
-std::vector<ModSpec> flattenMods(std::map<std::string, ModSpec> mods);
+std::vector<ModSpec> flattenMods(const std::map<std::string, ModSpec> &mods);
 
 // a ModConfiguration is a subset of installed mods, expected to have
 // all dependencies fullfilled, so it can be used as a list of mods to

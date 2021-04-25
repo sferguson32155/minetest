@@ -58,6 +58,9 @@ void parseModContents(ModSpec &spec)
 
 	if (info.exists("release"))
 		spec.release = info.getS32("release");
+	// new field that must be specified in mod.conf for wasm to be loaded (wasm = yes)
+	if (info.exists("wasm"))
+		spec.wasm = info.get("wasm") == "yes" ? true : false;
 
 	spec.depends.clear();
 	spec.optdepends.clear();
@@ -167,7 +170,7 @@ std::map<std::string, ModSpec> getModsInPath(
 	return result;
 }
 
-std::vector<ModSpec> flattenMods(std::map<std::string, ModSpec> mods)
+std::vector<ModSpec> flattenMods(const std::map<std::string, ModSpec> &mods)
 {
 	std::vector<ModSpec> result;
 	for (const auto &it : mods) {

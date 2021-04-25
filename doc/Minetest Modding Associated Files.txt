@@ -1,0 +1,19 @@
+﻿Minetest Modding Associated Files
+
+
+File System
+* minetest/games/minimal/mods are where mods are located for our development purposes
+* minetest/lib/lua houses the actual Lua subsystem. API documentation is located there as well 
+* minetest/src contains the bulk of code/operation in C/C++ 
+* minetest/src/server/mods.cpp&mods.h is where mods are loaded into server
+* minetest/src/content - contains modpack.txt, modpack.conf, init.lua, game.conf that parse out mods and configure them
+* minetest/src/scripting -initialize mod api’s here
+* minetest/src/unittest - test api’s
+* minetest/src/util - utility libraries - string/time/numeric/hex, etc…acts as a ”MineTest STL”
+* minetest/util - build utilities
+        
+Parsing and Configuration  
+* Minetest compiles a list of names of mods, gets associated dependencies, mods without unmet dependencies can be appended to sorted list, and then are written back to a list of unsatisfied mods
+* A lot of “mod code” and data is written in lua, and then the C/C++ engine incorporates it into the rest of the program
+
+References: Minetest. “Minetest/Minetest.” GitHub, The Minetest Team, 8 Oct. 2019, https://github.com/minetest/minetest.

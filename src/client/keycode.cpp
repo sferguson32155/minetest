@@ -109,6 +109,7 @@ static const struct table_key table[] = {
 	DEFINEKEY1(KEY_RETURN, N_("Return"))
 	DEFINEKEY1(KEY_SHIFT, N_("Shift"))
 	DEFINEKEY1(KEY_CONTROL, N_("Control"))
+	//~ Key name, common on Windows keyboards
 	DEFINEKEY1(KEY_MENU, N_("Menu"))
 	DEFINEKEY1(KEY_PAUSE, N_("Pause"))
 	DEFINEKEY1(KEY_CAPITAL, N_("Caps Lock"))
@@ -121,7 +122,9 @@ static const struct table_key table[] = {
 	DEFINEKEY1(KEY_UP, N_("Up"))
 	DEFINEKEY1(KEY_RIGHT, N_("Right"))
 	DEFINEKEY1(KEY_DOWN, N_("Down"))
+	//~ Key name
 	DEFINEKEY1(KEY_SELECT, N_("Select"))
+	//~ "Print screen" key
 	DEFINEKEY1(KEY_PRINT, N_("Print"))
 	DEFINEKEY1(KEY_EXECUT, N_("Execute"))
 	DEFINEKEY1(KEY_SNAPSHOT, N_("Snapshot"))
@@ -313,7 +316,8 @@ KeyPress::KeyPress(const char *name)
 	int chars_read = mbtowc(&Char, name, 1);
 	FATAL_ERROR_IF(chars_read != 1, "Unexpected multibyte character");
 	m_name = "";
-	warningstream << "KeyPress: Unknown key '" << name << "', falling back to first char.";
+	warningstream << "KeyPress: Unknown key '" << name
+		<< "', falling back to first char." << std::endl;
 }
 
 KeyPress::KeyPress(const irr::SEvent::SKeyInput &in, bool prefer_character)
