@@ -1,7 +1,196 @@
 #include "native_item.h"
-#include "itemdef.h"
-#include "server.h"
 
+// NativeItemStack function definitions
+
+int NativeItemStack::native_gc_object(ItemStack *item)
+{
+    delete item;
+    return 0;
+}
+
+std::string NativeItemStack::native_mt_tostring(ItemStack* item)
+{
+    return item->getItemString(false);
+}
+
+bool NativeItemStack::native_is_empty(ItemStack* item)
+{
+    return item->empty();
+}
+
+std::string NativeItemStack::native_get_name(ItemStack* item)
+{
+    return item->name;
+}
+
+bool NativeItemStack::native_set_name(ItemStack* item, std::string name)
+{
+    bool status = true;
+
+    item->name = name;
+
+    if (item.name.empty() || item.empty()) {
+        item.clear();
+        status = false;
+    }
+
+    return status;
+}
+
+int NativeItemStack::native_get_count(ItemStack* item)
+{
+    return item->count;
+}
+
+bool NativeItemStack::native_set_count(ItemStack* item, int count)
+{
+    bool status = true;
+
+    if (count > 0 && count <= 65535) {
+        item->count = count;
+    } else {
+        item.clear();
+        status = false;
+    }
+
+    return status;
+}
+
+int NativeItemStack::native_get_wear(ItemStack* item)
+{
+    return item->wear;
+}
+
+bool NativeItemStack::native_set_wear(ItemStack* item, int wear)
+{
+    bool status = true;
+
+    if (wear <= 65535) {
+        item->wear = wear;
+    } else {
+        item.clear();
+        status = false;
+    }
+
+    return status;
+}
+
+// TODO: I am unsure if this is the correct way to do this.
+ItemStackMetadata NativeItemStack::native_get_metadata(ItemStack* item)
+{
+    return item->metadata;
+}
+
+std::string NativeItemStack::native_get_description(Server* server, ItemStack* item)
+{
+    return item->getDescription(server->getItemDefManager());
+}
+
+std::string NativeItemStack::native_get_short_description(Server* server, ItemStack* item)
+{
+    return item->getShortDescription(server->getItemDefManager());
+}
+
+bool NativeItemStack::native_clear(ItemStack* item)
+{
+    item->clear();
+    return true;
+}
+
+// TODO: I am unsure if this is the correct way to do this.
+bool NativeItemStack::native_replace(ItemStack* item, ItemStack* new_item)
+{
+    status = true;
+
+    if (new_item == nullptr) {
+        new_item = new ItemStack();
+    }
+
+    item = new_item;
+
+    return true;
+}
+
+std::string NativeItemStack::native_to_string(ItemStack* item)
+{
+    return item->getItemString();
+}
+
+int NativeItemStack::native_get_stack_max(Server* server, ItemStack* item)
+{
+    return item->getStackMax(server->getItemDefManager());
+}
+
+
+int NativeItemStack::native_get_free_space(Server* server, ItemStack* item)
+{
+    return item->freeSpace(server->getItemDefManager());
+}
+
+bool NativeItemStack::native_is_known(Server* server, ItemStack* item)
+{
+    return item->isKnown(server->getItemDefManager());
+}
+
+ToolCapabilities NativeItemStack::native_get_tool_capabilities(Server* server, ItemStack* item)
+{
+    return item->getToolCapabilities(server->getItemDefManager());
+}
+
+bool NativeItemStack::native_add_wear(ItemStack* item, int amount)
+{
+    return item->addWear(amount);
+}
+
+ItemStack NativeItemStack::native_add_item(Server* server, ItemStack* item, ItemStack* new_item)
+{
+    return item->addItem(*new_item, server->getItemDefManager());
+}
+
+// FIXME: this is supposed to have two returns??
+bool NativeItemStack::native_item_fits(Server* server, ItemStack* item, ItemStack* new_item)
+{
+    ItemStack rest_item;
+    return item->itemFits(*new_item, rest_item, server->getItemDefManager());
+}
+
+ItemStack NativeItemStack::native_take_item(ItemStack* item, int count)
+{
+    // TODO: it looks like this is what the l_take_item function does, in a round-about
+    // way, however I am unsure.
+    if (count < 1) {
+        count = 1;
+    }
+
+    return item->takeItem(count);
+}
+
+ItemStack NativeItemStack::native_peek_item(ItemStack* item, int count)
+{
+    if (count < 1) {
+        count = 1;
+    }
+
+
+    return item->peekItem(count);
+}
+
+NativeItemStack::NativeItemStack(const ItemStack &item):
+	item(item)
+{
+}
+
+const ItemStack& NativeItemStack::getItem() const
+{
+    return item;
+}
+
+ItemStack& NativeItemStack::getItem()
+{
+    return item;
+}
+
+// NativeModApiItemMod function definitions
 
 int NativeModApiItemMod::native_register_item_raw(Server *server, std::string name,
 		std::string description, std::string short_description,
@@ -138,5 +327,4 @@ const char* NativeModApiItemMod::native_get_name_from_content_id(Server *server,
     
     
     return ndef->get(c).name.c_str();
-
 }
