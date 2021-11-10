@@ -29,8 +29,8 @@ bool NativeItemStack::native_set_name(ItemStack* item, std::string name)
 
     item->name = name;
 
-    if (item.name.empty() || item.empty()) {
-        item.clear();
+    if (item->name.empty() || item->empty()) {
+        item->clear();
         status = false;
     }
 
@@ -49,7 +49,7 @@ bool NativeItemStack::native_set_count(ItemStack* item, int count)
     if (count > 0 && count <= 65535) {
         item->count = count;
     } else {
-        item.clear();
+        item->clear();
         status = false;
     }
 
@@ -68,7 +68,7 @@ bool NativeItemStack::native_set_wear(ItemStack* item, int wear)
     if (wear <= 65535) {
         item->wear = wear;
     } else {
-        item.clear();
+        item->clear();
         status = false;
     }
 
@@ -100,7 +100,7 @@ bool NativeItemStack::native_clear(ItemStack* item)
 // TODO: I am unsure if this is the correct way to do this.
 bool NativeItemStack::native_replace(ItemStack* item, ItemStack* new_item)
 {
-    status = true;
+    bool status = true;
 
     if (new_item == nullptr) {
         new_item = new ItemStack();
@@ -137,9 +137,11 @@ ToolCapabilities NativeItemStack::native_get_tool_capabilities(Server* server, I
     return item->getToolCapabilities(server->getItemDefManager());
 }
 
+// FIXME: refactor this function to take in a Server object
 bool NativeItemStack::native_add_wear(ItemStack* item, int amount)
 {
-    return item->addWear(amount);
+	return false;
+    // return item->addWear(amount);
 }
 
 ItemStack NativeItemStack::native_add_item(Server* server, ItemStack* item, ItemStack* new_item)
@@ -150,7 +152,7 @@ ItemStack NativeItemStack::native_add_item(Server* server, ItemStack* item, Item
 // FIXME: this is supposed to have two returns??
 bool NativeItemStack::native_item_fits(Server* server, ItemStack* item, ItemStack* new_item)
 {
-    ItemStack rest_item;
+    ItemStack *rest_item;
     return item->itemFits(*new_item, rest_item, server->getItemDefManager());
 }
 
@@ -226,7 +228,7 @@ int NativeModApiItemMod::native_register_item_raw(Server *server, std::string na
     def.palette_image = palette_image;
 
     if (def.node_placement_prediction == "__default") {
-        if (def.type === ITEM_NODE) {
+        if (def.type == ITEM_NODE) {
             def.node_placement_prediction = name;
         } else {
             def.node_placement_prediction = "";
@@ -276,7 +278,7 @@ int NativeModApiItemMod::native_register_item_raw(Server *server, std::string na
     return 0; /* number of results */
 }
 
-int NativeModApiItemMod::native_unregister_item(Server *server, std::string name)
+int NativeModApiItemMod::native_unregister_item_raw(Server *server, std::string name)
 {
     IWritableItemDefManager *idef = server->getWritableItemDefManager();
 
@@ -313,7 +315,7 @@ content_t NativeModApiItemMod::native_get_content_id(Server *server, std::string
         if (!ndef->getId(alias_name, content_id)) {
             throw ModError("Unknown node: " + alias_name +
 					" (from alias " + name + ")");
-        } else if (!ndef-><getId(name, content_id)) {
+        } else if (!ndef->getId(name, content_id)) {
             throw ModError("Unknown node: " + name);
         }
     }

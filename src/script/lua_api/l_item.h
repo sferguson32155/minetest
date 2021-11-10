@@ -21,6 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "lua_api/l_base.h"
 #include "inventory.h"  // ItemStack
+#include "native_api/native_item.h"
 
 class LuaItemStack : public ModApiBase {
 private:

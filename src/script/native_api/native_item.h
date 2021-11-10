@@ -1,3 +1,5 @@
+#pragma once
+
 #include "inventory.h"  // ItemStack
 #include "tool.h" 
 #include "server.h"
@@ -22,7 +24,7 @@ private:
 	static int native_get_count(ItemStack* item);
 	static bool native_set_count(ItemStack* item, int count);
 	static int native_get_wear(ItemStack* item);
-	static bool native_set_wear(ItemStack* item);
+	static bool native_set_wear(ItemStack* item, int wear);
 	static ItemStackMetadata native_get_metadata(ItemStack* item);
 	static std::string native_get_description(Server* server, ItemStack* item);
 	static std::string native_get_short_description(Server* server, ItemStack* item);
@@ -80,9 +82,7 @@ private:
 	);
 
 	static int native_unregister_item_raw(Server *server, std::string name);
-	static int native_register_alias_raw(Server *server, std::string name, 
-		std::string name, std::string convert_to
-	);
+	static int native_register_alias_raw(Server *server, std::string name, std::string convert_to);
 	static content_t native_get_content_id(Server *server, std::string name);
 	static const char* native_get_name_from_content_id(Server *server, content_t c);
 
