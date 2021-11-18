@@ -1,8 +1,9 @@
 #include "native_item.h"
+#include <tuple>
 
 // NativeItemStack function definitions
 
-int NativeItemStack::native_gc_object(ItemStack *item)
+int NativeItemStack::native_gc_object(NativeItemStack *item)
 {
     delete item;
     return 0;
@@ -75,20 +76,16 @@ bool NativeItemStack::native_set_wear(ItemStack* item, int wear)
     return status;
 }
 
-// TODO: I am unsure if this is the correct way to do this.
-ItemStackMetadata NativeItemStack::native_get_metadata(ItemStack* item)
+// TODO: implement native_get_meta
+
+std::string NativeItemStack::native_get_description(ItemStack* item, IItemDefManager* idef)
 {
-    return item->metadata;
+    return item->getDescription(idef);
 }
 
-std::string NativeItemStack::native_get_description(Server* server, ItemStack* item)
+std::string NativeItemStack::native_get_short_description(ItemStack* item, IItemDefManager* idef)
 {
-    return item->getDescription(server->getItemDefManager());
-}
-
-std::string NativeItemStack::native_get_short_description(Server* server, ItemStack* item)
-{
-    return item->getShortDescription(server->getItemDefManager());
+    return item->getShortDescription(idef);
 }
 
 bool NativeItemStack::native_clear(ItemStack* item)
@@ -116,64 +113,57 @@ std::string NativeItemStack::native_to_string(ItemStack* item)
     return item->getItemString();
 }
 
-int NativeItemStack::native_get_stack_max(Server* server, ItemStack* item)
+// TODO: implement native_to_table
+// I am not sure how to implement it
+
+int NativeItemStack::native_get_stack_max(ItemStack* item, IItemDefManager* idef)
 {
-    return item->getStackMax(server->getItemDefManager());
+    return item->getStackMax(idef);
 }
 
 
-int NativeItemStack::native_get_free_space(Server* server, ItemStack* item)
+int NativeItemStack::native_get_free_space(ItemStack* item, IItemDefManager* idef)
 {
-    return item->freeSpace(server->getItemDefManager());
+    return item->freeSpace(idef);
 }
 
-bool NativeItemStack::native_is_known(Server* server, ItemStack* item)
+bool NativeItemStack::native_is_known(ItemStack* item, IItemDefManager* idef)
 {
-    return item->isKnown(server->getItemDefManager());
+    return item->isKnown(idef);
 }
 
-ToolCapabilities NativeItemStack::native_get_tool_capabilities(Server* server, ItemStack* item)
+ToolCapabilities NativeItemStack::native_get_tool_capabilities(ItemStack* item, IItemDefManager* idef)
 {
-    return item->getToolCapabilities(server->getItemDefManager());
+    return item->getToolCapabilities(idef);
 }
 
-// FIXME: refactor this function to take in a Server object
-bool NativeItemStack::native_add_wear(ItemStack* item, int amount)
+// TODO: implement native_get_definition
+
+bool NativeItemStack::native_add_wear(ItemStack* item, int amount, IItemDefManager* idef)
 {
-	return false;
-    // return item->addWear(amount);
+    return item->addWear(amount, idef);
 }
 
-ItemStack NativeItemStack::native_add_item(Server* server, ItemStack* item, ItemStack* new_item)
+ItemStack NativeItemStack::native_add_item(ItemStack* item, ItemStack* new_item, IItemDefManager* idef)
 {
-    return item->addItem(*new_item, server->getItemDefManager());
+    return item->addItem(*new_item, idef);
 }
 
-// FIXME: this is supposed to have two returns??
-bool NativeItemStack::native_item_fits(Server* server, ItemStack* item, ItemStack* new_item)
+std::tuple<bool, ItemStack*> NativeItemStack::native_item_fits(ItemStack* item, ItemStack* new_item, IItemDefManager* idef)
 {
     ItemStack *rest_item;
-    return item->itemFits(*new_item, rest_item, server->getItemDefManager());
+    bool fits = item->itemFits(*new_item, rest_item, idef);
+
+    return std::tuple<bool, ItemStack*>(fits, rest_item);
 }
 
 ItemStack NativeItemStack::native_take_item(ItemStack* item, int count)
 {
-    // TODO: it looks like this is what the l_take_item function does, in a round-about
-    // way, however I am unsure.
-    if (count < 1) {
-        count = 1;
-    }
-
     return item->takeItem(count);
 }
 
 ItemStack NativeItemStack::native_peek_item(ItemStack* item, int count)
 {
-    if (count < 1) {
-        count = 1;
-    }
-
-
     return item->peekItem(count);
 }
 

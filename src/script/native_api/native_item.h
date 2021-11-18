@@ -12,10 +12,11 @@
 // methods as static, but I'm not sure if it's a good idea to change that so until then I'm
 // going to keep it static.
 class NativeItemStack {
-private:
+// private:
+public:
 	ItemStack item;
 
-	static int native_gc_object(ItemStack* item);
+	static int native_gc_object(NativeItemStack* item);
 	static std::string native_mt_tostring(ItemStack* item);
 
 	static bool native_is_empty(ItemStack* item);
@@ -25,32 +26,33 @@ private:
 	static bool native_set_count(ItemStack* item, int count);
 	static int native_get_wear(ItemStack* item);
 	static bool native_set_wear(ItemStack* item, int wear);
-	static ItemStackMetadata native_get_metadata(ItemStack* item);
-	static std::string native_get_description(Server* server, ItemStack* item);
-	static std::string native_get_short_description(Server* server, ItemStack* item);
+	// TODO: implement native_get_meta, blocked until l_itemstackmeta.h is native implemented
+	static std::string native_get_description(ItemStack* item, IItemDefManager* idef);
+	static std::string native_get_short_description(ItemStack* item, IItemDefManager* idef);
 	static bool native_clear(ItemStack* item);
 	static bool native_replace(ItemStack* item, ItemStack* new_item);
 	static std::string native_to_string(ItemStack* item);
 
 	// TODO: is this function necessary for a native class?
 	// UNKNOWN_RETURN native_to_table(ItemStack* item);
+	// I am not sure how to implement it
 
-	static int native_get_stack_max(Server* server, ItemStack* item);
-	static int native_get_free_space(Server* server, ItemStack* item);
-	static bool native_is_known(Server* server, ItemStack* item);
+	static int native_get_stack_max(ItemStack* item, IItemDefManager* idef);
+	static int native_get_free_space(ItemStack* item, IItemDefManager* idef);
+	static bool native_is_known(ItemStack* item, IItemDefManager* idef);
 
 	// TODO: I did not know how to do this one
 	// UNKNOWN_RETURN native_get_definition(ItemStack* item);
 
-	static ToolCapabilities native_get_tool_capabilities(Server* server, ItemStack* item);
-	static bool native_add_wear(ItemStack* item, int amount);
-	static ItemStack native_add_item(Server* server, ItemStack* item, ItemStack* new_item);
+	static ToolCapabilities native_get_tool_capabilities(ItemStack* item, IItemDefManager* idef);
+	static bool native_add_wear(ItemStack* item, int amount, IItemDefManager* idef);
+	static ItemStack native_add_item(ItemStack* item, ItemStack* new_item, IItemDefManager* idef);
 	// TODO: fix this function implementation
-	static bool native_item_fits(Server* server, ItemStack* item, ItemStack* new_item);
+	static std::tuple<bool, ItemStack*> native_item_fits(ItemStack* item, ItemStack* new_item, IItemDefManager* idef);
 	static ItemStack native_take_item(ItemStack* item, int count);
 	static ItemStack native_peek_item(ItemStack* item, int count);
 
-public:
+// public:
 	NativeItemStack(const ItemStack& item);
 	// TODO: what does this do?
 	~NativeItemStack() = default;

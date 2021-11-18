@@ -27,6 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "server.h"
 #include "inventory.h"
 #include "log.h"
+#include <tuple>
 
 
 // garbage collector
@@ -41,7 +42,7 @@ int LuaItemStack::gc_object(lua_State *L)
 int LuaItemStack::mt_tostring(lua_State *L)
 {
 	LuaItemStack *o = checkobject(L, 1);
-	std::string itemstring = o->m_stack.getItemString(false);
+	std::string itemstring = NativeItemStack::native_mt_tostring(&o->m_stack);
 	lua_pushfstring(L, "ItemStack(\"%s\")", itemstring.c_str());
 	return 1;
 }
@@ -51,8 +52,8 @@ int LuaItemStack::l_is_empty(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	ItemStack &item = o->m_stack;
-	lua_pushboolean(L, item.empty());
+	bool is_empty = NativeItemStack::native_is_empty(&o->m_stack);
+	lua_pushboolean(L, is_empty);
 	return 1;
 }
 
@@ -61,8 +62,8 @@ int LuaItemStack::l_get_name(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	ItemStack &item = o->m_stack;
-	lua_pushstring(L, item.name.c_str());
+	std::string name = NativeItemStack::native_get_name(&o->m_stack);
+	lua_pushstring(L, name.c_str());
 	return 1;
 }
 
@@ -71,14 +72,9 @@ int LuaItemStack::l_set_name(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	ItemStack &item = o->m_stack;
+	std::string new_name = luaL_checkstring(L, 2);
 
-	bool status = true;
-	item.name = luaL_checkstring(L, 2);
-	if (item.name.empty() || item.empty()) {
-		item.clear();
-		status = false;
-	}
+	bool status = NativeItemStack::native_set_name(&o->m_stack, new_name);
 
 	lua_pushboolean(L, status);
 	return 1;
@@ -89,8 +85,8 @@ int LuaItemStack::l_get_count(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	ItemStack &item = o->m_stack;
-	lua_pushinteger(L, item.count);
+	int count = NativeItemStack::native_get_count(&o->m_stack);
+	lua_pushinteger(L, count);
 	return 1;
 }
 
@@ -99,17 +95,11 @@ int LuaItemStack::l_set_count(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	ItemStack &item = o->m_stack;
 
-	bool status;
+	ItemStack &item = o->m_stack;
 	lua_Integer count = luaL_checkinteger(L, 2);
-	if (count > 0 && count <= 65535) {
-		item.count = count;
-		status = true;
-	} else {
-		item.clear();
-		status = false;
-	}
+
+	bool status = NativeItemStack::native_set_count(&item, count);
 
 	lua_pushboolean(L, status);
 	return 1;
@@ -120,8 +110,8 @@ int LuaItemStack::l_get_wear(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	ItemStack &item = o->m_stack;
-	lua_pushinteger(L, item.wear);
+	int wear = NativeItemStack::native_get_wear(&o->m_stack);
+	lua_pushinteger(L, wear);
 	return 1;
 }
 
@@ -131,16 +121,9 @@ int LuaItemStack::l_set_wear(lua_State *L)
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
 	ItemStack &item = o->m_stack;
+	lua_Integer new_wear = luaL_checkinteger(L, 2);
 
-	bool status;
-	lua_Integer wear = luaL_checkinteger(L, 2);
-	if (wear <= 65535) {
-		item.wear = wear;
-		status = true;
-	} else {
-		item.clear();
-		status = false;
-	}
+	bool status = NativeItemStack::native_set_wear(&item, new_wear);
 
 	lua_pushboolean(L, status);
 	return 1;
@@ -188,7 +171,8 @@ int LuaItemStack::l_get_description(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	std::string desc = o->m_stack.getDescription(getGameDef(L)->idef());
+	IItemDefManager *idef = getGameDef(L)->idef();
+	std::string desc = NativeItemStack::native_get_description(&o->m_stack, idef);
 	lua_pushstring(L, desc.c_str());
 	return 1;
 }
@@ -198,7 +182,8 @@ int LuaItemStack::l_get_short_description(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	std::string desc = o->m_stack.getShortDescription(getGameDef(L)->idef());
+	IItemDefManager *idef = getGameDef(L)->idef();
+	std::string desc = NativeItemStack::native_get_short_description(&o->m_stack, idef);
 	lua_pushstring(L, desc.c_str());
 	return 1;
 }
@@ -208,8 +193,8 @@ int LuaItemStack::l_clear(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	o->m_stack.clear();
-	lua_pushboolean(L, true);
+	bool status = NativeItemStack::native_clear(&o->m_stack);
+	lua_pushboolean(L, status);
 	return 1;
 }
 
@@ -218,8 +203,9 @@ int LuaItemStack::l_replace(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	o->m_stack = read_item(L, 2, getGameDef(L)->idef());
-	lua_pushboolean(L, true);
+	ItemStack new_item = read_item(L, 2, getGameDef(L)->idef());
+	bool status = NativeItemStack::native_replace(&o->m_stack, &new_item);
+	lua_pushboolean(L, status);
 	return 1;
 }
 
@@ -228,7 +214,7 @@ int LuaItemStack::l_to_string(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	std::string itemstring = o->m_stack.getItemString();
+	std::string itemstring = NativeItemStack::native_to_string(&o->m_stack);
 	lua_pushstring(L, itemstring.c_str());
 	return 1;
 }
@@ -278,8 +264,9 @@ int LuaItemStack::l_get_stack_max(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	ItemStack &item = o->m_stack;
-	lua_pushinteger(L, item.getStackMax(getGameDef(L)->idef()));
+	IItemDefManager *idef = getGameDef(L)->idef();
+	int max = NativeItemStack::native_get_stack_max(&o->m_stack, idef);
+	lua_pushinteger(L, max);
 	return 1;
 }
 
@@ -288,8 +275,9 @@ int LuaItemStack::l_get_free_space(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	ItemStack &item = o->m_stack;
-	lua_pushinteger(L, item.freeSpace(getGameDef(L)->idef()));
+	IItemDefManager *idef = getGameDef(L)->idef();
+	int free_space = NativeItemStack::native_get_free_space(&o->m_stack, idef);
+	lua_pushinteger(L, free_space);
 	return 1;
 }
 
@@ -299,8 +287,7 @@ int LuaItemStack::l_is_known(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	ItemStack &item = o->m_stack;
-	bool is_known = item.isKnown(getGameDef(L)->idef());
+	bool is_known = NativeItemStack::native_is_known(&o->m_stack, getGameDef(L)->idef());
 	lua_pushboolean(L, is_known);
 	return 1;
 }
@@ -335,8 +322,8 @@ int LuaItemStack::l_get_tool_capabilities(lua_State *L)
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
 	ItemStack &item = o->m_stack;
-	const ToolCapabilities &prop =
-		item.getToolCapabilities(getGameDef(L)->idef());
+	const ToolCapabilities &prop = 
+		NativeItemStack::native_get_tool_capabilities(&item, getGameDef(L)->idef());
 	push_tool_capabilities(L, prop);
 	return 1;
 }
@@ -351,7 +338,7 @@ int LuaItemStack::l_add_wear(lua_State *L)
 	LuaItemStack *o = checkobject(L, 1);
 	ItemStack &item = o->m_stack;
 	int amount = lua_tointeger(L, 2);
-	bool result = item.addWear(amount, getGameDef(L)->idef());
+	bool result = NativeItemStack::native_add_wear(&item, amount, getGameDef(L)->idef());
 	lua_pushboolean(L, result);
 	return 1;
 }
@@ -363,8 +350,9 @@ int LuaItemStack::l_add_item(lua_State *L)
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
 	ItemStack &item = o->m_stack;
+	IItemDefManager *idef = getGameDef(L)->idef();
 	ItemStack newitem = read_item(L, -1, getGameDef(L)->idef());
-	ItemStack leftover = item.addItem(newitem, getGameDef(L)->idef());
+	ItemStack leftover = NativeItemStack::native_add_item(&item, &newitem, idef);
 	create(L, leftover);
 	return 1;
 }
@@ -378,10 +366,11 @@ int LuaItemStack::l_item_fits(lua_State *L)
 	LuaItemStack *o = checkobject(L, 1);
 	ItemStack &item = o->m_stack;
 	ItemStack newitem = read_item(L, 2, getGameDef(L)->idef());
-	ItemStack restitem;
-	bool fits = item.itemFits(newitem, &restitem, getGameDef(L)->idef());
-	lua_pushboolean(L, fits);  // first return value
-	create(L, restitem);       // second return value
+
+	std::tuple<bool, ItemStack*> result = NativeItemStack::native_item_fits(&item, &newitem, getGameDef(L)->idef());
+
+	lua_pushboolean(L, std::get<0>(result)); // first return value
+	create(L, *std::get<1>(result));			 // second return value
 	return 2;
 }
 
@@ -394,7 +383,7 @@ int LuaItemStack::l_take_item(lua_State *L)
 	u32 takecount = 1;
 	if(!lua_isnone(L, 2))
 		takecount = luaL_checkinteger(L, 2);
-	ItemStack taken = item.takeItem(takecount);
+	ItemStack taken = NativeItemStack::native_take_item(&item, takecount);
 	create(L, taken);
 	return 1;
 }
@@ -408,7 +397,7 @@ int LuaItemStack::l_peek_item(lua_State *L)
 	u32 peekcount = 1;
 	if(!lua_isnone(L, 2))
 		peekcount = lua_tointeger(L, 2);
-	ItemStack peekaboo = item.peekItem(peekcount);
+	ItemStack peekaboo = NativeItemStack::native_peek_item(&item, peekcount);
 	create(L, peekaboo);
 	return 1;
 }
