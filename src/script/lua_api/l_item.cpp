@@ -584,19 +584,7 @@ int ModApiItemMod::l_unregister_item_raw(lua_State *L)
 	NO_MAP_LOCK_REQUIRED;
 	std::string name = luaL_checkstring(L, 1);
 
-	IWritableItemDefManager *idef =
-			getServer(L)->getWritableItemDefManager();
-
-	// Unregister the node
-	if (idef->get(name).type == ITEM_NODE) {
-		NodeDefManager *ndef =
-			getServer(L)->getWritableNodeDefManager();
-		ndef->removeNode(name);
-	}
-
-	idef->unregisterItem(name);
-
-	return 0; /* number of results */
+	return NativeModApiItemMod::native_unregister_item_raw(getServer(L), name);
 }
 
 // register_alias_raw(name, convert_to_name)
@@ -606,13 +594,7 @@ int ModApiItemMod::l_register_alias_raw(lua_State *L)
 	std::string name = luaL_checkstring(L, 1);
 	std::string convert_to = luaL_checkstring(L, 2);
 
-	// Get the writable item definition manager from the server
-	IWritableItemDefManager *idef =
-			getServer(L)->getWritableItemDefManager();
-
-	idef->registerAlias(name, convert_to);
-
-	return 0; /* number of results */
+	return NativeModApiItemMod::native_register_alias_raw(getServer(L), name, convert_to);
 }
 
 // get_content_id(name)
@@ -621,21 +603,10 @@ int ModApiItemMod::l_get_content_id(lua_State *L)
 	NO_MAP_LOCK_REQUIRED;
 	std::string name = luaL_checkstring(L, 1);
 
-	const IItemDefManager *idef = getGameDef(L)->getItemDefManager();
+	IItemDefManager *idef = getGameDef(L)->getItemDefManager();
 	const NodeDefManager *ndef = getGameDef(L)->getNodeDefManager();
 
-	// If this is called at mod load time, NodeDefManager isn't aware of
-	// aliases yet, so we need to handle them manually
-	std::string alias_name = idef->getAlias(name);
-
-	content_t content_id;
-	if (alias_name != name) {
-		if (!ndef->getId(alias_name, content_id))
-			throw LuaError("Unknown node: " + alias_name +
-					" (from alias " + name + ")");
-	} else if (!ndef->getId(name, content_id)) {
-		throw LuaError("Unknown node: " + name);
-	}
+	content_t content_id = NativeModApiItemMod::native_get_content_id(idef, ndef, name);
 
 	lua_pushinteger(L, content_id);
 	return 1; /* number of results */
@@ -648,7 +619,7 @@ int ModApiItemMod::l_get_name_from_content_id(lua_State *L)
 	content_t c = luaL_checkint(L, 1);
 
 	const NodeDefManager *ndef = getGameDef(L)->getNodeDefManager();
-	const char *name = ndef->get(c).name.c_str();
+	const char *name =	NativeModApiItemMod::native_get_name_from_content_id(ndef, c);
 
 	lua_pushstring(L, name);
 	return 1; /* number of results */

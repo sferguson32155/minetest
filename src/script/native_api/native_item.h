@@ -75,7 +75,7 @@ public:
 };
 
 class NativeModApiItemMod {
-private:
+public:
 	static int native_register_item_raw(Server *server, std::string name, 
 		std::string description, std::string short_description, std::string inventory_image, 
 		std::string inventory_overlay, std::string wield_image, std::string wield_overlay,
@@ -85,8 +85,8 @@ private:
 
 	static int native_unregister_item_raw(Server *server, std::string name);
 	static int native_register_alias_raw(Server *server, std::string name, std::string convert_to);
-	static content_t native_get_content_id(Server *server, std::string name);
-	static const char* native_get_name_from_content_id(Server *server, content_t c);
+	static content_t native_get_content_id(IItemDefManager *idef, const NodeDefManager *ndef, std::string name);
+	static const char* native_get_name_from_content_id(const NodeDefManager *ndef, content_t c);
 
 public:
 	// TODO: determine if this is necessary, it looks like this is just for lua

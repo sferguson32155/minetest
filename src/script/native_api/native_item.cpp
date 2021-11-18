@@ -271,7 +271,8 @@ int NativeModApiItemMod::native_register_item_raw(Server *server, std::string na
 int NativeModApiItemMod::native_unregister_item_raw(Server *server, std::string name)
 {
     IWritableItemDefManager *idef = server->getWritableItemDefManager();
-
+	
+    // Unregister the node
     if (idef->get(name).type == ITEM_NODE) {
         NodeDefManager *ndef = server->getWritableNodeDefManager();
         ndef->removeNode(name);
@@ -292,11 +293,10 @@ int NativeModApiItemMod::native_register_alias_raw(Server *server, std::string n
     return 0;
 }
 
-content_t NativeModApiItemMod::native_get_content_id(Server *server, std::string name)
+content_t NativeModApiItemMod::native_get_content_id(IItemDefManager *idef, const NodeDefManager *ndef, std::string name)
 {
-    const IItemDefManager *idef = server->getItemDefManager();
-    const NodeDefManager *ndef = server->getNodeDefManager();
-
+    // If this is called at mod load time, NodeDefManager isn't aware of
+	// aliases yet, so we need to handle them manually
     std::string alias_name = idef->getAlias(name);
 
     content_t content_id;
@@ -313,10 +313,7 @@ content_t NativeModApiItemMod::native_get_content_id(Server *server, std::string
     return content_id;
 }
 
-const char* NativeModApiItemMod::native_get_name_from_content_id(Server *server, content_t c)
+const char* NativeModApiItemMod::native_get_name_from_content_id(const NodeDefManager *ndef, content_t c)
 {
-    const NodeDefManager *ndef = server->getNodeDefManager();
-    
-    
     return ndef->get(c).name.c_str();
 }
