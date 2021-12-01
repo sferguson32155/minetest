@@ -21,8 +21,12 @@ static JSClassOps global_ops = { nullptr, nullptr, nullptr, nullptr, nullptr, nu
 /* The class of the global object. */
 static JSClass global_class = { "global", JSCLASS_GLOBAL_FLAGS, &global_ops };
 
+
+// # Params:
+// ## cx: 
 std::string WasmLoader::getModProperty(JSContext *cx, JSObject *source, const char *prop)
 {
+	// Creates a Handle from the raw location `source`
 	JS::HandleObject object = JS::HandleObject::fromMarkedLocation(&source);
 
 	JS::Value v;
@@ -47,22 +51,29 @@ std::string WasmLoader::getModProperty(JSContext *cx, JSObject *source, const ch
 
 std::vector<std::string> WasmLoader::loadWasmData(const std::string &path)
 {
-	JS_Init();
-	std::vector<std::string> ret_vec;
-	JSContext *cx = JS_NewContext(8L * 1024 * 1024);
+	// Initialize the JS engine and context
+	if (!JS_IsInitialized())
+		JS_Init();											// Starts Spidermonkey
+
+	std::vector<std::string> ret_vec;					// Vector containing Strings of mod info
+	JSContext *cx = JS_NewContext(8L * 1024 * 1024);	// Using the default max heap size and passing nullptr for rt
+	
+	// Check if context is valid
 	if (!cx)
 		return ret_vec;
 
+	// Attempt to initialize the runtime's self hosted code. Needed before JS_NewGlobalObject
 	if (!JS::InitSelfHostedCode(cx))
 		return ret_vec;
 
+	// Limit Scope to the Realm
 	{
 		JS::RealmOptions options;
 		JS::RootedObject global(cx, JS_NewGlobalObject(cx, &global_class, nullptr, JS::FireOnNewGlobalHook, options));
 		if (!global)
 			return ret_vec;
 
-		JS::RootedValue rval(cx);
+		JS::RootedValue rval(cx); // Root the context?
 		{
 			JSAutoRealm ar(cx, global);
 			if (!JS::InitRealmStandardClasses(cx))
@@ -73,8 +84,9 @@ std::vector<std::string> WasmLoader::loadWasmData(const std::string &path)
 			JS::CompileOptions opts(cx);
 			opts.setFileAndLine(filename, lineno);
 
+			WasmInjector::inject_wasm(path.c_str());
 			std::string js_path = path + "\\mod.js";
-			WasmInjector::inject_wasm(js_path.c_str());
+
 			bool ok = JS::EvaluateUtf8Path(cx, opts, js_path.c_str(), &rval);
 			if (!ok)
 				return ret_vec;
@@ -90,6 +102,9 @@ std::vector<std::string> WasmLoader::loadWasmData(const std::string &path)
 		}
 	}
 	JS_DestroyContext(cx);
-	JS_ShutDown();
+
+	// We don't shutdown JS here, we do it in clientlauncher.cpp, where the game loop
+	// exits. This way, spidermonkey isn't reinitialized and one can re-enter mods.
+
 	return ret_vec;
 }

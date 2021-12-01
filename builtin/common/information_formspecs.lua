@@ -115,7 +115,7 @@ core.register_on_player_receive_fields(function(player, formname, fields)
 		return
 	end
 
-	local event = minetest.explode_table_event(fields.list)
+	local event = core.explode_table_event(fields.list)
 	if event.type ~= "INV" then
 		local name = player:get_player_name()
 		core.show_formspec(name, "__builtin:help_cmds",
@@ -136,14 +136,14 @@ help_command.func = function(name, param)
 		core.show_formspec(name, "__builtin:help_privs",
 			build_privs_formspec(name))
 		if name ~= admin then
-			return
+			return true
 		end
 	end
 	if param == "" or param == "all" then
 		core.show_formspec(name, "__builtin:help_cmds",
 			build_chatcommands_formspec(name))
 		if name ~= admin then
-			return
+			return true
 		end
 	end
 

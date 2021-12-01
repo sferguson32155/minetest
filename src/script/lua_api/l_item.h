@@ -21,6 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "lua_api/l_base.h"
 #include "inventory.h"  // ItemStack
+#include "native_api/native_item.h"
 
 class LuaItemStack : public ModApiBase {
 private:
@@ -33,6 +34,9 @@ private:
 
 	// garbage collector
 	static int gc_object(lua_State *L);
+
+	// __tostring metamethod
+	static int mt_tostring(lua_State *L);
 
 	// is_empty(self) -> true/false
 	static int l_is_empty(lua_State *L);
@@ -68,6 +72,9 @@ private:
 
 	// get_description(self)
 	static int l_get_description(lua_State *L);
+
+	// get_short_description(self)
+	static int l_get_short_description(lua_State *L);
 
 	// clear(self) -> true
 	static int l_clear(lua_State *L);

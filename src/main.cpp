@@ -16,8 +16,15 @@ You should have received a copy of the GNU Lesser General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#include "WasmLoader.h"
 
+#include "jsapi.h"
+#include "js/Initialization.h"
+#include "js/CompilationAndEvaluation.h"
+#include "js/SourceText.h"
+#include "js/Utility.h"
+#include "js/CompileOptions.h"
+
+#include "irrlichttypes.h" // must be included before anything irrlicht, see comment in the file
 #include "irrlicht.h" // createDevice
 #include "irrlichttypes_extrabloated.h"
 #include "chat_interface.h"
@@ -47,14 +54,24 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "gui/guiEngine.h"
 #include "gui/mainmenumanager.h"
 #endif
-
 #ifdef HAVE_TOUCHSCREENGUI
 #include "gui/touchscreengui.h"
 #endif
 
-#if !defined(SERVER) && (IRRLICHT_VERSION_MAJOR == 1) &&                                 \
-		(IRRLICHT_VERSION_MINOR == 8) && (IRRLICHT_VERSION_REVISION == 2)
-#error "Irrlicht 1.8.2 is known to be broken - please update Irrlicht to version >= 1.8.3"
+// for version information only
+extern "C" {
+#if USE_LUAJIT
+	#include <luajit.h>
+#else
+	#include <lua.h>
+#endif
+}
+
+#if !defined(SERVER) && \
+	(IRRLICHT_VERSION_MAJOR == 1) && \
+	(IRRLICHT_VERSION_MINOR == 8) && \
+	(IRRLICHT_VERSION_REVISION == 2)
+	#error "Irrlicht 1.8.2 is known to be broken - please update Irrlicht to version >= 1.8.3"
 #endif
 
 #define DEBUGFILE "debug.txt"
@@ -65,6 +82,13 @@ typedef std::map<std::string, ValueSpec> OptionList;
 /**********************************************************************
  * Private functions
  **********************************************************************/
+
+static JSClassOps global_ops = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr, JS_GlobalObjectTraceHook};
+/* The class of the global object. */
+static JSClass global_class = {"global", JSCLASS_GLOBAL_FLAGS, &global_ops};
+
+static int sm_hello_world();
 
 static bool get_cmdline_opts(int argc, char *argv[], Settings *cmd_args);
 static void set_allowed_options(OptionList *allowed_options);
@@ -109,6 +133,9 @@ static OptionList allowed_options;
 
 int main(int argc, char *argv[])
 {
+
+	// int sm_status = sm_hello_world();
+	// std::cout << "SpiderMonkey Status: " << sm_status << std::endl;
 
 	int retval;
 	debug_set_exception_handler();
@@ -183,11 +210,17 @@ int main(int argc, char *argv[])
 #ifndef __ANDROID__
 	// Run unit tests
 	if (cmd_args.getFlag("run-unittests")) {
+#if BUILD_UNITTESTS
 		return run_tests();
+#else
+		errorstream << "Unittest support is not enabled in this binary. "
+			<< "If you want to enable it, compile project with BUILD_UNITTESTS=1 flag."
+			<< std::endl;
+#endif
 	}
 #endif
 
-	GameParams game_params;
+	GameStartData game_params;
 #ifdef SERVER
 	porting::attachOrCreateConsole();
 	game_params.is_dedicated_server = true;
@@ -202,9 +235,6 @@ int main(int argc, char *argv[])
 		return 1;
 
 	sanity_check(!game_params.world_path.empty());
-
-	infostream << "Using commanded world path [" << game_params.world_path << "]"
-		   << std::endl;
 
 	if (game_params.is_dedicated_server)
 		return run_dedicated_server(game_params, cmd_args) ? 0 : 1;
@@ -233,6 +263,51 @@ int main(int argc, char *argv[])
 /*****************************************************************************
  * Startup / Init
  *****************************************************************************/
+
+static int sm_hello_world()
+{
+	JS_Init();
+	JSContext *cx = JS_NewContext(8L * 1024 * 1024);
+	if (!cx)
+		return 1;
+	if (!JS::InitSelfHostedCode(cx))
+		return 1;
+	{
+		JS::RealmOptions options;
+		JS::RootedObject global(
+				cx, JS_NewGlobalObject(cx, &global_class, nullptr,
+						    JS::FireOnNewGlobalHook, options));
+		if (!global)
+			return 1;
+		JS::RootedValue rval(cx);
+		{
+			// "'hello'+'world, it is '+new Date()"
+			JSAutoRealm ar(cx, global);
+			const char *srcRaw = "'hello'+'world'"; //, it is '+new Date()";
+			auto src = u"'hello'+'world'";		//, it is '+new Date()";
+			JS::SourceText<char16_t> srcBuf;
+			srcBuf.init(cx, src, strlen(srcRaw),
+					JS::SourceOwnership::Borrowed);
+			const char *filename = "noname";
+			int lineno = 1;
+			JS::CompileOptions opts(cx);
+			opts.setFileAndLine(filename, lineno);
+			bool ok = JS::Evaluate(cx, opts, srcBuf, &rval);
+			if (!ok)
+				return 1;
+		}
+		JSString *str = rval.toString();
+		size_t size = JS_GetStringLength(str);
+		char *buffer = (char *)malloc(size);
+		if (JS_EncodeStringToBuffer(cx, str, buffer, size)) {
+			buffer[size] = '\0';
+			printf("%s\n", buffer);
+		}
+	}
+	JS_DestroyContext(cx);
+	JS_ShutDown();
+	return 0;
+}
 
 static bool get_cmdline_opts(int argc, char *argv[], Settings *cmd_args)
 {
@@ -369,6 +444,11 @@ static void print_version()
 #ifndef SERVER
 	std::cout << "Using Irrlicht " IRRLICHT_SDK_VERSION << std::endl;
 #endif
+#if USE_LUAJIT
+	std::cout << "Using " << LUAJIT_VERSION << std::endl;
+#else
+	std::cout << "Using " << LUA_RELEASE << std::endl;
+#endif
 	std::cout << g_build_info << std::endl;
 }
 
@@ -455,7 +535,7 @@ static bool setup_log_params(const Settings &cmd_args)
 	if (cmd_args.getFlag("trace")) {
 		dstream << _("Enabling trace level debug output") << std::endl;
 		g_logger.setTraceEnabled(true);
-		dout_con_ptr = &verbosestream;     // This is somewhat old
+		dout_con_ptr = &verbosestream;	   // This is somewhat old
 		socket_enable_debug_output = true; // Sockets doesn't use log.h
 	}
 
@@ -481,7 +561,6 @@ static bool create_userdata_path()
 	} else {
 		success = true;
 	}
-	porting::copyAssets();
 #else
 	// Create user data directory
 	success = fs::CreateDir(porting::path_user);
@@ -493,11 +572,14 @@ static bool create_userdata_path()
 static bool init_common(const Settings &cmd_args, int argc, char *argv[])
 {
 	startup_message();
-	set_default_settings(g_settings);
+	set_default_settings();
 
 	// Initialize sockets
 	sockets_init();
 	atexit(sockets_cleanup);
+
+	// Initialize g_settings
+	Settings::createLayer(SL_GLOBAL);
 
 	if (!read_config_file(cmd_args))
 		return false;
@@ -625,10 +707,14 @@ static bool game_configure(GameParams *game_params, const Settings &cmd_args)
 
 static void game_configure_port(GameParams *game_params, const Settings &cmd_args)
 {
-	if (cmd_args.exists("port"))
+	if (cmd_args.exists("port")) {
 		game_params->socket_port = cmd_args.getU16("port");
-	else
-		game_params->socket_port = g_settings->getU16("port");
+	} else {
+		if (game_params->is_dedicated_server)
+			game_params->socket_port = g_settings->getU16("port");
+		else
+			game_params->socket_port = g_settings->getU16("remote_port");
+	}
 
 	if (game_params->socket_port == 0)
 		game_params->socket_port = DEFAULT_SERVER_PORT;
@@ -711,8 +797,6 @@ static bool auto_select_world(GameParams *game_params)
 	// No world was specified; try to select it automatically
 	// Get information about available worlds
 
-	verbosestream << _("Determining world path") << std::endl;
-
 	std::vector<WorldSpec> worldspecs = getAvailableWorlds();
 	std::string world_path;
 
@@ -732,10 +816,10 @@ static bool auto_select_world(GameParams *game_params)
 		// If there are no worlds, automatically create a new one
 	} else {
 		// This is the ultimate default world path
-		world_path = porting::path_user + DIR_DELIM + "worlds" + DIR_DELIM +
-			     "world";
-		infostream << "Creating default world at [" << world_path << "]"
-			   << std::endl;
+		world_path = porting::path_user + DIR_DELIM + "worlds" +
+				DIR_DELIM + "world";
+		infostream << "Using default world at ["
+		           << world_path << "]" << std::endl;
 	}
 
 	assert(world_path != ""); // Post-condition
@@ -795,7 +879,6 @@ static bool determine_subgame(GameParams *game_params)
 
 	assert(game_params->world_path != ""); // Pre-condition
 
-	verbosestream << _("Determining gameid/gamespec") << std::endl;
 	// If world doesn't exist
 	if (!game_params->world_path.empty() &&
 			!getWorldExists(game_params->world_path)) {
@@ -809,9 +892,9 @@ static bool determine_subgame(GameParams *game_params)
 			infostream << "Using default gameid [" << gamespec.id << "]"
 				   << std::endl;
 			if (!gamespec.isValid()) {
-				errorstream << "Subgame specified in default_game ["
-					    << g_settings->get("default_game")
-					    << "] is invalid." << std::endl;
+				errorstream << "Game specified in default_game ["
+				            << g_settings->get("default_game")
+				            << "] is invalid." << std::endl;
 				return false;
 			}
 		}
@@ -836,8 +919,8 @@ static bool determine_subgame(GameParams *game_params)
 	}
 
 	if (!gamespec.isValid()) {
-		errorstream << "Subgame [" << gamespec.id << "] could not be found."
-			    << std::endl;
+		errorstream << "Game [" << gamespec.id << "] could not be found."
+		            << std::endl;
 		return false;
 	}
 
@@ -918,7 +1001,6 @@ static bool run_dedicated_server(const GameParams &game_params, const Settings &
 			// Create server
 			Server server(game_params.world_path, game_params.game_spec,
 					false, bind_addr, true, &iface);
-			server.init();
 
 			g_term_console.setup(&iface, &kill, admin_nick);
 
@@ -952,9 +1034,8 @@ static bool run_dedicated_server(const GameParams &game_params, const Settings &
 #endif
 		try {
 			// Create server
-			Server server(game_params.world_path, game_params.game_spec,
-					false, bind_addr, true);
-			server.init();
+			Server server(game_params.world_path, game_params.game_spec, false,
+				bind_addr, true);
 			server.start();
 
 			// Run server
