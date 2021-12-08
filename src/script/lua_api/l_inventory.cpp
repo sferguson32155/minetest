@@ -39,23 +39,23 @@ InvRef* InvRef::checkobject(lua_State *L, int narg)
 
 Inventory* InvRef::getinv(lua_State *L, InvRef *ref)
 {
-	return getServerInventoryMgr(L)->getInventory(ref->m_loc);
+	Server *server = getServer(L);
+	return NativeInvRef::getinv(server, ref);
 }
 
 InventoryList* InvRef::getlist(lua_State *L, InvRef *ref,
 		const char *listname)
 {
 	NO_MAP_LOCK_REQUIRED;
-	Inventory *inv = getinv(L, ref);
-	if(!inv)
-		return NULL;
-	return inv->getList(listname);
+	Server *server = getServer(L);
+	return NativeInvRef::getlist(server, ref, listname);
 }
 
 void InvRef::reportInventoryChange(lua_State *L, InvRef *ref)
 {
 	// Inform other things that the inventory has changed
-	getServerInventoryMgr(L)->setInventoryModified(ref->m_loc);
+	Server *server = getServer(L);
+	NativeInvRef::reportInventoryChange(server, ref);
 }
 
 // Exported functions
@@ -71,14 +71,10 @@ int InvRef::gc_object(lua_State *L) {
 int InvRef::l_is_empty(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
 	const char *listname = luaL_checkstring(L, 2);
-	InventoryList *list = getlist(L, ref, listname);
-	if(list && list->getUsedSlots() > 0){
-		lua_pushboolean(L, false);
-	} else {
-		lua_pushboolean(L, true);
-	}
+	lua_pushboolean(L, NativeInvRef::n_is_empty(server, ref, listname));
 	return 1;
 }
 
@@ -86,14 +82,10 @@ int InvRef::l_is_empty(lua_State *L)
 int InvRef::l_get_size(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
 	const char *listname = luaL_checkstring(L, 2);
-	InventoryList *list = getlist(L, ref, listname);
-	if(list){
-		lua_pushinteger(L, list->getSize());
-	} else {
-		lua_pushinteger(L, 0);
-	}
+	lua_pushinteger(L, NativeInvRef::n_get_size(server, ref, listname));
 	return 1;
 }
 
@@ -101,14 +93,10 @@ int InvRef::l_get_size(lua_State *L)
 int InvRef::l_get_width(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
 	const char *listname = luaL_checkstring(L, 2);
-	InventoryList *list = getlist(L, ref, listname);
-	if(list){
-		lua_pushinteger(L, list->getWidth());
-	} else {
-		lua_pushinteger(L, 0);
-	}
+	lua_pushinteger(L, NativeInvRef::n_get_width(server, ref, listname));
 	return 1;
 }
 
@@ -116,39 +104,12 @@ int InvRef::l_get_width(lua_State *L)
 int InvRef::l_set_size(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
 	const char *listname = luaL_checkstring(L, 2);
 
 	int newsize = luaL_checknumber(L, 3);
-	if (newsize < 0) {
-		lua_pushboolean(L, false);
-		return 1;
-	}
-
-	Inventory *inv = getinv(L, ref);
-	if(inv == NULL){
-		lua_pushboolean(L, false);
-		return 1;
-	}
-	if(newsize == 0){
-		inv->deleteList(listname);
-		reportInventoryChange(L, ref);
-		lua_pushboolean(L, true);
-		return 1;
-	}
-	InventoryList *list = inv->getList(listname);
-	if(list){
-		list->setSize(newsize);
-	} else {
-		list = inv->addList(listname, newsize);
-		if (!list)
-		{
-			lua_pushboolean(L, false);
-			return 1;
-		}
-	}
-	reportInventoryChange(L, ref);
-	lua_pushboolean(L, true);
+	lua_pushboolean(L, NativeInvRef::n_set_size(server, ref, listname, newsize));
 	return 1;
 }
 
@@ -156,20 +117,11 @@ int InvRef::l_set_size(lua_State *L)
 int InvRef::l_set_width(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
 	const char *listname = luaL_checkstring(L, 2);
 	int newwidth = luaL_checknumber(L, 3);
-	Inventory *inv = getinv(L, ref);
-	if(inv == NULL){
-		return 0;
-	}
-	InventoryList *list = inv->getList(listname);
-	if(list){
-		list->setWidth(newwidth);
-	} else {
-		return 0;
-	}
-	reportInventoryChange(L, ref);
+	NativeInvRef::n_set_width(server, ref, listname, newwidth);
 	return 0;
 }
 
@@ -177,14 +129,11 @@ int InvRef::l_set_width(lua_State *L)
 int InvRef::l_get_stack(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
 	const char *listname = luaL_checkstring(L, 2);
 	int i = luaL_checknumber(L, 3) - 1;
-	InventoryList *list = getlist(L, ref, listname);
-	ItemStack item;
-	if(list != NULL && i >= 0 && i < (int) list->getSize())
-		item = list->getItem(i);
-	LuaItemStack::create(L, item);
+	LuaItemStack::create(L, NativeInvRef::n_get_stack(server, ref, listname, i));
 	return 1;
 }
 
@@ -192,18 +141,12 @@ int InvRef::l_get_stack(lua_State *L)
 int InvRef::l_set_stack(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
 	const char *listname = luaL_checkstring(L, 2);
 	int i = luaL_checknumber(L, 3) - 1;
 	ItemStack newitem = read_item(L, 4, getServer(L)->idef());
-	InventoryList *list = getlist(L, ref, listname);
-	if(list != NULL && i >= 0 && i < (int) list->getSize()){
-		list->changeItem(i, newitem);
-		reportInventoryChange(L, ref);
-		lua_pushboolean(L, true);
-	} else {
-		lua_pushboolean(L, false);
-	}
+	lua_pushboolean(L, NativeInvRef::n_set_stack(server, ref, listname, i, newitem));
 	return 1;
 }
 
@@ -211,11 +154,16 @@ int InvRef::l_set_stack(lua_State *L)
 int InvRef::l_get_list(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
 	const char *listname = luaL_checkstring(L, 2);
-	Inventory *inv = getinv(L, ref);
+	Inventory *inv = NativeInvRef::getinv(server, ref);
 	if(inv){
-		push_inventory_list(L, inv, listname);
+		if (inv->getList(listname) != NULL) {
+			push_items(L, NativeInvRef::n_get_list(server, ref, listname));
+		} else {
+			lua_pushnil(L);
+		}
 	} else {
 		lua_pushnil(L);
 	}
@@ -226,15 +174,16 @@ int InvRef::l_get_list(lua_State *L)
 int InvRef::l_set_list(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
 	const char *listname = luaL_checkstring(L, 2);
-	Inventory *inv = getinv(L, ref);
+	Inventory *inv = NativeInvRef::getinv(server, ref);
 	if(inv == NULL){
 		return 0;
 	}
 	InventoryList *list = inv->getList(listname);
 	if(list)
-		read_inventory_list(L, 3, inv, listname,
+		read_inventory_list(L, 3, inv, listname,	//read_inventory_list is reimplemented in n_inventory.cpp, unsure if function call should be changed
 				getServer(L), list->getSize());
 	else
 		read_inventory_list(L, 3, inv, listname, getServer(L));
@@ -246,12 +195,10 @@ int InvRef::l_set_list(lua_State *L)
 int InvRef::l_get_lists(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
-	Inventory *inv = getinv(L, ref);
-	if (!inv) {
-		return 0;
-	}
-	std::vector<const InventoryList*> lists = inv->getLists();
+	Inventory *inv = NativeInvRef::getinv(server, ref);
+	std::vector<const InventoryList*> lists = NativeInvRef::n_get_lists(server, ref);
 	std::vector<const InventoryList*>::iterator iter = lists.begin();
 	lua_createtable(L, 0, lists.size());
 	for (; iter != lists.end(); iter++) {
@@ -267,8 +214,9 @@ int InvRef::l_get_lists(lua_State *L)
 int InvRef::l_set_lists(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
-	Inventory *inv = getinv(L, ref);
+	Inventory *inv = NativeInvRef::getinv(server, ref);
 	if (!inv) {
 		return 0;
 	}
@@ -277,13 +225,11 @@ int InvRef::l_set_lists(lua_State *L)
 	Inventory *tempInv(inv);
 	tempInv->clear();
 
-	Server *server = getServer(L);
-
 	lua_pushnil(L);
 	luaL_checktype(L, 2, LUA_TTABLE);
 	while (lua_next(L, 2)) {
 		const char *listname = lua_tostring(L, -2);
-		read_inventory_list(L, -1, tempInv, listname, server);
+		read_inventory_list(L, -1, tempInv, listname, server);	//same as n_set_list, unsure if function call should be replaced
 		lua_pop(L, 1);
 	}
 	inv = tempInv;
@@ -295,18 +241,11 @@ int InvRef::l_set_lists(lua_State *L)
 int InvRef::l_add_item(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
 	const char *listname = luaL_checkstring(L, 2);
 	ItemStack item = read_item(L, 3, getServer(L)->idef());
-	InventoryList *list = getlist(L, ref, listname);
-	if(list){
-		ItemStack leftover = list->addItem(item);
-		if(leftover.count != item.count)
-			reportInventoryChange(L, ref);
-		LuaItemStack::create(L, leftover);
-	} else {
-		LuaItemStack::create(L, item);
-	}
+	LuaItemStack::create(L, NativeInvRef::n_add_item(server, ref, listname, item));
 	return 1;
 }
 
@@ -315,15 +254,11 @@ int InvRef::l_add_item(lua_State *L)
 int InvRef::l_room_for_item(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
 	const char *listname = luaL_checkstring(L, 2);
 	ItemStack item = read_item(L, 3, getServer(L)->idef());
-	InventoryList *list = getlist(L, ref, listname);
-	if(list){
-		lua_pushboolean(L, list->roomForItem(item));
-	} else {
-		lua_pushboolean(L, false);
-	}
+	lua_pushboolean(L, NativeInvRef::n_room_for_item(server, ref, listname, item));
 	return 1;
 }
 
@@ -332,18 +267,11 @@ int InvRef::l_room_for_item(lua_State *L)
 int InvRef::l_contains_item(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
 	const char *listname = luaL_checkstring(L, 2);
 	ItemStack item = read_item(L, 3, getServer(L)->idef());
-	InventoryList *list = getlist(L, ref, listname);
-	bool match_meta = false;
-	if (lua_isboolean(L, 4))
-		match_meta = readParam<bool>(L, 4);
-	if (list) {
-		lua_pushboolean(L, list->containsItem(item, match_meta));
-	} else {
-		lua_pushboolean(L, false);
-	}
+	lua_pushboolean(L, NativeInvRef::n_contains_item(server, ref, listname, item));
 	return 1;
 }
 
@@ -352,23 +280,16 @@ int InvRef::l_contains_item(lua_State *L)
 int InvRef::l_remove_item(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
+	Server *server = getServer(L);
 	InvRef *ref = checkobject(L, 1);
 	const char *listname = luaL_checkstring(L, 2);
 	ItemStack item = read_item(L, 3, getServer(L)->idef());
-	InventoryList *list = getlist(L, ref, listname);
-	if(list){
-		ItemStack removed = list->removeItem(item);
-		if(!removed.empty())
-			reportInventoryChange(L, ref);
-		LuaItemStack::create(L, removed);
-	} else {
-		LuaItemStack::create(L, ItemStack());
-	}
+	LuaItemStack::create(L, NativeInvRef::n_remove_item(server, ref, listname, item));
 	return 1;
 }
 
 // get_location() -> location (like get_inventory(location))
-int InvRef::l_get_location(lua_State *L)
+int InvRef::l_get_location(lua_State *L)	//unsure how to convert to native function calls for all remaining functions
 {
 	NO_MAP_LOCK_REQUIRED;
 	InvRef *ref = checkobject(L, 1);

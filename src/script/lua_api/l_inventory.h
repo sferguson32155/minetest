@@ -20,7 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 
 #include "lua_api/l_base.h"
-
+#include "native_api/n_inventory.h"
 #include "inventory.h"
 #include "inventorymanager.h"
 
@@ -32,7 +32,7 @@ class RemotePlayer;
 
 class InvRef : public ModApiBase {
 private:
-	InventoryLocation m_loc;
+	
 
 	static const char className[];
 	static const luaL_Reg methods[];
@@ -104,6 +104,7 @@ private:
 	static int l_get_location(lua_State *L);
 
 public:
+	InventoryLocation m_loc;
 	InvRef(const InventoryLocation &loc);
 
 	~InvRef() = default;
