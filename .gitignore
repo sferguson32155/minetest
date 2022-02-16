@@ -1,4 +1,7 @@
 ## Editors and development environments
+/.vs
+../v16
+
 *~
 *.swp
 *.bak*
@@ -41,6 +44,7 @@ build/.cmake/
 /bin/
 /games/*
 !/games/devtest/
+!/games/minetest_game-5.1.0
 /cache
 /textures/*
 !/textures/base/

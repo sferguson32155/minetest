@@ -1,17 +1,14 @@
 /*
 Minetest
 Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
-
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation; either version 2.1 of the License, or
 (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
-
 You should have received a copy of the GNU Lesser General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -61,17 +58,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // for version information only
 extern "C" {
 #if USE_LUAJIT
-	#include <luajit.h>
+#include <luajit.h>
 #else
-	#include <lua.h>
+#include <lua.h>
 #endif
 }
 
-#if !defined(SERVER) && \
-	(IRRLICHT_VERSION_MAJOR == 1) && \
-	(IRRLICHT_VERSION_MINOR == 8) && \
-	(IRRLICHT_VERSION_REVISION == 2)
-	#error "Irrlicht 1.8.2 is known to be broken - please update Irrlicht to version >= 1.8.3"
+#if !defined(SERVER) && (IRRLICHT_VERSION_MAJOR == 1) &&                                 \
+		(IRRLICHT_VERSION_MINOR == 8) && (IRRLICHT_VERSION_REVISION == 2)
+#error "Irrlicht 1.8.2 is known to be broken - please update Irrlicht to version >= 1.8.3"
 #endif
 
 #define DEBUGFILE "debug.txt"
@@ -214,8 +209,9 @@ int main(int argc, char *argv[])
 		return run_tests();
 #else
 		errorstream << "Unittest support is not enabled in this binary. "
-			<< "If you want to enable it, compile project with BUILD_UNITTESTS=1 flag."
-			<< std::endl;
+			    << "If you want to enable it, compile project with "
+			       "BUILD_UNITTESTS=1 flag."
+			    << std::endl;
 #endif
 	}
 #endif
@@ -816,10 +812,10 @@ static bool auto_select_world(GameParams *game_params)
 		// If there are no worlds, automatically create a new one
 	} else {
 		// This is the ultimate default world path
-		world_path = porting::path_user + DIR_DELIM + "worlds" +
-				DIR_DELIM + "world";
-		infostream << "Using default world at ["
-		           << world_path << "]" << std::endl;
+		world_path = porting::path_user + DIR_DELIM + "worlds" + DIR_DELIM +
+			     "world";
+		infostream << "Using default world at [" << world_path << "]"
+			   << std::endl;
 	}
 
 	assert(world_path != ""); // Post-condition
@@ -893,8 +889,8 @@ static bool determine_subgame(GameParams *game_params)
 				   << std::endl;
 			if (!gamespec.isValid()) {
 				errorstream << "Game specified in default_game ["
-				            << g_settings->get("default_game")
-				            << "] is invalid." << std::endl;
+					    << g_settings->get("default_game")
+					    << "] is invalid." << std::endl;
 				return false;
 			}
 		}
@@ -920,7 +916,7 @@ static bool determine_subgame(GameParams *game_params)
 
 	if (!gamespec.isValid()) {
 		errorstream << "Game [" << gamespec.id << "] could not be found."
-		            << std::endl;
+			    << std::endl;
 		return false;
 	}
 
@@ -1034,8 +1030,8 @@ static bool run_dedicated_server(const GameParams &game_params, const Settings &
 #endif
 		try {
 			// Create server
-			Server server(game_params.world_path, game_params.game_spec, false,
-				bind_addr, true);
+			Server server(game_params.world_path, game_params.game_spec,
+					false, bind_addr, true);
 			server.start();
 
 			// Run server
