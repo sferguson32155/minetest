@@ -1,5 +1,5 @@
 -- get_camera()
-minetest.register_chatcommand("lua_getcamera", {
+minetest.register_chatcommand("lua_camera_getcamera", {
 	description = "Invokes lua_api > l_camera.l_get_camera_mode",
 	func = function(self)
 		local res = minetest.camera:get_camera_mode()
@@ -7,7 +7,7 @@ minetest.register_chatcommand("lua_getcamera", {
 	end
 })
 
-minetest.register_chatcommand("native_getcamera", {
+minetest.register_chatcommand("native_camera_getcamera", {
 	description = "Invokes lua_api > l_camera.l_get_camera_mode > native_camera.native_get_camera_mode",
 	func = function(self)
 		local res = minetest.camera:native_get_camera_mode()
@@ -15,7 +15,7 @@ minetest.register_chatcommand("native_getcamera", {
 	end
 })
 
-minetest.register_chatcommand("test_getcamera", {
+minetest.register_chatcommand("test_camera_getcamera", {
 	description = "Invokes lua_api > l_camera.l_get_camera_mode > native_camera.native_get_camera_mode",
 	func = function(self)
 		local lua = minetest.camera:get_camera_mode()
@@ -29,7 +29,7 @@ minetest.register_chatcommand("test_getcamera", {
 })
 
 -- set_camera(int)
-minetest.register_chatcommand("lua_setcamera", {
+minetest.register_chatcommand("lua_camera_setcamera", {
 	description = "Invokes lua_api > l_camera.l_set_camera_mode",
 	func = function(self)
 		local curr = minetest.camera:get_camera_mode()
@@ -46,7 +46,7 @@ minetest.register_chatcommand("lua_setcamera", {
 	end
 })
 
-minetest.register_chatcommand("native_setcamera", {
+minetest.register_chatcommand("native_camera_setcamera", {
 	description = "Invokes lua_api > l_camera.l_set_camera_mode > native_camera.native_set_camera_mode",
 	func = function(self)
 		local curr = minetest.camera:get_camera_mode()
