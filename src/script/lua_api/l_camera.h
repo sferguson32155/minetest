@@ -20,6 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 
 #include "l_base.h"
+#include "../native_api/native_camera.h"
 
 class Camera;
 
@@ -44,6 +45,10 @@ private:
 	static int l_get_look_horizontal(lua_State *L);
 	static int l_get_aspect_ratio(lua_State *L);
 
+	// testing functions
+	static int l_native_set_camera_mode(lua_State *L);
+	static int l_native_get_camera_mode(lua_State *L);
+
 	Camera *m_camera = nullptr;
 
 public:
@@ -57,4 +62,6 @@ public:
 	static Camera *getobject(lua_State *L, int narg);
 
 	static void Register(lua_State *L);
+
+	static void LuaCamera::TestInitialize(lua_State *L, int top);
 };

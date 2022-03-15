@@ -237,6 +237,37 @@ const luaL_Reg LuaCamera::methods[] = {
 	luamethod(LuaCamera, get_look_horizontal),
 	luamethod(LuaCamera, get_aspect_ratio),
 
+	// register testing methods 
+	luamethod(LuaCamera, native_set_camera_mode),
+	luamethod(LuaCamera, native_get_camera_mode),
+
 	{0, 0}
 };
 // clang-format on
+
+
+// native_set_camera_mode(self, mode)
+int LuaCamera::l_native_set_camera_mode(lua_State *L)
+{
+	// get values
+	Camera *camera = getobject(L, 1);
+	Client *client = getClient(L);
+	int val = (int)lua_tonumber(L, 2);
+	
+	// call native function
+	NativeCamera::native_set_camera_mode(camera, client, val);
+
+	return 0;
+}
+
+// native_get_camera_mode(self)
+int LuaCamera::l_native_get_camera_mode(lua_State *L)
+{
+	// get values
+	Camera *camera = getobject(L, 1);
+
+	// call native function
+	NativeCamera::native_get_camera_mode(camera);
+
+	return 1;
+}

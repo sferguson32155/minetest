@@ -5,12 +5,12 @@
 #include "client/camera.h"
 #include "client/client.h"
 
-int NativeCamera::native_set_camera_mode(Camera *camera, Client *client, int *val)
+int NativeCamera::native_set_camera_mode(Camera *camera, Client *client, int val)
 {
 	GenericCAO *playercao = client->getEnv().getLocalPlayer()->getCAO();
 	sanity_check(playercao);
 
-	camera->setCameraMode((CameraMode)(*val));
+	camera->setCameraMode((CameraMode)(val));
 	playercao->setVisible(camera->getCameraMode() > CAMERA_MODE_FIRST);
 	playercao->setChildrenVisible(camera->getCameraMode() > CAMERA_MODE_FIRST);
 
