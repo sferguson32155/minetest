@@ -249,7 +249,7 @@ const luaL_Reg LuaCamera::methods[] = {
 // native_set_camera_mode(self, mode)
 int LuaCamera::l_native_set_camera_mode(lua_State *L)
 {
-	// get values
+	// get values from lua state
 	Camera *camera = getobject(L, 1);
 	Client *client = getClient(L);
 	int val = (int)lua_tonumber(L, 2);
@@ -263,11 +263,14 @@ int LuaCamera::l_native_set_camera_mode(lua_State *L)
 // native_get_camera_mode(self)
 int LuaCamera::l_native_get_camera_mode(lua_State *L)
 {
-	// get values
+	// get values from lua state
 	Camera *camera = getobject(L, 1);
 
 	// call native function
-	NativeCamera::native_get_camera_mode(camera);
+	int result = NativeCamera::native_get_camera_mode(camera);
+
+	// update lua state
+	lua_pushinteger(L, result);
 
 	return 1;
 }
