@@ -28,6 +28,25 @@ minetest.register_chatcommand("test_camera_getcamera", {
 	end
 })
 
+minetest.register_chatcommand("TEST", {
+	description = "",
+	func = function(self)
+		local clientObjects = {
+			[1] = minetest.raycast,
+			[2] = minetest.localplayer,
+			[3] = minetest.camera
+		}
+		
+		for i, obj in ipairs(clientObjects) do
+			if obj ~= nil then
+				return true, i..": Success"
+			else
+				return false, i..": Fail"
+			end
+		end
+	end
+})
+
 -- set_camera(int)
 minetest.register_chatcommand("lua_camera_setcamera", {
 	description = "Invokes lua_api > l_camera.l_set_camera_mode",
