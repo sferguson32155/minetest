@@ -122,7 +122,7 @@ const NodeDefManager *NativeModApiClient::native_get_node_or_nil(
 		v3s16 pos, Client *client)
 {
 	bool pos_ok;
-	MapNode n = client->getNode(pos, &pos_ok);
+	MapNode n = client->CSMGetNode(pos, &pos_ok);
 	if (pos_ok) {
 		return client->ndef();
 	} else {

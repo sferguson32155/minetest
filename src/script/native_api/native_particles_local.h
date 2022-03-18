@@ -1,16 +1,19 @@
 #include "lua_api/l_base.h"
 #include "tileanimation.h"
 #include "irr_v3d.h"
+#include "mapnode.h"
 
 class NativeApiParticlesLocal
 {
 private:
-	int native_add_particle(Client *_client, v3f *_pos, v3f *_vel, v3f *_acc,
-			float *_expirationtime, float *_size, bool *_collisiondetection,
-			bool *_collision_removal, bool *_vertical,
-			TileAnimationParams *_animation, std::string *_texture,
-			u8 *_glow);
-	static int native_add_particlespawner(Client *_client, u16 *_amount = nullptr,
+	static int native_add_particle(Client *_client, v3f *_pos = nullptr,
+			v3f *_vel = nullptr, v3f *_acc = nullptr,
+			float *_expirationtime = nullptr, float *_size = nullptr,
+			bool *_collisiondetection = nullptr, bool *_collision_removal = nullptr,
+			bool *_vertical = nullptr, TileAnimationParams *_animation = nullptr,
+			std::string *_texture = nullptr, u8 *_glow = nullptr,
+			MapNode *_node = nullptr, irr::u8 *_nodeTile = nullptr);
+	static u64 native_add_particlespawner(Client *_client, u16 *_amount = nullptr,
 			v3f *_minpos = nullptr, v3f *_maxpos = nullptr,
 			v3f *_minvel = nullptr, v3f *_maxvel = nullptr,
 			v3f *_minacc = nullptr, v3f *_maxacc = nullptr,
@@ -19,6 +22,7 @@ private:
 			float *_maxsize = nullptr, bool *_collisiondetection = nullptr,
 			bool *_vertical = nullptr, bool *_collision_removal = nullptr,
 			TileAnimationParams *_animation = nullptr,
-			std::string *_texture = nullptr, u8 *_glow = nullptr);
+			std::string *_texture = nullptr, u8 *_glow = nullptr,
+			MapNode *_node = nullptr, irr::u8 *_nodeTile = nullptr);
 	static int native_delete_particlespawner(u32 _id, Client *_client);
 };

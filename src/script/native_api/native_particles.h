@@ -4,6 +4,7 @@
 #include "tileanimation.h"
 #include "irr_v3d.h"
 #include "server.h"
+#include "mapnode.h"
 
 class NativeApiParticles
 {
@@ -16,7 +17,8 @@ private:
 			bool *_object_collision = nullptr, bool *_vertical = nullptr,
 			TileAnimationParams *_animation = nullptr,
 			std::string *_texture = nullptr,
-			std::string *_playername = nullptr, u8 *_glow = nullptr);
+			std::string *_playername = nullptr, u8 *_glow = nullptr,
+			MapNode *_node = nullptr, irr::u8 *_nodeTile = nullptr);
 	static u32 native_add_particlespawner(Server *_server, u16 *_amount = nullptr,
 			v3f *_minpos = nullptr, v3f *_maxpos = nullptr,
 			v3f *_minvel = nullptr, v3f *_maxvel = nullptr,
@@ -29,7 +31,7 @@ private:
 			TileAnimationParams *_animation = nullptr,
 			std::string *_texture = nullptr,
 			ServerActiveObject *_attached = nullptr,
-			std::string *_playername = nullptr, u8 *_glow = nullptr);
-	static int native_delete_particlespawner(
-			u32 _id, std::string _playername, Server *_server);
+			std::string *_playername = nullptr, u8 *_glow = nullptr,
+			MapNode *_node = nullptr, irr::u8 *_nodeTile = nullptr);
+	static int native_delete_particlespawner(u32 _id, std::string _playername, Server *_server);
 };

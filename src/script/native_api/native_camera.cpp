@@ -14,7 +14,7 @@ int NativeCamera::native_set_camera_mode(Camera *camera, Client *client, int val
 	playercao->setVisible(camera->getCameraMode() > CAMERA_MODE_FIRST);
 	playercao->setChildrenVisible(camera->getCameraMode() > CAMERA_MODE_FIRST);
 
-	return 1;
+	return 0;
 }
 
 int NativeCamera::native_get_camera_mode(Camera *camera)
@@ -42,22 +42,19 @@ v3f NativeCamera::native_get_pos(Camera *camera)
 	return position;
 }
 
-v3f NativeCamera::native_get_offset(Camera *camera)
+v3f NativeCamera::native_get_offset(Client *client)
 {
-	v3f offset = camera->getPosition();
+	LocalPlayer *player = client->getEnv().getLocalPlayer();
+	sanity_check(player);
+	
+	v3f offset = player->getEyeOffset() / BS;
 
 	return offset;
 }
 
-v3f NativeCamera::native_get_look_dir(Client *client)
+v3f NativeCamera::native_get_look_dir(Camera *camera)
 {
-	LocalPlayer *player = client->getEnv().getLocalPlayer();
-	sanity_check(player);
-
-	float pitch = -1.0 * player->getPitch() * core::DEGTORAD;
-	float yaw = (player->getYaw() + 90.) * core::DEGTORAD;
-	v3f lookDir(std::cos(pitch) * std::cos(yaw), std::sin(pitch),
-			std::cos(pitch) * std::sin(yaw));
+	v3f lookDir = camera->getDirection();
 
 	return lookDir;
 }
@@ -67,7 +64,7 @@ f32 NativeCamera::native_get_look_horizontal(Client *client)
 	LocalPlayer *player = client->getEnv().getLocalPlayer();
 	sanity_check(player);
 
-	f32 lookHorizontal = (player->getYaw() + 90.) * core::DEGTORAD;
+	f32 lookHorizontal = (player->getYaw() + 90.f) * core::DEGTORAD;
 
 	return lookHorizontal;
 }
@@ -77,7 +74,7 @@ f32 NativeCamera::native_get_look_vertical(Client *client)
 	LocalPlayer *player = client->getEnv().getLocalPlayer();
 	sanity_check(player);
 
-	f32 lookVertical = -1.0 * player->getPitch() * core::DEGTORAD;
+	f32 lookVertical = -1.0f * player->getPitch() * core::DEGTORAD;
 
 	return lookVertical;
 }
