@@ -1,20 +1,4 @@
 #include "native_client.h"
-#include "chatmessage.h"
-#include "client/client.h"
-#include "client/clientevent.h"
-#include "client/sound.h"
-#include "client/clientenvironment.h"
-#include "common/c_content.h"
-#include "common/c_converter.h"
-#include "cpp_api/s_base.h"
-#include "gettext.h"
-#include "lua_api/l_item.h"
-#include "lua_api/l_nodemeta.h"
-#include "gui/mainmenumanager.h"
-#include "map.h"
-#include "util/string.h"
-#include "nodedef.h"
-#include <script\lua_api\l_client.cpp>
 
 std::string NativeModApiClient::native_get_current_modname(std::string current_mod)
 {
@@ -94,7 +78,7 @@ int NativeModApiClient::native_send_respawn(Client *client)
 	return 0;
 }
 
-bool NativeModApiClient::native_disconnect(Client *client)
+bool NativeModApiClient::native_disconnect(Client *client, MainGameCallback *g_gamecallback)
 {
 	g_gamecallback->disconnect();
 	return true;
@@ -135,7 +119,7 @@ std::tuple<char*, const char*> NativeModApiClient::native_get_language()
 }
 
 
-NodeMetadata *NativeModApiClient::native_get_meta(v3s16 p, Client *client)
+NodeMetadata* NativeModApiClient::native_get_meta(v3s16 p, Client *client)
 {
 	NodeMetadata *meta = client->getEnv().getMap().getNodeMetadata(p);
 	return meta;
@@ -226,11 +210,9 @@ const char* NativeModApiClient::native_get_builtin_path()
 	return val;
 }
 
-std::map<const char *, bool>  NativeModApiClient::native_get_csm_restrictions(
-		Client *client)
+std::map<const char *, bool>  NativeModApiClient::native_get_csm_restrictions(Client *client, const CSMFlagDesc *flagdesc)
 {
 	u64 flags = client->getCSMRestrictionFlags();
-	const CSMFlagDesc *flagdesc = flagdesc_csm_restriction;
 
 	std::map<const char *, bool> result;
 	for (int i = 0; flagdesc[i].name; i++) {

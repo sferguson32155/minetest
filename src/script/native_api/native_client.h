@@ -4,9 +4,21 @@
 #include <map>
 #include <list>
 #include "client/client.h"
-#include "script/cpp_api/s_base.h"
+#include "client/sound.h"
+#include <script\cpp_api\s_base.h>
+#include "chatmessage.h"
+#include <nodemetadata.h>
+#include "client/clientevent.h"
 #include "nodedef.h"
-#include "util/areastore.h"
+#include <gettext.h>
+#include "map.h"
+#include "gui/mainmenumanager.h"
+
+struct CSMFlagDesc
+{
+	const char *name;
+	u64 flag;
+};
 
 class NativeModApiClient
 {
@@ -23,7 +35,7 @@ private:
 	static bool native_show_formspec(std::string *formname, std::string *formspec,
 		Client *client);
 	static int native_send_respawn(Client *client);
-	static bool native_disconnect(Client *client);
+	static bool native_disconnect(Client *client, MainGameCallback *g_gamecallback);
 	static const char* native_gettext(std::string text);
 	static const NodeDefManager *native_get_node_or_nil(v3s16 pos, Client *client);
 	static std::tuple<char*, const char*> native_get_language();
@@ -41,6 +53,6 @@ private:
 	static const ContentFeatures *native_get_node_def(Client *client, IGameDef *gdef,
 		std::string name);
 	static std::map<bool, std::string> native_get_privilege_list(Client *client);
-	static const char* native_get_builtin_path();
-	static std::map<const char *, bool> native_get_csm_restrictions(Client *client);
+	static const char *native_get_builtin_path();
+	static std::map<const char *, bool> native_get_csm_restrictions(Client *client, const CSMFlagDesc *flagdesc);
 };

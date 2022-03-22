@@ -24,7 +24,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class LuaItemStack : public ModApiBase {
 private:
-	ItemStack m_stack;
 
 	static const char className[];
 	static const luaL_Reg methods[];
@@ -129,6 +128,8 @@ private:
 	static int l_peek_item(lua_State *L);
 
 public:
+	ItemStack m_stack;
+
 	LuaItemStack(const ItemStack &item);
 	~LuaItemStack() = default;
 
