@@ -31,7 +31,6 @@ std::tuple<f32, f32, f32, f32> NativeCamera::native_get_fov(Camera *camera)
 	f32 actual = camera->getCameraNode()->getFOV() * core::RADTODEG;
 	f32 max = camera->getFovMax() * core::RADTODEG;
 
-	// TODO: Save these fov values somewhere
 	return std::tuple<f32, f32, f32, f32>(x, y, actual, max);
 }
 

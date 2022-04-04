@@ -45,9 +45,17 @@ private:
 	static int l_get_look_horizontal(lua_State *L);
 	static int l_get_aspect_ratio(lua_State *L);
 
-	// testing functions
+	// new lua functions to call corresponding native functions
+	// will be called by modded chat commands to test native api functionality
 	static int l_native_set_camera_mode(lua_State *L);
 	static int l_native_get_camera_mode(lua_State *L);
+	static int l_native_get_fov(lua_State *L);
+	static int l_native_get_pos(lua_State *L);
+	static int l_native_get_offset(lua_State *L);
+	static int l_native_get_look_dir(lua_State *L);
+	static int l_native_get_look_horizontal(lua_State *L);
+	static int l_native_get_look_vertical(lua_State *L);
+	static int l_native_get_aspect_ratio(lua_State *L);
 
 	Camera *m_camera = nullptr;
 

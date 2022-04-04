@@ -240,6 +240,13 @@ const luaL_Reg LuaCamera::methods[] = {
 	// register testing methods 
 	luamethod(LuaCamera, native_set_camera_mode),
 	luamethod(LuaCamera, native_get_camera_mode),
+	luamethod(LuaCamera, native_get_fov),
+	luamethod(LuaCamera, native_get_pos),
+	luamethod(LuaCamera, native_get_offset),
+	luamethod(LuaCamera, native_get_look_dir),
+	luamethod(LuaCamera, native_get_look_horizontal),
+	luamethod(LuaCamera, native_get_look_vertical),
+	luamethod(LuaCamera, native_get_aspect_ratio),
 
 	{0, 0}
 };
@@ -272,5 +279,92 @@ int LuaCamera::l_native_get_camera_mode(lua_State *L)
 	// update lua state
 	lua_pushinteger(L, result);
 
+	return 1;
+}
+
+// native_get_fov(self)
+int LuaCamera::l_native_get_fov(lua_State *L)
+{
+	Camera *camera = getobject(L, 1);
+	if (!camera)
+		return 0;
+
+	std::tuple<f32, f32, f32, f32> result = NativeCamera::native_get_fov(camera);
+
+	lua_newtable(L);
+	lua_pushnumber(L, std::get<0>(result));
+	lua_setfield(L, -2, "x");
+	lua_pushnumber(L, std::get<1>(result));
+	lua_setfield(L, -2, "y");
+	lua_pushnumber(L, std::get<2>(result));
+	lua_setfield(L, -2, "actual");
+	lua_pushnumber(L, std::get<3>(result));
+	lua_setfield(L, -2, "max");
+	return 1;
+}
+
+// native_get_pos(self)
+int LuaCamera::l_native_get_pos(lua_State *L)
+{
+	Camera *camera = getobject(L, 1);
+	if (!camera)
+		return 0;
+
+	v3f result = NativeCamera::native_get_pos(camera);
+
+	push_v3f(L, result);
+	return 1;
+}
+
+// native_get_offset(self)
+int LuaCamera::l_native_get_offset(lua_State *L)
+{	
+	v3f result = NativeCamera::native_get_offset(getClient(L));
+
+	push_v3f(L, result);
+	return 1;
+}
+
+// native_get_look_dir(self)
+int LuaCamera::l_native_get_look_dir(lua_State *L)
+{
+	Camera *camera = getobject(L, 1);
+	if (!camera)
+		return 0;
+
+	v3f result = NativeCamera::native_get_look_dir(camera);
+
+	push_v3f(L, result);
+	return 1;
+}
+
+// native_get_look_horizontal(self)
+int LuaCamera::l_native_get_look_horizontal(lua_State *L)
+{
+	f32 result = NativeCamera::native_get_look_horizontal(getClient(L));
+
+	lua_pushnumber(L, result);
+	return 1;
+}
+
+// native_get_look_vertical(self)
+int LuaCamera::l_native_get_look_vertical(lua_State *L)
+{
+	f32 result = NativeCamera::native_get_look_vertical(getClient(L));
+
+	lua_pushnumber(L, result);
+	return 1;
+}
+
+// native_get_aspect_ratio(self)
+int LuaCamera::l_native_get_aspect_ratio(lua_State *L)
+{
+	Camera *camera = getobject(L, 1);
+	if (!camera)
+		return 0;
+
+	f32 result = NativeCamera::native_get_aspect_ratio(camera);
+
+	lua_pushnumber(L, result);
 	return 1;
 }
