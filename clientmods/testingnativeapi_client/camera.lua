@@ -63,12 +63,51 @@ minetest.register_chatcommand("native_camera_setcamera", {
 	end
 })
 
+minetest.register_chatcommand("test_camera_setcamera", {
+	description = "Asserts lua api and native api behaviors for l_camera.set_camera",
+	func = function(self)
+		local curr = minetest.camera:get_camera_mode()
+		
+		-- Calculate which camera mode to change to and switch, and return result
+		local res1;
+		local res2;
+		local first;
+		local second;
+		if curr == 0 then
+			first = 1
+			second = 0
+		else
+			first = 0
+			second = 1
+		end
+
+		-- Test lua
+		minetest.camera:set_camera_mode(first)
+		res1 = minetest.camera:get_camera_mode()
+
+		-- Test native
+		minetest.camera:native_set_camera_mode(second)
+		res2 = minetest.camera:get_camera_mode()
+
+		-- Return result
+		if res1 == 1 and res2 == 0 then
+			return true, "(Success) [Camera] set_camera_mode()"
+		else
+			return false, "(Fail) [Camera] set_camera_mode()"
+		end
+	end
+})
+
 -- get_fov()
 minetest.register_chatcommand("lua_camera_getfov", {
 	description = "Invokes lua_api > l_camera.l_get_fov",
 	func = function(self)
 		local res = minetest.camera:get_fov()
-		return true, "Success, get_fov() returned: "..res
+		print("Success, get_fov() returned:")
+		for key, value in pairs(res) do
+    		print(key, value)
+		end
+		return true, ""
 	end
 })
 
@@ -76,7 +115,11 @@ minetest.register_chatcommand("native_camera_getfov", {
 	description = "Invokes lua_api > l_camera.l_native_get_fov > native_fov.native_get_fov",
 	func = function(self)
 		local res = minetest.camera:native_get_fov()
-		return true, "Success, native_get_fov() returned: "..res
+		print("Success, get_fov() returned:")
+		for key, value in pairs(res) do
+    		print(key, value)
+		end
+		return true, ""
 	end
 })
 
@@ -98,7 +141,11 @@ minetest.register_chatcommand("lua_camera_getpos", {
 	description = "Invokes lua_api > l_camera.l_get_pos",
 	func = function(self)
 		local res = minetest.camera:get_pos()
-		return true, "Success, get_pos() returned: "..res
+		print("Success, get_pos() returned:")
+		for key, value in pairs(res) do
+    		print(key, value)
+		end
+		return true, ""
 	end
 })
 
@@ -106,7 +153,11 @@ minetest.register_chatcommand("native_camera_getpos", {
 	description = "Invokes lua_api > l_camera.l_native_get_pos > native_pos.native_get_pos",
 	func = function(self)
 		local res = minetest.camera:native_get_pos()
-		return true, "Success, native_get_pos() returned: "..res
+		print("Success, get_pos() returned:")
+		for key, value in pairs(res) do
+    		print(key, value)
+		end
+		return true, ""
 	end
 })
 
@@ -128,7 +179,11 @@ minetest.register_chatcommand("lua_camera_getoffset", {
 	description = "Invokes lua_api > l_camera.l_get_offset",
 	func = function(self)
 		local res = minetest.camera:get_offset()
-		return true, "Success, get_offset() returned: "..res
+		print("Success, get_offset() returned:")
+		for key, value in pairs(res) do
+    		print(key, value)
+		end
+		return true, ""
 	end
 })
 
@@ -136,7 +191,11 @@ minetest.register_chatcommand("native_camera_getoffset", {
 	description = "Invokes lua_api > l_camera.l_native_get_offset > native_offset.native_get_offset",
 	func = function(self)
 		local res = minetest.camera:native_get_offset()
-		return true, "Success, native_get_offset() returned: "..res
+		print("Success, get_offset() returned:")
+		for key, value in pairs(res) do
+    		print(key, value)
+		end
+		return true, ""
 	end
 })
 
@@ -158,7 +217,11 @@ minetest.register_chatcommand("lua_camera_getlookdir", {
 	description = "Invokes lua_api > l_camera.l_get_look_dir",
 	func = function(self)
 		local res = minetest.camera:get_look_dir()
-		return true, "Success, get_look_dir() returned: "..res
+		print("Success, get_look_dir() returned:")
+		for key, value in pairs(res) do
+    		print(key, value)
+		end
+		return true, ""
 	end
 })
 
@@ -166,7 +229,11 @@ minetest.register_chatcommand("native_camera_getlookdir", {
 	description = "Invokes lua_api > l_camera.l_native_get_look_dir > native_look_dir.native_get_look_dir",
 	func = function(self)
 		local res = minetest.camera:native_get_look_dir()
-		return true, "Success, native_get_look_dir() returned: "..res
+		print("Success, native_get_look_dir() returned:")
+		for key, value in pairs(res) do
+    		print(key, value)
+		end
+		return true, ""
 	end
 })
 
