@@ -46,6 +46,20 @@ private:
 
 	static int l_from_string(lua_State *L);
 	static int l_from_file(lua_State *L);
+	
+	// new lua functions to call corresponding native functions
+	// will be called by modded chat commands to test native api functionality
+	static int l_native_get_area(lua_State *L);
+	static int l_native_get_areas_for_pos(lua_State *L);
+	static int l_native_get_areas_in_area(lua_State *L);
+	static int l_native_insert_area(lua_State *L);
+	static int l_native_reserve(lua_State *L);
+	static int l_native_remove_area(lua_State *L);
+	static int l_native_set_cache_params(lua_State *L);
+	static int l_native_to_string(lua_State *L);
+	static int l_native_to_file(lua_State *L);
+	static int l_native_from_string(lua_State *L);
+	static int l_native_from_file(lua_State *L);
 
 public:
 	AreaStore *as = nullptr;

@@ -4,29 +4,29 @@
 #include <fstream>
 #include <tuple>
 
-static std::tuple<bool, v3s16, v3s16, std::string> push_area(
+static std::tuple<bool*, v3s16*, v3s16*, std::string*> push_area(
 	const Area *a, bool include_borders, bool include_data)
 {
-	std::tuple<bool, v3s16, v3s16, std::string> result;
+	std::tuple<bool*, v3s16*, v3s16*, std::string*> result = std::make_tuple(nullptr, nullptr, nullptr, nullptr);
 	if (!include_borders && !include_data) {
-		std::get<0>(result) = true;
+		*std::get<0>(result) = true;
 		return result;
 	}
 	if (include_borders) {
-		std::get<1>(result) = a->minedge;
-		std::get<2>(result) = a->maxedge;
+		*std::get<1>(result) = a->minedge;
+		*std::get<2>(result) = a->maxedge;
 	}
 	if (include_data) {
-		std::get<3>(result) = a->data.c_str();
+		*std::get<3>(result) = a->data.c_str();
 	}
 	return result;
 }
 
-static std::map<u32, std::tuple<bool, v3s16, v3s16, std::string>> push_areas(
+static std::map<u32, std::tuple<bool*, v3s16*, v3s16*, std::string*>> push_areas(
 	const std::vector<Area *> &areas, bool include_borders,bool include_data)
 {
 	size_t cnt = areas.size();
-	std::map<u32, std::tuple<bool, v3s16, v3s16, std::string>> result;
+	std::map<u32, std::tuple<bool*, v3s16*, v3s16*, std::string*>> result;
 	for (size_t i = 0; i < cnt; i++) {
 		// TODO: some sort of save for area to id?
 		result[areas[i]->id] =
@@ -50,13 +50,13 @@ static std::tuple<bool, std::string> deserialization_helper(AreaStore *as, std::
 	return result;
 }
 
-std::tuple<bool, v3s16, v3s16, std::string> NativeAreaStore::native_get_area(Area *res, u32 id,
+std::tuple<bool*, v3s16*, v3s16*, std::string*> NativeAreaStore::native_get_area(const Area *res, u32 id,
 	bool include_borders, bool include_data)
 {
 	return push_area(res, include_borders, include_data);
 }
 
-std::map<u32, std::tuple<bool, v3s16, v3s16, std::string>> NativeAreaStore::native_get_areas_for_pos(LuaAreaStore *o, v3s16 pos,
+std::map<u32, std::tuple<bool*, v3s16*, v3s16*, std::string*>> NativeAreaStore::native_get_areas_for_pos(LuaAreaStore *o, v3s16 pos,
 	bool include_borders, bool include_data)
 {
 	AreaStore *ast = o->as;
@@ -66,7 +66,7 @@ std::map<u32, std::tuple<bool, v3s16, v3s16, std::string>> NativeAreaStore::nati
 	return push_areas(res, include_borders, include_data);
 }
 
-std::map<u32, std::tuple<bool, v3s16, v3s16, std::string>> NativeAreaStore::native_get_areas_in_area(LuaAreaStore *o, v3s16 minedge,
+std::map<u32, std::tuple<bool*, v3s16*, v3s16*, std::string*>> NativeAreaStore::native_get_areas_in_area(LuaAreaStore *o, v3s16 minedge,
 	v3s16 maxedge, bool include_borders,
 	bool include_data, bool accept_overlap)
 {

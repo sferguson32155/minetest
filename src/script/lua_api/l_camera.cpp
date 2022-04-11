@@ -24,6 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "client/content_cao.h"
 #include "client/camera.h"
 #include "client/client.h"
+#include "../native_api/native_camera.h"
 
 LuaCamera::LuaCamera(Camera *m) : m_camera(m)
 {

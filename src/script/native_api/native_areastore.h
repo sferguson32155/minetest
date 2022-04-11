@@ -8,12 +8,12 @@
 
 class NativeAreaStore
 {
-private:
-	static std::tuple<bool, v3s16, v3s16, std::string> native_get_area(Area *res, u32 id,
+public:
+	static std::tuple<bool*, v3s16*, v3s16*, std::string*> native_get_area(const Area *res, u32 id,
 		bool include_borders, bool include_data);
-	static std::map<u32, std::tuple<bool, v3s16, v3s16, std::string>> native_get_areas_for_pos(LuaAreaStore *o, v3s16 pos,
+	static std::map<u32, std::tuple<bool*, v3s16*, v3s16*, std::string*>> native_get_areas_for_pos(LuaAreaStore *o, v3s16 pos,
 		bool include_borders,bool include_data);
-	static std::map<u32, std::tuple<bool, v3s16, v3s16, std::string>> native_get_areas_in_area(LuaAreaStore *o, v3s16 minedge,
+	static std::map<u32, std::tuple<bool*, v3s16*, v3s16*, std::string*>> native_get_areas_in_area(LuaAreaStore *o, v3s16 minedge,
 		v3s16 maxedge, bool include_borders,
 		bool include_data, bool accept_overlap);
 	static int native_insert_area(LuaAreaStore *o, v3s16 edge1,

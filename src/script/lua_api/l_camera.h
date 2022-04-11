@@ -20,7 +20,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 
 #include "l_base.h"
-#include "../native_api/native_camera.h"
 
 class Camera;
 

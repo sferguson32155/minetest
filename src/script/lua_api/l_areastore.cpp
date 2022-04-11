@@ -26,6 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "util/areastore.h"
 #include "filesys.h"
 #include <fstream>
+#include "../native_api/native_areastore.h"
 
 static inline void get_data_and_border_flags(lua_State *L, u8 start_i,
 		bool *borders, bool *data)
@@ -392,5 +393,260 @@ const luaL_Reg LuaAreaStore::methods[] = {
 	luamethod(LuaAreaStore, to_file),
 	luamethod(LuaAreaStore, from_string),
 	luamethod(LuaAreaStore, from_file),
+
+	// register testing methods
+	luamethod(LuaAreaStore, native_get_area),
+	luamethod(LuaAreaStore, native_get_areas_for_pos),
+	luamethod(LuaAreaStore, native_get_areas_in_area),
+	luamethod(LuaAreaStore, native_insert_area),
+	luamethod(LuaAreaStore, native_reserve),
+	luamethod(LuaAreaStore, native_remove_area),
+	luamethod(LuaAreaStore, native_set_cache_params),
+	luamethod(LuaAreaStore, native_to_string),
+	luamethod(LuaAreaStore, native_to_file),
+	luamethod(LuaAreaStore, native_from_string),
+	luamethod(LuaAreaStore, native_from_file),
+
 	{0,0}
 };
+
+static void push_area_from_native(
+		lua_State *L, std::tuple<bool *, v3s16 *, v3s16 *, std::string *> input)
+{
+	if (std::get<0>(input)) {
+		lua_pushboolean(L, true);
+		return;
+	}
+	lua_newtable(L);
+	if (std::get<1>(input) && std::get<2>(input)) {
+		push_v3s16(L, *std::get<1>(input));
+		lua_setfield(L, -2, "min");
+		push_v3s16(L, *std::get<2>(input));
+		lua_setfield(L, -2, "max");
+	}
+	if (std::get<3>(input)) {
+		lua_pushlstring(L, (*std::get<3>(input)).c_str(),
+				(*std::get<3>(input)).size());
+		lua_setfield(L, -2, "data");
+	}
+}
+
+static inline void push_areas_from_native(lua_State *L,
+		std::map<u32, std::tuple<bool *, v3s16 *, v3s16 *, std::string *>> input)
+{
+	lua_newtable(L);
+	for (const auto &pair : input) {
+		lua_pushnumber(L, pair.first);
+		push_area_from_native(L, pair.second);
+		lua_settable(L, -3);
+	}
+}
+
+// native_get_area(id, include_borders, include_data)
+int LuaAreaStore::l_native_get_area(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaAreaStore *o = checkobject(L, 1);
+	AreaStore *ast = o->as;
+
+	u32 id = luaL_checknumber(L, 2);
+
+	bool include_borders = true;
+	bool include_data = false;
+	get_data_and_border_flags(L, 3, &include_borders, &include_data);
+
+	const Area *res;
+
+	res = ast->getArea(id);
+	if (!res)
+		return 0;
+
+	std::tuple<bool*, v3s16*, v3s16*, std::string*> result =
+			NativeAreaStore::native_get_area(res, id, include_borders, include_data);
+
+	push_area_from_native(L, result);
+
+	return 1;
+}
+
+// native_get_areas_for_pos(pos, include_borders, include_data)
+int LuaAreaStore::l_native_get_areas_for_pos(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaAreaStore *o = checkobject(L, 1);
+
+	v3s16 pos = check_v3s16(L, 2);
+
+	bool include_borders = true;
+	bool include_data = false;
+	get_data_and_border_flags(L, 3, &include_borders, &include_data);
+
+	std::map<u32, std::tuple<bool *, v3s16 *, v3s16 *, std::string *>> result =
+		NativeAreaStore::native_get_areas_for_pos(o, pos, include_borders, include_data);
+
+	push_areas_from_native(L, result);
+
+	return 1;
+}
+
+// native_get_areas_in_area(edge1, edge2, accept_overlap, include_borders, include_data)
+int LuaAreaStore::l_native_get_areas_in_area(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaAreaStore *o = checkobject(L, 1);
+	AreaStore *ast = o->as;
+
+	v3s16 minedge = check_v3s16(L, 2);
+	v3s16 maxedge = check_v3s16(L, 3);
+
+	bool include_borders = true;
+	bool include_data = false;
+	bool accept_overlap = false;
+	if (lua_isboolean(L, 4)) {
+		accept_overlap = readParam<bool>(L, 4);
+		get_data_and_border_flags(L, 5, &include_borders, &include_data);
+	}
+	std::vector<Area *> res;
+
+	ast->getAreasInArea(&res, minedge, maxedge, accept_overlap);
+	push_areas(L, res, include_borders, include_data);
+
+	return 1;
+}
+
+// native_insert_area(edge1, edge2, data, id)
+int LuaAreaStore::l_native_insert_area(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaAreaStore *o = checkobject(L, 1);
+	AreaStore *ast = o->as;
+
+	Area a(check_v3s16(L, 2), check_v3s16(L, 3));
+
+	size_t d_len;
+	const char *data = lual_native_checklstring(L, 4, &d_len);
+
+	a.data = std::string(data, d_len);
+
+	if (lua_isnumber(L, 5))
+		a.id = lua_tonumber(L, 5);
+
+	// native_Insert & assign a new ID if necessary
+	if (!ast->insertArea(&a))
+		return 0;
+
+	lua_pushnumber(L, a.id);
+	return 1;
+}
+
+// native_reserve(count)
+int LuaAreaStore::l_native_reserve(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaAreaStore *o = checkobject(L, 1);
+	AreaStore *ast = o->as;
+
+	size_t count = lual_native_checknumber(L, 2);
+	ast->reserve(count);
+	return 0;
+}
+
+// native_remove_area(id)
+int LuaAreaStore::l_native_remove_area(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaAreaStore *o = checkobject(L, 1);
+	AreaStore *ast = o->as;
+
+	u32 id = lual_native_checknumber(L, 2);
+	bool success = ast->removeArea(id);
+
+	lua_pushboolean(L, success);
+	return 1;
+}
+
+// native_set_cache_params(params)
+int LuaAreaStore::l_native_set_cache_params(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaAreaStore *o = checkobject(L, 1);
+	AreaStore *ast = o->as;
+
+	lual_native_checktype(L, 2, LUA_TTABLE);
+
+	bool enabled = getboolfield_default(L, 2, "enabled", true);
+	u8 block_radius = getintfield_default(L, 2, "block_radius", 64);
+	size_t limit = getintfield_default(L, 2, "block_radius", 1000);
+
+	ast->setCacheParams(enabled, block_radius, limit);
+
+	return 0;
+}
+
+// native_to_string()
+int LuaAreaStore::l_native_to_string(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaAreaStore *o = checkobject(L, 1);
+
+	std::ostringstream os(std::ios_base::binary);
+	o->as->serialize(os);
+	std::string str = os.str();
+
+	lua_pushlstring(L, str.c_str(), str.length());
+	return 1;
+}
+
+// native_to_file(filename)
+int LuaAreaStore::l_native_to_file(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaAreaStore *o = checkobject(L, 1);
+	AreaStore *ast = o->as;
+
+	const char *filename = lual_native_checkstring(L, 2);
+	CHECK_SECURE_PATH(L, filename, true);
+
+	std::ostringstream os(std::ios_base::binary);
+	ast->serialize(os);
+
+	lua_pushboolean(L, fs::safeWriteToFile(filename, os.str()));
+	return 1;
+}
+
+// native_from_string(str)
+int LuaAreaStore::l_native_from_string(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaAreaStore *o = checkobject(L, 1);
+
+	size_t len;
+	const char *str = lual_native_checklstring(L, 2, &len);
+
+	std::istringstream is(std::string(str, len), std::ios::binary);
+	return deserialization_helper(L, o->as, is);
+}
+
+// native_from_file(filename)
+int LuaAreaStore::l_native_from_file(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaAreaStore *o = checkobject(L, 1);
+
+	const char *filename = lual_native_checkstring(L, 2);
+	CHECK_SECURE_PATH(L, filename, false);
+
+	std::ifstream is(filename, std::ios::binary);
+	return deserialization_helper(L, o->as, is);
+}
