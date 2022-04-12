@@ -540,12 +540,17 @@ int LuaAreaStore::l_native_insert_area(lua_State *L)
 
 	std::string str = std::string(data, d_len);
 
-	int *id = nullptr;
-	if (lua_isnumber(L, 5))
-		*id = lua_tonumber(L, 5);
+	int result;
+	if (lua_isnumber(L, 5)) {
+		int val = lua_tonumber(L, 5);
+		result = NativeAreaStore::native_insert_area(
+				o, check_v3s16(L, 2), check_v3s16(L, 3), str, &val);
+	} else {
+		result = NativeAreaStore::native_insert_area(
+				o, check_v3s16(L, 2), check_v3s16(L, 3), str, nullptr);
+	}
 
-	int result = NativeAreaStore::native_insert_area(
-			o, check_v3s16(L, 2), check_v3s16(L, 3), str, id);
+
 	if (result == -1)
 		return 0;
 
@@ -562,7 +567,7 @@ int LuaAreaStore::l_native_reserve(lua_State *L)
 
 	size_t count = luaL_checknumber(L, 2);
 
-	return NativeAreaStore::native_reserve(0, count);;
+	return NativeAreaStore::native_reserve(o, count);;
 }
 
 // native_remove_area(id)
