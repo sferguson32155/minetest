@@ -518,8 +518,327 @@ const luaL_Reg LuaItemStack::methods[] = {
 	luamethod(LuaItemStack, item_fits),
 	luamethod(LuaItemStack, take_item),
 	luamethod(LuaItemStack, peek_item),
+
+	// Register testing methods for native functions.
+	luamethod(LuaItemStack, native_is_empty),
+	luamethod(LuaItemStack, native_get_name),
+	luamethod(LuaItemStack, native_set_name),
+	luamethod(LuaItemStack, native_get_count),
+	luamethod(LuaItemStack, native_set_count),
+	luamethod(LuaItemStack, native_get_wear),
+	luamethod(LuaItemStack, native_set_wear),
+	luamethod(LuaItemStack, native_get_meta),
+	luamethod(LuaItemStack, native_get_metadata),
+	luamethod(LuaItemStack, native_set_metadata),
+	luamethod(LuaItemStack, native_get_description),
+	luamethod(LuaItemStack, native_get_short_description),
+	luamethod(LuaItemStack, native_clear),
+	luamethod(LuaItemStack, native_replace),
+	luamethod(LuaItemStack, native_to_string),
+	luamethod(LuaItemStack, native_to_table),
+	luamethod(LuaItemStack, native_get_stack_max),
+	luamethod(LuaItemStack, native_get_free_space),
+	luamethod(LuaItemStack, native_is_known),
+	luamethod(LuaItemStack, native_get_definition),
+	luamethod(LuaItemStack, native_get_tool_capabilities),
+	luamethod(LuaItemStack, native_add_wear),
+	luamethod(LuaItemStack, native_add_item),
+	luamethod(LuaItemStack, native_item_fits),
+	luamethod(LuaItemStack, native_take_item),
+	luamethod(LuaItemStack, native_peek_item),
+
+
 	{0,0}
 };
+
+/*
+	Native ItemStack methods.
+*/
+
+int LuaItemStack::l_native_is_empty(lua_State *L) {
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	lua_pushboolean(L, NativeItemStack::native_is_empty(o));
+	return 1;
+}
+
+int LuaItemStack::l_native_get_name(lua_State* L) {
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	lua_pushstring(L, NativeItemStack::native_get_name(o));
+	return 1;
+}
+
+int LuaItemStack::l_native_set_name(lua_State* L) {
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+
+	lua_pushboolean(L, NativeItemStack::native_set_name(o, luaL_checkstring(L, 2)));
+	return 1;
+}
+
+int LuaItemStack::l_native_get_count(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	lua_pushinteger(L, NativeItemStack::native_get_count(o));
+	return 1;
+}
+
+int LuaItemStack::l_native_set_count(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+
+	lua_pushboolean(L, NativeItemStack::native_set_count(o, luaL_checkinteger(L, 2)));
+	return 1;
+}
+
+int LuaItemStack::l_native_get_wear(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	lua_pushinteger(L, NativeItemStack::native_get_wear(o));
+	return 1;
+}
+
+int LuaItemStack::l_native_set_wear(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+
+	lua_pushboolean(L,  NativeItemStack::native_set_count(o, luaL_checkinteger(L, 2)));
+	return 1;
+}
+
+int LuaItemStack::l_native_get_meta(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	ItemStackMetaRef::create(L, &NativeItemStack::native_get_meta(o));
+	return 1;
+}
+
+int LuaItemStack::l_native_get_metadata(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	std::string value = NativeItemStack::native_get_metadata(o);
+	lua_pushlstring(L, value.c_str(), value.size());
+	return 1;
+}
+
+int LuaItemStack::l_native_set_metadata(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	ItemStack &item = o->m_stack;
+
+	size_t len = 0;
+	const char *ptr = luaL_checklstring(L, 2, &len);
+	NativeItemStack::native_set_metadata(o, len, ptr);
+	lua_pushboolean(L, true);
+	return 1;
+}
+
+int LuaItemStack::l_native_get_description(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	lua_pushstring(L, NativeItemStack::native_get_description(o, getGameDef(L)));
+	return 1;
+}
+int LuaItemStack::l_native_get_short_description(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	lua_pushstring(L, NativeItemStack::native_get_short_description(o, getGameDef(L)));
+	return 1;
+}
+
+int LuaItemStack::l_native_clear(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	lua_pushboolean(L, NativeItemStack::native_clear(o));
+	return 1;
+}
+
+int LuaItemStack::l_native_replace(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	lua_pushboolean(L, NativeItemStack::native_replace(o, &read_item(L, 2, getGameDef(L)->idef())));
+	return 1;
+}
+
+int LuaItemStack::l_native_to_string(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	lua_pushstring(L, NativeItemStack::native_to_string(o));
+	return 1;
+}
+
+bool tupleEmpty(std::tuple<const char*, u16, u16, const std::string&,
+	std::vector<std::tuple<std::string, std::string>>> table) {
+	bool empty = true;
+	if (!(std::get<0>(table) == ""))
+		empty = false;
+	if (!(std::get<1>(table) == 0))
+		empty = false;
+	if (!(std::get<2>(table) == 0))
+		empty = false;
+	if (!(std::get<3>(table) == ""))
+		empty = false;
+	std::vector<std::tuple<std::string, std::string>> fielddata = std::get<4>(table);
+	for (std::vector<std::tuple<std::string, std::string>>::iterator it = fielddata.begin(); it != fielddata.end(); it++) {
+		if (!(std::get<0>(*it) == "") || !(std::get<1>(*it) == "")) {
+			empty = false;
+		}
+	}
+	return empty;
+}
+
+int LuaItemStack::l_native_to_table(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	std::tuple<const char *, u16, u16, const std::string &, 
+		std::vector<std::tuple<std::string, std::string>>>
+			table = NativeItemStack::native_to_table(o);
+	if (tupleEmpty(table)) {
+		lua_pushnil(L);
+	} else {
+		lua_newtable(L);
+		lua_pushstring(L, std::get<0>(table));
+		lua_setfield(L, -2, "name");
+		lua_pushinteger(L, std::get<1>(table));
+		lua_setfield(L, -2, "count");
+		lua_pushinteger(L, std::get<2>(table));
+		lua_setfield(L, -2, "wear");
+
+		const std::string &metadata_str = std::get<3>(table);
+		lua_pushlstring(L, metadata_str.c_str(), metadata_str.size());
+		lua_setfield(L, -2, "metadata");
+
+		lua_newtable(L);
+		std::vector<std::tuple<std::string, std::string>> fielddata =
+				std::get<4>(table);
+		for (std::vector<std::tuple<std::string, std::string>>::iterator it = fielddata.begin(); it != fielddata.end(); it++) {
+			const std::string &name = std::get<0>(*it);
+			if (name == "") {
+				continue;
+			}
+			const std::string &value = std::get<1>(*it);
+			lua_pushlstring(L, name.c_str(), name.size());
+			lua_pushlstring(L, value.c_str(), value.size());
+			lua_settable(L, -3);
+		}
+		lua_setfield(L, -2, "meta");
+	}
+	return 1;
+}
+
+int LuaItemStack::l_native_get_stack_max(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	ItemStack &item = o->m_stack;
+	lua_pushinteger(L, NativeItemStack::native_get_stack_max(o, getGameDef(L)));
+	return 1;
+}
+
+int LuaItemStack::l_native_get_free_space(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	lua_pushinteger(L, NativeItemStack::native_get_free_space(o, getGameDef(L)));
+	return 1;
+}
+
+int LuaItemStack::l_native_is_known(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	lua_pushboolean(L, NativeItemStack::native_get_free_space(o, getGameDef(L)));
+	return 1;
+}
+
+int LuaItemStack::l_native_get_definition(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	ItemStack &item = o->m_stack;
+
+	// Get registered_items[name]
+	lua_getglobal(L, "core");
+	lua_getfield(L, -1, "registered_items");
+	luaL_checktype(L, -1, LUA_TTABLE);
+	lua_getfield(L, -1, NativeItemStack::native_get_definition(o));
+	if (lua_isnil(L, -1)) {
+		lua_pop(L, 1);
+		lua_getfield(L, -1, "unknown");
+	}
+	return 1;
+}
+
+int LuaItemStack::l_native_get_tool_capabilities(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	push_tool_capabilities(L, NativeItemStack::native_get_tool_capabilities(o, getGameDef(L)));
+	return 1;
+}
+
+int LuaItemStack::l_native_add_wear(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	lua_pushboolean(L, NativeItemStack::native_add_wear(o, lua_tointeger(L, 2), getGameDef(L)));
+	return 1;
+}
+
+int LuaItemStack::l_native_add_item(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	create(L, NativeItemStack::native_add_item(o, &read_item(L, -1, getGameDef(L)->idef()), getGameDef(L)));
+	return 1;
+}
+
+int LuaItemStack::l_native_item_fits(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	std::tuple<bool, ItemStack> itemFit = NativeItemStack::native_item_fits(
+			o, &read_item(L, 2, getGameDef(L)->idef()), getGameDef(L));
+	lua_pushboolean(L, std::get<0>(itemFit)); // first return value
+	create(L, std::get<1>(itemFit));	  // second return value
+	return 2;
+}
+
+int LuaItemStack::l_native_take_item(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	u32 takecount = 1;
+	if (!lua_isnone(L, 2))
+		takecount = luaL_checkinteger(L, 2);
+	create(L, NativeItemStack::native_take_item(o, takecount));
+	return 1;
+}
+
+int LuaItemStack::l_native_peek_item(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaItemStack *o = checkobject(L, 1);
+	u32 peekcount = 1;
+	if (!lua_isnone(L, 2))
+		peekcount = lua_tointeger(L, 2);
+	create(L, NativeItemStack::native_peek_item(o, peekcount));
+	return 1;
+}
 
 /*
 	ItemDefinition

@@ -175,7 +175,7 @@ bool NativeItemStack::native_is_known(LuaItemStack *o, IGameDef *gamedef)
     return item.isKnown(gamedef->idef());
 }
 
-const char * NativeItemStack::native_get_description(LuaItemStack *o){
+const char * NativeItemStack::native_get_definition(LuaItemStack *o){
 	ItemStack &item = o->m_stack;
 	return item.name.c_str();
 }
