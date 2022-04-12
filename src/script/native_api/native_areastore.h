@@ -25,6 +25,6 @@ public:
 		u8 *block_radius = nullptr, size_t *limit = nullptr);
 	static std::string native_to_string(LuaAreaStore *o);
 	static bool native_to_file(LuaAreaStore *o, std::string filename);
-	static std::tuple<bool, std::string> native_from_string(LuaAreaStore *o, std::string str);
-	static std::tuple<bool, std::string> native_from_file(LuaAreaStore *o, std::string filename);
+	static std::tuple<bool*, const char*> native_from_string(LuaAreaStore *o, std::string str);
+	static std::tuple<bool*, const char*> native_from_file(LuaAreaStore *o, std::string filename);
 };
