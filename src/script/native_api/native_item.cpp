@@ -298,6 +298,9 @@ content_t NativeModApiItemMod::native_get_content_id(IGameDef *def, std::string 
 		throw LuaError("Unknown node: " + name);
         }
     }
+    else {
+	    content_id = 0;
+    }
 
     return content_id;
 }

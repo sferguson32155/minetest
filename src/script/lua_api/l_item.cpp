@@ -991,4 +991,29 @@ void ModApiItemMod::Initialize(lua_State *L, int top)
 	API_FCT(register_alias_raw);
 	API_FCT(get_content_id);
 	API_FCT(get_name_from_content_id);
+
+	// Native testing functions
+	API_FCT(native_get_content_id);
+	API_FCT(native_get_name_from_content_id);
+}
+
+/*
+	NativeModApiItemMod testing functions
+*/
+
+int ModApiItemMod::l_native_get_content_id(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	std::string name = luaL_checkstring(L, 1);
+	lua_pushinteger(L, NativeModApiItemMod::native_get_content_id(getGameDef(L), name));
+	return 1; /* number of results */
+}
+
+int ModApiItemMod::l_native_get_name_from_content_id(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	content_t c = luaL_checkint(L, 1);
+
+	lua_pushstring(L, NativeModApiItemMod::native_get_name_from_content_id(getGameDef(L), &c));
+	return 1; /* number of results */
 }

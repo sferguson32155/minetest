@@ -182,6 +182,14 @@ private:
 	static int l_register_alias_raw(lua_State *L);
 	static int l_get_content_id(lua_State *L);
 	static int l_get_name_from_content_id(lua_State *L);
+
+	// Functions for testing native ModApiItemMod functions
+	//static int l_native_register_item_raw(lua_State *L);
+	//static int l_native_unregister_item_raw(lua_State *L);
+	//static int l_native_register_alias_raw(lua_State *L);
+	static int l_native_get_content_id(lua_State *L);
+	static int l_native_get_name_from_content_id(lua_State *L);
+
 public:
 	static void Initialize(lua_State *L, int top);
 };
