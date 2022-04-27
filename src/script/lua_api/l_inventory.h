@@ -20,7 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #pragma once
 
 #include "lua_api/l_base.h"
-
+#include "../script/native_api/native_inventory.h"
 #include "inventory.h"
 #include "inventorymanager.h"
 
@@ -54,14 +54,22 @@ private:
 	// is_empty(self, listname) -> true/false
 	static int l_is_empty(lua_State *L);
 
+	static int l_native_is_empty(lua_State *L);
+
 	// get_size(self, listname)
 	static int l_get_size(lua_State *L);
+
+	static int l_native_get_size(lua_State *L);
 
 	// get_width(self, listname)
 	static int l_get_width(lua_State *L);
 
+	static int l_native_get_width(lua_State *L);
+
 	// set_size(self, listname, size)
 	static int l_set_size(lua_State *L);
+
+	static int l_native_set_size(lua_State *L);
 
 	// set_width(self, listname, size)
 	static int l_set_width(lua_State *L);

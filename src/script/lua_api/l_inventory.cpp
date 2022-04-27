@@ -82,6 +82,16 @@ int InvRef::l_is_empty(lua_State *L)
 	return 1;
 }
 
+int InvRef::l_native_is_empty(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	InvRef *ref = checkobject(L, 1);
+	const char *listname = luaL_checkstring(L, 2);
+	InventoryList *list = getlist(L, ref, listname);
+	lua_pushboolean(L, NativeInvRef::native_is_empty(getinv(L, ref), list));
+	return 1;
+}
+
 // get_size(self, listname)
 int InvRef::l_get_size(lua_State *L)
 {
@@ -97,6 +107,16 @@ int InvRef::l_get_size(lua_State *L)
 	return 1;
 }
 
+int InvRef::l_native_get_size(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	InvRef *ref = checkobject(L, 1);
+	const char *listname = luaL_checkstring(L, 2);
+	InventoryList *list = getlist(L, ref, listname);
+	lua_pushinteger(L, NativeInvRef::native_get_size(getinv(L, ref), list));
+	return 1;
+}
+
 // get_width(self, listname)
 int InvRef::l_get_width(lua_State *L)
 {
@@ -109,6 +129,16 @@ int InvRef::l_get_width(lua_State *L)
 	} else {
 		lua_pushinteger(L, 0);
 	}
+	return 1;
+}
+
+int InvRef::l_native_get_width(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	InvRef *ref = checkobject(L, 1);
+	const char *listname = luaL_checkstring(L, 2);
+	InventoryList *list = getlist(L, ref, listname);
+	lua_pushinteger(L, NativeInvRef::native_get_width(getinv(L, ref), list));
 	return 1;
 }
 
@@ -149,6 +179,23 @@ int InvRef::l_set_size(lua_State *L)
 	}
 	reportInventoryChange(L, ref);
 	lua_pushboolean(L, true);
+	return 1;
+}
+
+int InvRef::l_native_set_size(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	InvRef *ref = checkobject(L, 1);
+	const char *listname = luaL_checkstring(L, 2);
+
+	int newsize = luaL_checknumber(L, 3);
+	bool res = NativeInvRef::native_set_size(getinv(L, ref), listname, getinv(L, ref)->getList(listname), newsize);
+	if (res) {
+		reportInventoryChange(L, ref);
+		lua_pushboolean(L, true);
+	} else {
+		lua_pushboolean(L, false);
+	}
 	return 1;
 }
 
@@ -466,9 +513,13 @@ void InvRef::Register(lua_State *L)
 const char InvRef::className[] = "InvRef";
 const luaL_Reg InvRef::methods[] = {
 	luamethod(InvRef, is_empty),
+	luamethod(InvRef, native_is_empty),
 	luamethod(InvRef, get_size),
+	luamethod(InvRef, native_get_size),
 	luamethod(InvRef, set_size),
+	luamethod(InvRef, native_set_size),
 	luamethod(InvRef, get_width),
+	luamethod(InvRef, native_get_width),
 	luamethod(InvRef, set_width),
 	luamethod(InvRef, get_stack),
 	luamethod(InvRef, set_stack),
@@ -557,3 +608,5 @@ void ModApiInventory::Initialize(lua_State *L, int top)
 	API_FCT(remove_detached_inventory_raw);
 	API_FCT(get_inventory);
 }
+
+
