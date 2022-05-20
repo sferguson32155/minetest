@@ -175,7 +175,7 @@ bool NativeItemStack::native_is_known(LuaItemStack *o, IGameDef *gamedef)
     return item.isKnown(gamedef->idef());
 }
 
-const char * NativeItemStack::native_get_description(LuaItemStack *o){
+const char * NativeItemStack::native_get_definition(LuaItemStack *o){
 	ItemStack &item = o->m_stack;
 	return item.name.c_str();
 }
@@ -297,6 +297,9 @@ content_t NativeModApiItemMod::native_get_content_id(IGameDef *def, std::string 
         } else if (!ndef->getId(name, content_id)) {
 		throw LuaError("Unknown node: " + name);
         }
+    }
+    else {
+	    content_id = 0;
     }
 
     return content_id;

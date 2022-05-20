@@ -21,6 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "lua_api/l_base.h"
 #include "inventory.h"  // ItemStack
+#include "../native_api/native_item.h"  // For testing native functions
 
 class LuaItemStack : public ModApiBase {
 private:
@@ -127,6 +128,34 @@ private:
 	// peek_item(self, peekcount=1) -> itemstack
 	static int l_peek_item(lua_State *L);
 
+	// Functions for testing native ItemStack functions.
+	static int l_native_is_empty(lua_State *L);
+	static int l_native_get_name(lua_State *L);
+	static int l_native_set_name(lua_State *L);
+	static int l_native_get_count(lua_State *L);
+	static int l_native_set_count(lua_State *L);
+	static int l_native_get_wear(lua_State *L);
+	static int l_native_set_wear(lua_State *L);
+	static int l_native_get_meta(lua_State *L);
+	static int l_native_get_metadata(lua_State *L);
+	static int l_native_set_metadata(lua_State *L);
+	static int l_native_get_description(lua_State *L);
+	static int l_native_get_short_description(lua_State *L);
+	static int l_native_clear(lua_State *L);
+	static int l_native_replace(lua_State *L);
+	static int l_native_to_string(lua_State *L);
+	static int l_native_to_table(lua_State *L);
+	static int l_native_get_stack_max(lua_State *L);
+	static int l_native_get_free_space(lua_State *L);
+	static int l_native_is_known(lua_State *L);
+	static int l_native_get_definition(lua_State *L);
+	static int l_native_get_tool_capabilities(lua_State *L);
+	static int l_native_add_wear(lua_State *L);
+	static int l_native_add_item(lua_State *L);
+	static int l_native_item_fits(lua_State *L);
+	static int l_native_take_item(lua_State *L);
+	static int l_native_peek_item(lua_State *L);
+
 public:
 	ItemStack m_stack;
 
@@ -153,6 +182,14 @@ private:
 	static int l_register_alias_raw(lua_State *L);
 	static int l_get_content_id(lua_State *L);
 	static int l_get_name_from_content_id(lua_State *L);
+
+	// Functions for testing native ModApiItemMod functions
+	//static int l_native_register_item_raw(lua_State *L);
+	//static int l_native_unregister_item_raw(lua_State *L);
+	//static int l_native_register_alias_raw(lua_State *L);
+	static int l_native_get_content_id(lua_State *L);
+	static int l_native_get_name_from_content_id(lua_State *L);
+
 public:
 	static void Initialize(lua_State *L, int top);
 };

@@ -1,13 +1,14 @@
 #pragma once
 
-#include "inventory.h"  // LuaItemStack
+#include "inventory.h"  // ItemStack
 #include "tool.h" 
 #include "server.h"
 #include "nodedef.h"
 #include "itemdef.h"
 #include "log.h"
 #include <tuple>
-#include "./../lua_api/l_item.h"
+#include "../lua_api/l_item.h" // LuaItemStack
+#include "../cpp_api/s_item.h"  // I think LuaItemStack
 #include <utility>
 
 class NativeItemStack {
@@ -31,7 +32,7 @@ public:
 	static int native_get_stack_max(LuaItemStack *o, IGameDef *gamedef);
 	static int native_get_free_space(LuaItemStack *o, IGameDef *gamedef);
 	static bool native_is_known(LuaItemStack *o, IGameDef *gamedef);
-	static const char *native_get_description(LuaItemStack *o);
+	static const char *native_get_definition(LuaItemStack *o);
 	static ToolCapabilities native_get_tool_capabilities(LuaItemStack *o, IGameDef *gamedef);
 	static bool native_add_wear(LuaItemStack *o, int amount, IGameDef *gamedef);
 	static ItemStack native_add_item(LuaItemStack *o, ItemStack *new_item, IGameDef *gamedef);
