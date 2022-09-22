@@ -51,14 +51,14 @@ build/.cmake/
 /screenshots
 /sounds
 /mods/*
-!/mods/minetest/
+!/mods/testingnativeapi_server/
 /mods/minetest/*
 !/mods/minetest/mods_here.txt
 !/mods/inventory_api_test/
 /worlds
 /world/
-## /clientmods/*
-!/clientmods/preview/
+/clientmods/*
+!/clientmods/testingnativeapi_client/
 /client/mod_storage/
 
 ## Configuration/log files

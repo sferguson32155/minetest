@@ -16,4 +16,5 @@ local modpath = minetest.get_modpath("testingnativeapi_server")
 
 -- Load files
 dofile(modpath .. "/areastore.lua")
+dofile(modpath .. "/inventory.lua")
 dofile(modpath .. "/other.lua")
