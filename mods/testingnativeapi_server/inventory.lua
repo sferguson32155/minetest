@@ -326,6 +326,8 @@ minetest.register_chatcommand("lua_getlist", {
 		local res = inv:get_list("main");
 		return true, "Success, get_list() returned: "..tostring(res)
 	end
+
+	--iterate over each element in table
 })
 
 --[[
