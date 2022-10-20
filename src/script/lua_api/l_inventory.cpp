@@ -220,6 +220,23 @@ int InvRef::l_set_width(lua_State *L)
 	return 0;
 }
 
+int InvRef::l_native_set_width(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	InvRef *ref = checkobject(L, 1);
+	const char *listname = luaL_checkstring(L, 2);
+	int newwidth = luaL_checknumber(L, 3);
+	Inventory *inv = getinv(L, ref);
+	InventoryList *list = inv->getList(listname);
+	//do we need to check for inv != NULL here?
+
+	int result = NativeInvRef::native_set_width(inv, list, newwidth);
+	reportInventoryChange(L, ref);
+
+	return 0;
+}
+
+
 // get_stack(self, listname, i) -> itemstack
 int InvRef::l_get_stack(lua_State *L)
 {
@@ -233,6 +250,24 @@ int InvRef::l_get_stack(lua_State *L)
 		item = list->getItem(i);
 	LuaItemStack::create(L, item);
 	return 1;
+}
+
+int InvRef::l_native_get_stack(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	InvRef *ref = checkobject(L, 1);
+	const char *listname = luaL_checkstring(L, 2);
+	int i = luaL_checknumber(L, 3) - 1;
+	InventoryList *list = getlist(L, ref, listname);
+
+	ItemStack a = NativeInvRef::native_get_stack(getinv(L, ref), list, i);
+	LuaItemStack::create(L, a);
+
+	return 1;
+	
+	//create item?
+	//report inventory change?
+
 }
 
 // set_stack(self, listname, i, stack) -> true/false
@@ -251,6 +286,22 @@ int InvRef::l_set_stack(lua_State *L)
 	} else {
 		lua_pushboolean(L, false);
 	}
+	return 1;
+}
+
+int InvRef::l_native_set_stack(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	InvRef *ref = checkobject(L, 1);
+	const char *listname = luaL_checkstring(L, 2);
+	int i = luaL_checknumber(L, 3) - 1;
+	ItemStack newitem = read_item(L, 4, getServer(L)->idef());
+	InventoryList *list = getlist(L, ref, listname);
+
+	bool result = NativeInvRef::native_set_stack(getinv(L, ref), list,i, newitem);
+	reportInventoryChange(L, ref);
+	lua_pushboolean(L, result);
+
 	return 1;
 }
 
@@ -309,6 +360,23 @@ int InvRef::l_get_lists(lua_State *L)
 	}
 	return 1;
 }
+
+/*
+
+int InvRef::l_native_get_lists(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	InvRef *ref = checkobject(L, 1);
+	Inventory *inv = getinv(L, ref);
+	if (inv == nullptr) {
+		return 0;
+	}
+
+
+	return 1;
+}
+*/
+
 
 // set_lists(self, lists)
 int InvRef::l_set_lists(lua_State *L)
@@ -374,6 +442,20 @@ int InvRef::l_room_for_item(lua_State *L)
 	return 1;
 }
 
+int InvRef::l_native_room_for_item(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	InvRef *ref = checkobject(L, 1);
+	const char *listname = luaL_checkstring(L, 2);
+	ItemStack item = read_item(L, 3, getServer(L)->idef());
+	InventoryList *list = getlist(L, ref, listname);
+
+	bool result = NativeInvRef::native_room_for_item(getinv(L, ref), list, item);
+	lua_pushboolean(L, result);
+
+	return 1;
+}
+
 // contains_item(self, listname, itemstack or itemstring or table or nil, [match_meta]) -> true/false
 // Returns true if the list contains the given count of the given item
 int InvRef::l_contains_item(lua_State *L)
@@ -394,6 +476,23 @@ int InvRef::l_contains_item(lua_State *L)
 	return 1;
 }
 
+int InvRef::l_native_contains_item(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	InvRef *ref = checkobject(L, 1);
+	const char *listname = luaL_checkstring(L, 2);
+	ItemStack item = read_item(L, 3, getServer(L)->idef());
+	InventoryList *list = getlist(L, ref, listname);
+	bool match_meta = false;
+	if (lua_isboolean(L, 4))
+		match_meta = readParam<bool>(L, 4);
+	//some kind of read happening here?
+	bool result = NativeInvRef::native_contains_item(getinv(L, ref), list, item, match_meta);
+	lua_pushboolean(L,result);
+
+	return 1;
+}
+
 // remove_item(self, listname, itemstack or itemstring or table or nil) -> itemstack
 // Returns the items that were actually removed
 int InvRef::l_remove_item(lua_State *L)
@@ -411,6 +510,22 @@ int InvRef::l_remove_item(lua_State *L)
 	} else {
 		LuaItemStack::create(L, ItemStack());
 	}
+	return 1;
+}
+
+int InvRef::l_native_remove_item(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	InvRef *ref = checkobject(L, 1);
+	const char *listname = luaL_checkstring(L, 2);
+	ItemStack item = read_item(L, 3, getServer(L)->idef());
+	InventoryList *list = getlist(L, ref, listname);
+
+	ItemStack result = NativeInvRef::native_remove_item(getinv(L, ref), list, item);
+	reportInventoryChange(L, ref);
+	LuaItemStack::create(L, result);
+	//Do I report an inventory change?
+
 	return 1;
 }
 
@@ -521,16 +636,22 @@ const luaL_Reg InvRef::methods[] = {
 	luamethod(InvRef, get_width),
 	luamethod(InvRef, native_get_width),
 	luamethod(InvRef, set_width),
-	luamethod(InvRef, get_stack),
+	luamethod(InvRef, native_set_width),
+	luamethod(InvRef, get_stack), 
+	luamethod(InvRef, native_get_stack),
 	luamethod(InvRef, set_stack),
+	luamethod(InvRef, native_set_stack),
 	luamethod(InvRef, get_list),
 	luamethod(InvRef, set_list),
 	luamethod(InvRef, get_lists),
 	luamethod(InvRef, set_lists),
 	luamethod(InvRef, add_item),
-	luamethod(InvRef, room_for_item),
-	luamethod(InvRef, contains_item),
-	luamethod(InvRef, remove_item),
+	luamethod(InvRef, room_for_item), 
+	luamethod(InvRef, native_room_for_item),
+	luamethod(InvRef, contains_item), 
+	luamethod(InvRef, native_contains_item),
+	luamethod(InvRef, remove_item), 
+	luamethod(InvRef, native_remove_item),
 	luamethod(InvRef, get_location),
 	{0,0}
 };

@@ -203,7 +203,7 @@ minetest.register_chatcommand("native_setwidth", {
 	func = function(self)
 		local player = minetest.get_player_by_name("singleplayer")
 		local inv = player:get_inventory()
-		local res = inv:native_set_width("main", 6);
+		local res = inv:native_set_width("main", 8);
 		return true, "Success, native_set_width() returned: "..tostring(res)
 	end
 })
@@ -261,7 +261,7 @@ minetest.register_chatcommand("test_getstack", {
 		local nres = inv:native_get_stack("main", 1)
 		print("l_get_stack() returned: "..tostring(lres))
 		print("native_get_stack() returned: "..tostring(nres))
-		if lres == nres then
+		if tostring(lres) == tostring(nres) then
 			return true, "Success, function output matches - check console for more details"
 		else
 			return false, "Failure, function output does not match - check console for more details"
@@ -306,8 +306,8 @@ minetest.register_chatcommand("test_setstack", {
 		inv:native_set_stack("main", 1, items)
 		nres = inv:get_stack("main", 1)
 
-		print("l_set_stack() set stack to "..tostring(lres.name))
-		print("native_set_stack() set stack to: "..tostring(nres.name))
+		print("l_set_stack() set stack to "..tostring(lres))
+		print("native_set_stack() set stack to: "..tostring(nres))
 		if lres == nres then
 			return true, "Success, function output matches - check console for more details"
 		else
@@ -450,7 +450,7 @@ minetest.register_chatcommand("lua_additem", {
 		local player = minetest.get_player_by_name("singleplayer")
 		local inv = player:get_inventory()
 		local res = inv:add_item("main", items);
-		return true, "Success, add_item() returned: "..tostring(res.name)
+		return true, "Success, add_item() returned: "..tostring(res)
 	end
 })
 
@@ -584,15 +584,15 @@ minetest.register_chatcommand("test_removeitem", {
 		local items = ItemStack("default:stone 99")
 		local player = minetest.get_player_by_name("singleplayer")
 		local inv = player:get_inventory()
+		inv:add_item("main", items)
+		inv:add_item("main", items)
 		local lres = inv:remove_item("main", items)
-
-		inv:add_item(items)
 		local nres = inv:native_remove_item("main", items)
 
 		print("l_remove_item() returned: "..tostring(lres))
 		print("native_remove_item() returned: "..tostring(nres))
 
-		if lres == nres then
+		if tostring(lres) == tostring(nres) then
 			return true, "Success, function output matches - check console for more details"
 		else
 			return false, "Failure, function output does not match - check console for more details"
