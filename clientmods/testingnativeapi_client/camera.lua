@@ -339,3 +339,25 @@ minetest.register_chatcommand("test_camera_getaspectratio", {
 		end
 	end
 })
+
+--command to test entire class
+minetest.register_chatcommand("test_camera", {
+	description = "testing all camera methods",
+	func = function()
+
+		local methods = {
+			"getcamera",
+			"setcamera",
+			"getfov",
+			"getpos",
+			"getoffset",
+			"getlookdir",
+			"getlookhorizontal",
+			"getlookvertical",
+			"getaspectratio"
+		}
+
+		return native_tests.test_class("camera", methods), 
+		"Camera tests completed. See console for details."
+	end
+})

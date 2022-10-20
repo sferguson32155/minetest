@@ -202,3 +202,18 @@ minetest.register_chatcommand("lua_getstack", {
 		return true, "Success, get_stack() returned: "..res.name
 	end
 })
+
+minetest.register_chatcommand("test_inventory", {
+	description = "testing all inventory methods",
+	func = function()
+
+		local methods = {
+			"isempty",
+			"getsize",
+			"setsize"
+		}
+
+		return native_tests.test_class("inventory", methods), 
+		"Inventory tests complete. See server_dump.txt for details."
+	end
+})
