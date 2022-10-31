@@ -24,26 +24,19 @@ public:
 
 	static ItemStack native_get_stack(Inventory* inv, InventoryList* list, int i);
 
-	static bool native_set_stack(
-			Inventory *inv, InventoryList *list, int i, ItemStack item);
+	static bool native_set_stack(Inventory* inv, InventoryList* list, int i, ItemStack item);
 
-	// native_get_list WRITTEN
+	//native_get_list
 
-	static const InventoryList * native_get_list(Inventory *inv, const char *listname);
-
-	//static bool native_set_list(Inventory *inv);
-	//native_set_list --NEED TO ASK
+	//native_set_list
 
 	static std::vector<const InventoryList *> native_get_lists(Inventory* inv);
 
-	//native_set_lists --NEED TO ASK
+	//native_set_lists
 
 	//native_add_item
 
-	//bool native_add_item();
-
-	static bool native_room_for_item(
-			Inventory *inv, InventoryList *list, ItemStack item);
+	static bool native_room_for_item(Inventory* inv, InventoryList* list, ItemStack item);
 
 	static bool native_contains_item(Inventory* inv, InventoryList* list, ItemStack item, bool match_meta);
 
