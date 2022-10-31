@@ -128,7 +128,7 @@ minetest.register_chatcommand("test_camera_getfov", {
 	func = function(self)
 		local lua = minetest.camera:get_fov()
 		local native = minetest.camera:native_get_fov()
-		if lua == native then
+		if minetest.serialize(lua) == minetest.serialize(native) then
 			return true, "(Success) [camera] get_fov()"
 		else
 			return false, "(Fail) [camera] get_fov()"
@@ -166,7 +166,7 @@ minetest.register_chatcommand("test_camera_getpos", {
 	func = function(self)
 		local lua = minetest.camera:get_pos()
 		local native = minetest.camera:native_get_pos()
-		if lua == native then
+		if minetest.serialize(lua) == minetest.serialize(native) then
 			return true, "(Success) [camera] get_pos()"
 		else
 			return false, "(Fail) [camera] get_pos()"
@@ -204,7 +204,7 @@ minetest.register_chatcommand("test_camera_getoffset", {
 	func = function(self)
 		local lua = minetest.camera:get_offset()
 		local native = minetest.camera:native_get_offset()
-		if lua == native then
+		if minetest.serialize(lua) == minetest.serialize(native) then
 			return true, "(Success) [camera] get_offset()"
 		else
 			return false, "(Fail) [camera] get_offset()"
@@ -242,7 +242,8 @@ minetest.register_chatcommand("test_camera_getlookdir", {
 	func = function(self)
 		local lua = minetest.camera:get_look_dir()
 		local native = minetest.camera:native_get_look_dir()
-		if lua == native then
+
+		if minetest.serialize(lua) == minetest.serialize(native) then
 			return true, "(Success) [camera] get_look_dir()"
 		else
 			return false, "(Fail) [camera] get_look_dir()"
@@ -337,5 +338,27 @@ minetest.register_chatcommand("test_camera_getaspectratio", {
 		else
 			return false, "(Fail) [camera] get_aspect_ratio()"
 		end
+	end
+})
+
+--command to test entire class
+minetest.register_chatcommand("test_camera", {
+	description = "testing all camera methods",
+	func = function()
+
+		local methods = {
+			"getcamera",
+			"setcamera",
+			"getfov",
+			"getpos",
+			"getoffset",
+			"getlookdir",
+			"getlookhorizontal",
+			"getlookvertical",
+			"getaspectratio"
+		}
+
+		return native_tests.test_class("camera", methods), 
+		"Camera tests completed. See console for details."
 	end
 })

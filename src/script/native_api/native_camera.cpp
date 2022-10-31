@@ -26,8 +26,8 @@ int NativeCamera::native_get_camera_mode(Camera *camera)
 
 std::tuple<f32, f32, f32, f32> NativeCamera::native_get_fov(Camera *camera)
 {
-	f32 x = camera->getFovX() * core::DEGTORAD;
-	f32 y = camera->getFovY() * core::DEGTORAD;
+	f32 x = camera->getFovX() * core::RADTODEG;
+	f32 y = camera->getFovY() * core::RADTODEG;
 	f32 actual = camera->getCameraNode()->getFOV() * core::RADTODEG;
 	f32 max = camera->getFovMax() * core::RADTODEG;
 
@@ -36,7 +36,7 @@ std::tuple<f32, f32, f32, f32> NativeCamera::native_get_fov(Camera *camera)
 
 v3f NativeCamera::native_get_pos(Camera *camera)
 {
-	v3f position = camera->getPosition();
+	v3f position = camera->getPosition() / BS;
 
 	return position;
 }

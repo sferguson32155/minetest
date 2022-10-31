@@ -14,7 +14,11 @@ minetest.register_chatcommand("lua_areastore_getarea", {
 	func = function(self)
         local areastore = AreaStore();
 		local res = areastore:get_area(1, true, true)
-        return true, "Success, lua_areastore_getarea() returned: "..tostring(res)
+		print("Success, native_get_area() returned: ")
+        for key, value in pairs(res) do
+    		print(key, value)
+		end
+		return true, "Returned"..res
 	end
 })
 
@@ -380,5 +384,28 @@ minetest.register_chatcommand("test_areastore_fromfile", {
 		else
 			return false, "(Fail) [AreaStore] from_file()"
 		end
+	end
+})
+
+--command to test entire class
+minetest.register_chatcommand("test_areastore", {
+	description = "testing all areastore methods",
+	func = function()
+
+		local methods = {
+			"getarea",
+			"getareasforpos",
+			"getareasinarea",
+			"insertarea",
+			"reserve",
+			"removearea",
+			"setcacheparams",
+			"tostring",
+			"tofile",
+			"fromfile"
+		}
+
+		return native_tests.test_class("areastore", methods), 
+		"Areastore tests completed. See server_dump.txt for details."
 	end
 })
