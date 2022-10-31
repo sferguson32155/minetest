@@ -20,11 +20,3 @@ minetest.register_chatcommand("log", {
 		end
 	end
 })
-
-minetest.register_chatcommand("pathest", {
-	description = "get current world path",
-	func = function()
-		print(minetest.get_worldpath())
-		return true, "Got path"
-	end
-})

@@ -1,3 +1,10 @@
+testing = {}
+
+function testing.print_to_everything(msg)
+	minetest.log("action", msg)
+	minetest.chat_send_all(msg)
+end
+
 minetest.log("info", "[testing] modname="..dump(minetest.get_current_modname()))
 minetest.log("info", "[testing] modpath="..dump(minetest.get_modpath("testingnativeapi_client")))
 
@@ -7,11 +14,7 @@ end)
 
 local modpath = minetest.get_modpath("testingnativeapi_client")
 
--- Load test suite
-native_tests = dofile(modpath .. "/native_tests.lua")
-
 -- Load files
 dofile(modpath .. "/camera.lua")
-dofile(modpath .. "/item.lua")
+--dofile(modpath .. "/item.lua")
 dofile(modpath .. "/other.lua")
-dofile(modpath .. "/client_test.lua")

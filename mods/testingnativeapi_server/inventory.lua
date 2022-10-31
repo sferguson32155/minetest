@@ -1,8 +1,8 @@
 --is_empty()
 
 --make one player and inventory
---replace every instance of name with ï¿½singleplayer"
---stack = ItemStack(ï¿½default:stone 99ï¿½)
+--replace every instance of name with “singleplayer"
+--stack = ItemStack(“default:stone 99”)
 
 
 minetest.register_chatcommand("lua_isempty", {
