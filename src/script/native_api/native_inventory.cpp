@@ -90,7 +90,29 @@ bool NativeInvRef::native_set_stack(
 
 // native_get_list
 
-// native_set_list
+const InventoryList *NativeInvRef::native_get_list(Inventory *inv, const char *listname)
+{
+	if (inv) {
+		return inv->getList(listname);
+		// do I return a ref here?
+	} else {
+		return nullptr;
+	}
+}
+
+// native_set_list -- How to write this?
+
+/*
+bool NativeInvRef::native_set_list(
+		Inventory *inv, const char *listname, InventoryList *list)
+{
+	InventoryList &invList = inv->getList(listname);
+	if (invList == NULL)
+		return false;
+	invList = list;
+	return true;
+}
+*/
 
 std::vector<const InventoryList *> NativeInvRef::native_get_lists(Inventory *inv)
 {
@@ -101,6 +123,23 @@ std::vector<const InventoryList *> NativeInvRef::native_get_lists(Inventory *inv
 // native_set_lists
 
 // native_add_item
+
+/*
+bool NativeInvRef::native_add_item(Inventory *inv, InventoryList *list, ItemStack item,
+const char *listname)
+{
+	/*
+
+	if (list) {
+		ItemStack leftover = list->addItem(item);
+		if (leftover.count != item.count)
+			inv->addItem(listname, leftover);
+	} else {
+		inv->addItem(listname, item);
+	}
+}
+	*/
+
 
 bool NativeInvRef::native_room_for_item(
 		Inventory *inv, InventoryList *list, ItemStack item)
