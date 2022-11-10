@@ -38,15 +38,19 @@ static std::map<u32, std::tuple<bool*, v3s16*, v3s16*, std::string*>> push_areas
 
 static std::tuple<bool*, const char*> deserialization_helper(AreaStore *as, std::istream &is)
 {
+	bool test;
+	test = false;
+
 	std::tuple<bool *, const char *> result;
 	try {
 		as->deserialize(is);
 	} catch (const SerializationError &e) {
-		*std::get<0>(result) = false;
+		std::get<0>(result) = &test;
 		std::get<1>(result) = e.what();
 		return result;
 	}
-	*std::get<0>(result) = true;
+	test = true;
+	std::get<0>(result) = &test;
 	return result;
 }
 
