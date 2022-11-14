@@ -384,9 +384,8 @@ int InvRef::l_get_lists(lua_State *L)
 		const char* name = (*iter)->getName().c_str();
 		lua_pushstring(L, name);
 		push_inventory_list(L, inv, name);
-		lua_rawset(L, -3); //sets a array, more optimized
-		//table[name] = inventoryLis
-		//try to print the name, could be a number or name of list
+		lua_rawset(L, -3); 
+		printf("%s\n", name);
 	}
 	return 1;
 }
@@ -410,15 +409,12 @@ int InvRef::l_native_get_lists(lua_State *L)
 		lua_pushstring(L, name);
 		push_inventory_list(L, inv, name);
 		lua_rawset(L, -3); // sets a array, more optimized
-		// table[name] = inventoryLis
-		// try to print the name, could be a number or name of list
+		printf("%s\n", name);
+
 	}
 	return 1;
 }
 	
-}
-
-
 
 // set_lists(self, lists)
 int InvRef::l_set_lists(lua_State *L)

@@ -96,6 +96,7 @@ private:
 
 	// get_lists(self) -> list of InventoryLists
 	static int l_get_lists(lua_State *L);
+	static int l_native_get_lists(lua_State *L);
 	//static int l_native_get_lists(lua_State *L); 
 	//Function above paused for now: native_get_lists appears incomplete
 
