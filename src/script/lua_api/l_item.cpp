@@ -441,7 +441,8 @@ int LuaItemStack::create_object(lua_State *L)
 	lua_setmetatable(L, -2);
 	return 1;
 }
-// Not callable from Lua
+// Not callable from Lua 
+//NOT part of lua API
 int LuaItemStack::create(lua_State *L, const ItemStack &item)
 {
 	NO_MAP_LOCK_REQUIRED;

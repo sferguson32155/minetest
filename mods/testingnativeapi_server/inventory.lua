@@ -358,10 +358,23 @@ minetest.register_chatcommand("lua_setlist", {
 	end
 })
 
---[[
+
 minetest.register_chatcommand("native_setlist", {
 	description = "Invokes lua_api > l_inventory.l_native_set_list()",
-	func = function(name, param)
+	func = function(self)
+		local player = minetest.get_player_by_name("singleplayer")
+		local inv = player:get_inventory()
+		local list = inv:get_list("main")
+		local size = inv:get_size("main")
+		local items = inv:prepare_itemStack()
+
+		if(list ~= NULL) then
+			local res = inv:native_set_list(inv, "main", items, size)
+		else
+			local res = inv:native_set_list(inv, "main", items)
+		end
+
+		return true, "Success, set_list() returned: "..tostring(res)
 	end
 })
 

@@ -3,7 +3,9 @@
 #include "inventory.h"
 #include "inventorymanager.h"
 #include "server.h"
+#include <vector>
 #include "../script/lua_api/l_inventory.h"
+#include "common/c_content.h"
 
 class RemotePlayer;
 
@@ -32,6 +34,8 @@ public:
 	const InventoryList *native_get_list(Inventory *inv, const char *listname);
 
 	//native_set_list -WIP Requires read_inventory_list(), will rewrite later
+	static int NativeInvRef::native_set_list(Inventory *inv, const char *listname,
+		std::vector<ItemStack> items, int forcesize = -1);
 
 	//native_get_lists
 
@@ -46,4 +50,8 @@ public:
 	static bool native_contains_item(Inventory* inv, InventoryList* list, ItemStack item, bool match_meta);
 
 	static ItemStack native_remove_item(Inventory* inv, InventoryList* list, ItemStack item);
+
+	static int read_inventory_list_native(Inventory *inv, const char *name,
+			int forcesize, std::vector<ItemStack> is);
+
 };
