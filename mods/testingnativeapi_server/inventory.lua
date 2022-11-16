@@ -365,13 +365,11 @@ minetest.register_chatcommand("native_setlist", {
 		local player = minetest.get_player_by_name("singleplayer")
 		local inv = player:get_inventory()
 		local list = inv:get_list("main")
-		local size = inv:get_size("main")
-		local items = inv:prepare_itemStack()
 
 		if(list ~= NULL) then
-			local res = inv:native_set_list(inv, "main", items, size)
+			local res = inv:native_set_list("main", items, size)
 		else
-			local res = inv:native_set_list(inv, "main", items)
+			local res = inv:native_set_list("main", items)
 		end
 
 		return true, "Success, set_list() returned: "..tostring(res)
