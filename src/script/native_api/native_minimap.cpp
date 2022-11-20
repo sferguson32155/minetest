@@ -1,21 +1,16 @@
-#pragma once
-
 #include "native_minimap.h"
 
-void NativeMiniMap::native_show(Minimap* m)
+void NativeMiniMap::native_show(Minimap* m, Client *c)
 {
 	if (m->getModeIndex() == 0 && m->getMaxModeIndex() > 0)
 		m->setModeIndex(1);
 
-	client->showMinimap(true);
+	c->showMinimap(true);
 }
 
-void NativeMiniMap::native_hide(Minimap* m)
+void NativeMiniMap::native_hide(Minimap* m, Client *c)
 {
-	if (m->getModeIndex() != 0)
-		m->setModeIndex(0);
-
-	client->showMinimap(false);
+	c->showMinimap(false);
 }
 
 v3s16 NativeMiniMap::native_get_pos(Minimap *m)
@@ -23,9 +18,10 @@ v3s16 NativeMiniMap::native_get_pos(Minimap *m)
 	return m->getPos();
 }
 
-vs316 NativeMiniMap::native_set_pos(Minimap *m, v3s16 pos)
+v3s16 NativeMiniMap::native_set_pos(Minimap *m, v3s16 pos)
 {
-	return m->setPos(pos);
+	m->setPos(pos);
+	return m->getPos();
 	//COME BACK LATER
 }
 
@@ -37,7 +33,8 @@ int NativeMiniMap::native_get_angle(Minimap* m)
 
 int NativeMiniMap::native_set_angle(Minimap *m, f32 angle)
 {
-	return m->getAngle(angle);
+	m->setAngle(angle);
+	return 1;
 	// COME BACK LATER
 }
 
@@ -47,11 +44,8 @@ int NativeMiniMap::native_get_mode(Minimap *m)
 	//Size_t to int conversion issues?
 }
 
-int NativeMiniMap::native_set_mode(Minimap *m, int mode)
+void NativeMiniMap::native_set_mode(Minimap *m, int mode)
 {
-	if (mode >= m->getMaxModeIndex())
-		return 0;
-
 	m->setModeIndex(mode);
 }
 
@@ -65,6 +59,7 @@ int NativeMiniMap::native_get_shape(Minimap *m)
 int NativeMiniMap::native_set_shape(Minimap *m, int shapeNum)
 {
 
-	m->setMinimapShape((MinimapShape)((int)lua_tonumber(shapeNum)));
-	return 0;
+	m->setMinimapShape((MinimapShape)((int)shapeNum));
+	return 0; 
+	//DO we need a return here?
 }

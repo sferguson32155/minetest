@@ -33,19 +33,34 @@ private:
 	static int gc_object(lua_State *L);
 
 	static int l_get_pos(lua_State *L);
+	static int l_native_get_pos(lua_State *L);
+
 	static int l_set_pos(lua_State *L);
+	//static int l_native_set_pos(lua_State *L);
 
 	static int l_get_angle(lua_State *L);
+	static int l_native_get_angle(lua_State *L);
+
 	static int l_set_angle(lua_State *L);
+	//static int l_native_set_angle(lua_State *L);
 
 	static int l_get_mode(lua_State *L);
+	static int l_native_get_mode(lua_State *L);
+
 	static int l_set_mode(lua_State *L);
+	static int l_native_set_mode(lua_State *L);
 
 	static int l_show(lua_State *L);
+	static int l_native_show(lua_State *L);
+
 	static int l_hide(lua_State *L);
+	static int l_native_hide(lua_State *L);
 
 	static int l_set_shape(lua_State *L);
+	static int l_native_set_shape(lua_State *L);
+
 	static int l_get_shape(lua_State *L);
+	static int l_native_get_shape(lua_State *L);
 
 	Minimap *m_minimap = nullptr;
 
