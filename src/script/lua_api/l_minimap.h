@@ -36,13 +36,13 @@ private:
 	static int l_native_get_pos(lua_State *L);
 
 	static int l_set_pos(lua_State *L);
-	//static int l_native_set_pos(lua_State *L);
+	static int l_native_set_pos(lua_State *L);
 
 	static int l_get_angle(lua_State *L);
 	static int l_native_get_angle(lua_State *L);
 
 	static int l_set_angle(lua_State *L);
-	//static int l_native_set_angle(lua_State *L);
+	static int l_native_set_angle(lua_State *L);
 
 	static int l_get_mode(lua_State *L);
 	static int l_native_get_mode(lua_State *L);

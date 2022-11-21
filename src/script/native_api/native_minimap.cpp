@@ -60,6 +60,6 @@ int NativeMiniMap::native_set_shape(Minimap *m, int shapeNum)
 {
 
 	m->setMinimapShape((MinimapShape)((int)shapeNum));
-	return 0; 
+	return (int)m->getMinimapShape(); 
 	//DO we need a return here?
 }

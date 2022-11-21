@@ -78,6 +78,16 @@ int LuaMinimap::l_set_pos(lua_State *L)
 }
 
 
+int LuaMinimap::l_native_set_pos(lua_State *L)
+{
+	LuaMinimap *ref = checkobject(L, 1);
+	Minimap *m = getobject(ref);
+
+	m->setPos(read_v3s16(L, 2));
+	return 1;
+}
+
+
 int LuaMinimap::l_get_angle(lua_State *L)
 {
 	LuaMinimap *ref = checkobject(L, 1);
@@ -105,16 +115,18 @@ int LuaMinimap::l_set_angle(lua_State *L)
 	return 1;
 }
 
-/*
+
 int LuaMinimap::l_native_set_angle(lua_State *L)
 {
 	LuaMinimap *ref = checkobject(L, 1);
 	Minimap *m = getobject(ref);
 
-	m->setAngle(lua_tointeger(L, 2));
+	f32 angle = lua_tointeger(L, 2);
+
+	m->setAngle(angle);
 	return 1;
 }
-*/
+
 
 int LuaMinimap::l_get_mode(lua_State *L)
 {
@@ -179,7 +191,7 @@ int LuaMinimap::l_native_set_shape(lua_State *L)
 	if (!lua_isnumber(L, 2))
 		return 0;
 
-	double shape = (double)(lua_tonumber(L, 2)); //can this be done?
+	int shape = (int)(lua_tonumber(L, 2)); //can this be done?
 
 	NativeMiniMap::native_set_shape(m, shape);
 	return 0;
@@ -343,9 +355,11 @@ const luaL_Reg LuaMinimap::methods[] = {
 	luamethod(LuaMinimap, get_pos),
 	luamethod(LuaMinimap, native_get_pos),
 	luamethod(LuaMinimap, set_pos),
+	luamethod(LuaMinimap, native_set_pos),
 	luamethod(LuaMinimap, get_angle),
 	luamethod(LuaMinimap, native_get_angle),
 	luamethod(LuaMinimap, set_angle),
+	luamethod(LuaMinimap, native_set_angle),
 	luamethod(LuaMinimap, get_mode),
 	luamethod(LuaMinimap, native_get_mode),
 	luamethod(LuaMinimap, set_mode),
