@@ -138,3 +138,19 @@ minetest.register_chatcommand("test_particles_delparticlespawner", {
 		end
 	end
 })
+
+--command to test entire class
+minetest.register_chatcommand("test_particles", {
+	description = "testing all particles methods",
+	func = function()
+
+		local methods = {
+			"addparticle",
+			"addparticlespawner",
+			"delparticlespawner"
+		}
+
+		return native_tests.test_class("particles", methods), 
+		"Particles tests completed. See server_dump.txt for details."
+	end
+})
