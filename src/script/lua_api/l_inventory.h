@@ -102,6 +102,7 @@ private:
 
 	// set_lists(self, lists)
 	static int l_set_lists(lua_State *L);
+	static int l_native_set_lists(lua_State *L);
 	// SKIP native for now, function not written yet
 
 	// add_item(self, listname, itemstack or itemstring or table or nil) -> itemstack

@@ -40,7 +40,7 @@ int NativeMiniMap::native_set_angle(Minimap *m, f32 angle)
 
 int NativeMiniMap::native_get_mode(Minimap *m)
 {
-	return m->getMaxModeIndex();
+	return m->getModeIndex();
 	//Size_t to int conversion issues?
 }
 

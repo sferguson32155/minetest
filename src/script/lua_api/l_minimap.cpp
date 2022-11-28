@@ -218,6 +218,7 @@ int LuaMinimap::l_native_get_shape(lua_State *L)
 
 int LuaMinimap::l_show(lua_State *L)
 {
+	std::cout << "do we get here? " << std::endl;
 	// If minimap is disabled by config, don't show it.
 	if (!g_settings->getBool("enable_minimap"))
 		return 1;

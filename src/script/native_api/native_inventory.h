@@ -39,7 +39,10 @@ public:
 
 	//native_get_lists
 
-	static std::vector<const InventoryList *> native_get_lists(Inventory* inv);
+	static std::vector<const InventoryList *> native_get_lists(Inventory *inv);
+
+	static int native_set_lists(Inventory *inv, const char *listname,
+			std::vector<ItemStack> items, int forcesize = -1);
 
 	//native_set_lists -WIP Requires read_inventory_list(), will rewrite later
 

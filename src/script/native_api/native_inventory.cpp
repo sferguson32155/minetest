@@ -118,7 +118,12 @@ std::vector<const InventoryList *> NativeInvRef::native_get_lists(Inventory *inv
 	return lists;
 }
 
-// native_set_lists
+int NativeInvRef::native_set_lists(Inventory *inv, const char *listname,
+		std::vector<ItemStack> items, int forcesize)
+{
+	read_inventory_list_native(inv, listname, forcesize, items);
+	return 0;
+}
 
 // native_add_item
 

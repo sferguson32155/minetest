@@ -358,7 +358,6 @@ int InvRef::l_native_set_list(lua_State *L)
 	if (list) {
 		int result = NativeInvRef::native_set_list(
 				inv, listname, items, list->getSize());
-		//read_inventory_list(L, 3, inv, listname, getServer(L), list->getSize());
 	}	
 	else {
 		result = NativeInvRef::native_set_list(inv, listname, items);
@@ -437,6 +436,36 @@ int InvRef::l_set_lists(lua_State *L)
 	while (lua_next(L, 2)) {
 		const char *listname = lua_tostring(L, -2);
 		read_inventory_list(L, -1, tempInv, listname, server);
+		lua_pop(L, 1);
+	}
+	inv = tempInv;
+	return 0;
+}
+
+int InvRef::l_native_set_lists(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	InvRef *ref = checkobject(L, 1);
+	Inventory *inv = getinv(L, ref);
+	if (!inv) {
+		return 0;
+	}
+
+	// Make a temporary inventory in case reading fails
+	Inventory *tempInv(inv);
+	tempInv->clear();
+
+	Server *server = getServer(L);
+	std::vector<ItemStack> items;
+	int result = 0;
+			
+
+	lua_pushnil(L);
+	luaL_checktype(L, 2, LUA_TTABLE);
+	while (lua_next(L, 2)) {
+		const char *listname = lua_tostring(L, -2);
+		items = read_inventory_list_helper(L, 3, listname, inv, getServer(L));
+		result = NativeInvRef::native_set_lists(inv, listname, items);
 		lua_pop(L, 1);
 	}
 	inv = tempInv;
@@ -684,7 +713,8 @@ const luaL_Reg InvRef::methods[] = {
 	luamethod(InvRef, native_set_list),
 	luamethod(InvRef, get_lists), 
 	luamethod(InvRef, native_get_lists),
-	luamethod(InvRef, set_lists),
+	luamethod(InvRef, set_lists), 
+	luamethod(InvRef, native_set_lists),
 	luamethod(InvRef, add_item),
 	luamethod(InvRef, room_for_item), 
 	luamethod(InvRef, native_room_for_item),

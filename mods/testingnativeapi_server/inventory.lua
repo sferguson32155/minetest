@@ -324,26 +324,43 @@ minetest.register_chatcommand("lua_getlist", {
 		local player = minetest.get_player_by_name("singleplayer")
 		local inv = player:get_inventory()
 		local res = inv:get_list("main");
-		return true, "Success, get_list() returned: "..tostring(res)
+
+		return true, "Success, get_list() returned: " ..dump(res)
 	end
+
 
 	--iterate over each element in table
 })
 
---[[
+
 minetest.register_chatcommand("native_getlist", {
 	description = "Invokes lua_api > l_inventory.l_native_get_list()",
-	func = function(name, param)
+	func = function(self)
+		local player = minetest.get_player_by_name("singleplayer")
+		local inv = player:get_inventory()
+		local res = inv:native_get_list("main");
+
+		return true, "Success, native_get_list() returned: " ..dump(res)
 	end
 })
 
 minetest.register_chatcommand("test_getlist", {
 	description = "Compares output of lua and native command for get_list()",
-	func = function(name, param)
+	func = function(self)
+		local player = minetest.get_player_by_name("singleplayer")
+		local inv = player:get_inventory()
+		local lua = inv:get_list("main")
+		local native = inv:native_get_list("main")
+
+		if lua == native then
+			return true, "Success, function output matches - check console for more details"
+		else
+			return false, "Failure, function output does not match - check console for more details"
+		end
 	end
 })
 
---]]
+
 
 --set_list()
 
@@ -352,7 +369,12 @@ minetest.register_chatcommand("lua_setlist", {
 	func = function(self)
 		local player = minetest.get_player_by_name("singleplayer")
 		local inv = player:get_inventory()
-		local list = inv:get_list("main")
+		local testDirt = ItemStack("default:dirt 1")
+		inv:add_item("main", testDirt)
+		local stack = ItemStack("default:stone 99")
+		inv:add_item("craft", stack)
+		local list = inv:get_list("craft")
+
 		local res = inv:set_list("main", list);
 		return true, "Success, set_list() returned: "..tostring(res)
 	end
@@ -364,13 +386,14 @@ minetest.register_chatcommand("native_setlist", {
 	func = function(self)
 		local player = minetest.get_player_by_name("singleplayer")
 		local inv = player:get_inventory()
-		local list = inv:get_list("main")
+		local stack = ItemStack("default:diamondblock 99")
+		inv:add_item("craft", stack)
 
-		if(list ~= NULL) then
-			local res = inv:native_set_list("main", items, size)
-		else
-			local res = inv:native_set_list("main", items)
-		end
+		local testDirt = ItemStack("default:dirt 1")
+		inv:add_item("main", testDirt)
+
+		local list = inv:get_list("craft")
+		local res = inv:native_set_list("main", list)
 
 		return true, "Success, set_list() returned: "..tostring(res)
 	end
@@ -378,7 +401,31 @@ minetest.register_chatcommand("native_setlist", {
 
 minetest.register_chatcommand("test_setlist", {
 	description = "Compares output of lua and native command for set_list()",
-	func = function(name, param)
+	func = function(self)
+		local player = minetest.get_player_by_name("singleplayer")
+		local inv = player:get_inventory()
+
+		local testDirt = ItemStack("default:dirt 1")
+		inv:add_item("main", testDirt)
+
+		local stack = ItemStack("default:diamondblock 99")
+		inv:add_item("craft", stack)
+		local list = inv:get_list("craft")
+
+		local lua = inv:set_list("main", list)
+
+		local stack2 = ItemStack("default:sand 99")
+		inv:remove_item("craft", stack)
+		inv:add_item("craft", stack2)
+		local list = inv:get_list("craft")
+		local native = inv:native_set_list("main", list)
+
+		if tostring(lua) == tostring(native) then
+			return true, "Success, function output matches - check console for more details"
+		else
+			return false, "Failure, function output does not match - check console for more details"
+		end
+
 	end
 })
 
@@ -392,7 +439,7 @@ minetest.register_chatcommand("lua_getlists", {
 		local player = minetest.get_player_by_name("singleplayer")
 		local inv = player:get_inventory()
 		local res = inv:get_lists();
-		return true, "Success, get_lists() returned: "..tostring(res)
+		return true, "Success, get_lists() returned: "..dump(res)
 	end
 	
 })
@@ -403,7 +450,7 @@ minetest.register_chatcommand("native_getlists", {
 		local player = minetest.get_player_by_name("singleplayer")
 		local inv = player:get_inventory()
 		local res = inv:native_get_lists();
-		return true, "Success, native_get_lists() returned: "..tostring(res)
+		return true, "Success, native_get_lists() returned: "..dump(res)
 	end
 })
 
@@ -415,8 +462,8 @@ minetest.register_chatcommand("test_getlists", {
 
 		local lres = inv:get_lists()
 		local nres = inv:native_get_lists()
-		print("l_get_lists() returned: "..tostring(lres))
-		print("native_get_lists() returned: "..tostring(nres))
+		print("l_get_lists() returned: "..dump(lres))
+		print("native_get_lists() returned: "..dump(nres))
 		if lres == nres then
 			return true, "Success, function output matches - check console for more details"
 		else
@@ -425,15 +472,19 @@ minetest.register_chatcommand("test_getlists", {
 	end
 })
 
---[[
---set_lists()
 
+--set_lists()
+--[[
 minetest.register_chatcommand("lua_setlists", {
 	description = "Invokes lua_api > l_inventory.l_set_lists()",
 	func = function(name, param)
 		local player = minetest.get_player_by_name("singleplayer")
 		local inv = player:get_inventory()
-		local res = inv:set_lists(param)
+
+		local list1 = inv:get_list("main")
+		local list2 = inv:get_list("craft")
+		
+		local res = inv:set_lists(list1)
 		return true, "Success, set_lists() returned: "..res
 	end
 })
@@ -642,3 +693,29 @@ minetest.register_chatcommand("test_getlocation", {
 })
 
 --]]
+
+minetest.register_chatcommand("test_inventory", {
+	description = "testing all inventory methods",
+	func = function()
+
+		local methods = {
+			"isempty",
+			"getsize",
+			"setsize",
+			"getwidth",
+			"setwidth",
+			"getstack",
+			"setstack",
+			"getlist",
+			"setlist",
+			"getlists",
+			"setlists",
+			"roomforitem",
+			"containsitem",
+			"removeitem"
+		}
+
+		return native_tests.test_class("inventory", methods), 
+		"Inventory tests completed. See server_dump.txt for details."
+	end
+})
