@@ -1,5 +1,5 @@
 --runs every server class; output sent to worlds/world/server_dump.txt
-minetest.register_chatcommand("test_server", {
+minetest.register_chatcommand("test_server_classes", {
 	description = "test all server classes",
 	func = function()
 

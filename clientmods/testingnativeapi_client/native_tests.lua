@@ -31,23 +31,23 @@ function native_tests.test_command (class, method)
 
 		local cmd = k.."_"..class.."_"..method
 		local entry = minetest.registered_chatcommands[cmd]
-		native_tests.write("["..cmd.."] ")
+		local pre = "["..cmd.."] " --if you want to write to console before declaring p/f, write() instead of append to result
 
 		if entry then
 			local eflag, res, msg = pcall(minetest.registered_chatcommands[cmd].func)
 	
 			if eflag then
 				if res then
-					native_tests.write("PASSED: "..msg.."\n")
+					native_tests.write(pre.."PASSED: "..msg.."\n")
 					hits = hits + 1
 				else
-					native_tests.write("FAILED: "..msg.."\n")
+					native_tests.write(pre.."FAILED: "..msg.."\n")
 				end
 			else
-				native_tests.write("EXCEPTION: "..res.."\n")
+				native_tests.write(pre.."EXCEPTION: "..res.."\n")
 			end
 		else
-			native_tests.write("NOT FOUND\n")
+			native_tests.write(pre.."NOT FOUND\n")
 		end
 	end
 

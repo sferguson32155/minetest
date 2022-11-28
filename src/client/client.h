@@ -237,6 +237,7 @@ public:
 		const StringMap &fields);
 	void sendInventoryAction(InventoryAction *a);
 	void sendChatMessage(const std::wstring &message);
+	int getChatSize();
 	void clearOutChatQueue();
 	void sendChangePassword(const std::string &oldpassword,
 		const std::string &newpassword);

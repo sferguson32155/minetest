@@ -6,7 +6,7 @@
 
 -- Make the auth object private, deny access to mods
 local core_auth = core.auth
-core.auth = nil
+--core.auth = nil
 
 core.builtin_auth_handler = {
 	get_auth = function(name)
