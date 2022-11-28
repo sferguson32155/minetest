@@ -14,6 +14,7 @@ native_tests = dofile(modpath .. "/native_tests.lua")
 dofile(modpath .. "/auth.lua")
 dofile(modpath .. "/areastore.lua")
 dofile(modpath .. "/inventory.lua")
+dofile(modpath .. "/particles.lua")
 
 -- Load helper files
 dofile(modpath .. "/other.lua")

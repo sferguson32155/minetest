@@ -24,17 +24,22 @@ public:
 
 	static ItemStack native_get_stack(Inventory* inv, InventoryList* list, int i);
 
-	static bool native_set_stack(Inventory* inv, InventoryList* list, int i, ItemStack item);
+	static bool native_set_stack(
+			Inventory *inv, InventoryList *list, int i, ItemStack item);
 
-	//native_get_list
 
-	//native_set_list
+	// native_get_list - WRITTEN
+	const InventoryList *native_get_list(Inventory *inv, const char *listname);
+
+	//native_set_list -WIP Requires read_inventory_list(), will rewrite later
+
+	//native_get_lists
 
 	static std::vector<const InventoryList *> native_get_lists(Inventory* inv);
 
-	//native_set_lists
+	//native_set_lists -WIP Requires read_inventory_list(), will rewrite later
 
-	//native_add_item
+	//native_add_item -WIP requires LuaItemStack::create() , will rewrite later
 
 	static bool native_room_for_item(Inventory* inv, InventoryList* list, ItemStack item);
 
