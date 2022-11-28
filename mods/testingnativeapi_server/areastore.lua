@@ -91,7 +91,7 @@ minetest.register_chatcommand("test_areastore_getareasforpos", {
 })
 
 -- get_areas_in_area()
-minetest.register_chatcommand("lua_areastore_getareasforpos", {
+minetest.register_chatcommand("lua_areastore_getareasinarea", {
 	description = "Invokes lua_api > l_areastore.l_get_areas_in_area",
 	func = function(self)
         local areastore = AreaStore();
@@ -104,7 +104,7 @@ minetest.register_chatcommand("lua_areastore_getareasforpos", {
 	end
 })
 
-minetest.register_chatcommand("native_areastore_getareasforpos", {
+minetest.register_chatcommand("native_areastore_getareasinarea", {
 	description = "Invokes lua_api > l_areastore.l_native_get_areas_in_area > native_areastore.native_get_areas_in_area",
 	func = function(self)
         local areastore = AreaStore();
