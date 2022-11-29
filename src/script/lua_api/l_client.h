@@ -105,6 +105,85 @@ private:
 	// get_csm_restrictions()
 	static int l_get_csm_restrictions(lua_State *L);
 
+	// native_get_current_modname()
+	static int l_native_get_current_modname(lua_State *L);
+
+	// native_get_modpath(modname)
+	static int l_native_get_modpath(lua_State *L);
+
+	// native_get_last_run_mod()
+	static int l_native_get_last_run_mod(lua_State *L);
+
+	// set_last_run_mod(modname)
+	static int l_native_set_last_run_mod(lua_State *L);
+
+	// native_print()
+	static int l_native_print(lua_State *L);
+
+	// native_display_chat_message(message)
+	static int l_native_display_chat_message(lua_State *L);
+
+	// native_send_chat_message(message)
+	static int l_native_send_chat_message(lua_State *L);
+
+	// native_get_chat_size()
+	static int l_native_get_chat_size(lua_State *L);
+
+	// native_clear_out_chat_queue()
+	static int l_native_clear_out_chat_queue(lua_State *L);
+
+	// native_get_player_names()
+	static int l_native_get_player_names(lua_State *L);
+
+	// native_show_formspec(formspec)
+	static int l_native_show_formspec(lua_State *L);
+
+	// native_send_respawn()
+	static int l_native_send_respawn(lua_State *L);
+
+	// native_disconnect()
+	static int l_native_disconnect(lua_State *L);
+
+	// native_gettext(text)
+	static int l_native_gettext(lua_State *L);
+
+	// native_get_node_or_nil(pos)
+	// pos = {x=num, y=num, z=num}
+	static int l_native_get_node_or_nil(lua_State *L);
+
+	// native_get_langauge()
+	static int l_native_get_language(lua_State *L);
+
+	// native_get_meta(pos)
+	static int l_native_get_meta(lua_State *L);
+
+	// native_sound_play(spec, parameters)
+	static int l_native_sound_play(lua_State *L);
+
+	// native_sound_stop(handle)
+	static int l_native_sound_stop(lua_State *L);
+
+	// native_sound_fade(handle, step, gain)
+	static int l_native_sound_fade(lua_State *L);
+
+	// native_get_server_info()
+	static int l_native_get_server_info(lua_State *L);
+
+	// native_get_item_def(itemstring)
+	static int l_native_get_item_def(lua_State *L);
+
+	// native_get_node_def(nodename)
+	static int l_native_get_node_def(lua_State *L);
+
+	// native_get_privilege_list()
+	static int l_native_get_privilege_list(lua_State *L);
+
+	// native_get_builtin_path()
+	static int l_native_get_builtin_path(lua_State *L);
+
+	// native_get_csm_restrictions()
+	static int l_native_get_csm_restrictions(lua_State *L);
+
 public:
 	static void Initialize(lua_State *L, int top);
 };

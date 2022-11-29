@@ -45,6 +45,24 @@ private:
 	// auth_reload()
 	static int l_auth_reload(lua_State *L);
 
+	// auth_native_read(name)
+	static int l_native_auth_read(lua_State *L);
+
+	// auth_native_save(table)
+	static int l_native_auth_save(lua_State *L);
+
+	// auth_native_create(table)
+	static int l_native_auth_create(lua_State *L);
+
+	// auth_native_delete(name)
+	static int l_native_auth_delete(lua_State *L);
+
+	// auth_native_list_names()
+	static int l_native_auth_list_names(lua_State *L);
+
+	// auth_native_reload()
+	static int l_native_auth_reload(lua_State *L);
+
 	// helper for auth* methods
 	static AuthDatabase *getAuthDb(lua_State *L);
 	static void pushAuthEntry(lua_State *L, const AuthEntry &authEntry);

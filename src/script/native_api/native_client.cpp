@@ -2,14 +2,14 @@
 
 std::string NativeModApiClient::native_get_current_modname(std::string current_mod)
 {
-	// TODO: Unsure how to write native version of this
+	//TO DO: can't write native version of this right now (will have to modify internal classes)
+	//see ModNameStorer in script/cpp_api/s_base.cpp
 	return current_mod;
 }
 
-const char* NativeModApiClient::native_get_modpath(std::string modname)
+std::string NativeModApiClient::native_get_modpath(std::string modname)
 {
-	std::string path = modname + ":";
-	return path.c_str();
+	return modname += ':';
 }
 
 const char* NativeModApiClient::native_get_last_run_mod(
@@ -43,22 +43,20 @@ int NativeModApiClient::native_send_chat_message(std::string message, Client *cl
 	return 0;
 }
 
+int NativeModApiClient::native_get_chat_size(Client *client)
+{
+	return client->getChatSize();
+}
+
 int NativeModApiClient::native_clear_out_chat_queue(Client *client)
 {
 	client->clearOutChatQueue();
 	return 0;
 }
 
-std::list<const char *> NativeModApiClient::native_get_player_names(Client *client)
+const std::list<std::string>& NativeModApiClient::native_get_player_names(Client *client)
 {
-	std::list<const char *> returnList;
-
-	const std::list<std::string> &plist = client->getConnectedPlayerNames();
-	std::list<std::string>::const_iterator iter;
-	for (iter = plist.begin(); iter != plist.end(); ++iter) {
-		returnList.push_back((*iter).c_str());
-	}
-	return returnList;
+	return client->getConnectedPlayerNames();
 }
 
 bool NativeModApiClient::native_show_formspec(
@@ -80,28 +78,32 @@ int NativeModApiClient::native_send_respawn(Client *client)
 
 bool NativeModApiClient::native_disconnect(Client *client, MainGameCallback *g_gamecallback)
 {
+	if (client->isShutdown()) return false;
 	g_gamecallback->disconnect();
 	return true;
 }
 
-const char * NativeModApiClient::native_gettext(std::string text)
+std::string NativeModApiClient::native_gettext(std::string text)
 {
-	return text.c_str();
+	return strgettext(text);
 }
 
-const NodeDefManager* NativeModApiClient::native_get_node_or_nil(
+std::tuple<MapNode, const NodeDefManager*> NativeModApiClient::native_get_node_or_nil(
 		v3s16 pos, Client *client)
 {
+	std::tuple<MapNode, const NodeDefManager*> result;
+
 	bool pos_ok;
-	MapNode n = client->CSMGetNode(pos, &pos_ok);
+	std::get<0>(result) = client->CSMGetNode(pos, &pos_ok);
 	if (pos_ok) {
-		return client->ndef();
+		std::get<1>(result) = client->ndef();
 	} else {
-		return nullptr;
+		std::get<1>(result) = nullptr;
 	}
+	return result;
 }
 
-std::tuple<char*, const char*> NativeModApiClient::native_get_language()
+std::tuple<std::string, std::string> NativeModApiClient::native_get_language()
 {
 	#ifdef _WIN32
 		char *locale = setlocale(LC_ALL, NULL);
@@ -112,27 +114,25 @@ std::tuple<char*, const char*> NativeModApiClient::native_get_language()
 		if (lang == "LANG_CODE")
 			lang = "";
 
-	std::tuple<char*, const char*> result;
+	std::tuple<std::string, std::string> result;
 	std::get<0>(result) = locale;
-	std::get<1>(result) = lang.c_str();
+	std::get<1>(result) = lang;
 	return result;
 }
 
 
-NodeMetadata* NativeModApiClient::native_get_meta(v3s16 p, Client *client)
+NodeMetadata* NativeModApiClient::native_get_meta(v3s16 p, Environment *env)
 {
-	NodeMetadata *meta = client->getEnv().getMap().getNodeMetadata(p);
-	return meta;
+	return env->getMap().getNodeMetadata(p);
 }
 
-s32 NativeModApiClient::native_sound_play(Client *client, SimpleSoundSpec spec, v3f default,
-				  float gain, float pitch, float looped, v3f *pos)
+s32 NativeModApiClient::native_sound_play(Client *client, SimpleSoundSpec spec, float gain,
+				float pitch, bool looped, v3f *pos)
 {
 	ISoundManager *sound = client->getSoundManager();
 
 	s32 handle;
-
-	if (pos == nullptr) {
+	if (pos != nullptr) {
 		handle = sound->playSoundAt(spec.name, looped, gain * spec.gain, *pos, pitch);
 		return handle;
 	}
@@ -152,21 +152,20 @@ int NativeModApiClient::native_sound_fade(s32 handle, float step, float gain, Cl
 	return 0;
 }
 
-std::tuple<Address, std::string, std::string, int, int>
+std::tuple<std::string, std::string, int, int>
 NativeModApiClient::native_get_server_info(Client *client)
 {
+	std::string addressName = client->getAddressName();
 	Address serverAddress = client->getServerAddress();
-	std::string address = client->getAddressName().c_str();
-	std::string ip = serverAddress.serializeString().c_str();
+	std::string ip = serverAddress.serializeString();
 	int port = serverAddress.getPort();
 	int protocol_version = client->getProtoVersion();
 
-	return std::tuple<Address, std::string, std::string, int, int>(
-			serverAddress, address, ip, port, protocol_version);
+	return std::tuple<std::string, std::string, int, int>(
+			addressName, ip, port, protocol_version);
 }
 
-const ItemDefinition *NativeModApiClient::native_get_item_def(
-		Client *client, IGameDef *gdef, std::string name)
+const ItemDefinition *NativeModApiClient::native_get_item_def(IGameDef *gdef, std::string name)
 {
 	assert(gdef);
 
@@ -180,8 +179,7 @@ const ItemDefinition *NativeModApiClient::native_get_item_def(
 	return &def;
 }
 
-const ContentFeatures *NativeModApiClient::native_get_node_def(
-		Client *client, IGameDef *gdef, std::string name)
+const ContentFeatures *NativeModApiClient::native_get_node_def(IGameDef *gdef, std::string name)
 {
 	assert(gdef);
 
@@ -195,22 +193,17 @@ const ContentFeatures *NativeModApiClient::native_get_node_def(
 	return &cf;
 }
 
-std::map<bool, std::string> NativeModApiClient::native_get_privilege_list(Client *client)
+const std::unordered_set<std::string>& NativeModApiClient::native_get_privilege_list(Client *client)
 {
-	std::map<bool, std::string> result;
-	for (const std::string &priv : client->getPrivilegeList()) {
-		result.insert(std::pair<bool, std::string>(true, priv.c_str()));
-	}
-	return result;
+	return client->getPrivilegeList();
 }
 
-const char* NativeModApiClient::native_get_builtin_path()
+std::string NativeModApiClient::native_get_builtin_path()
 {
-	const char * val = BUILTIN_MOD_NAME ":";
-	return val;
+	return std::string(BUILTIN_MOD_NAME ":");
 }
 
-std::map<const char *, bool>  NativeModApiClient::native_get_csm_restrictions(Client *client, const CSMFlagDesc *flagdesc)
+std::map<const char *, bool>  NativeModApiClient::native_get_csm_restrictions(Client *client, const NativeCSMFlagDesc *flagdesc)
 {
 	u64 flags = client->getCSMRestrictionFlags();
 

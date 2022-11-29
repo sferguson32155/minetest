@@ -26,6 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "environment.h"
 #include "database/database.h"
 #include <algorithm>
+#include "../native_api/native_auth.h"
 
 // common start: ensure auth db
 AuthDatabase *ModApiAuth::getAuthDb(lua_State *L)
@@ -212,5 +213,130 @@ void ModApiAuth::Initialize(lua_State *L, int top)
 	registerFunction(L, "list_names", l_auth_list_names, auth_top);
 	registerFunction(L, "reload", l_auth_reload, auth_top);
 
+	registerFunction(L, "native_read", l_native_auth_read, auth_top);
+	registerFunction(L, "native_save", l_native_auth_save, auth_top);
+	registerFunction(L, "native_create", l_native_auth_create, auth_top);
+	registerFunction(L, "native_delete", l_native_auth_delete, auth_top);
+	registerFunction(L, "native_list_names", l_native_auth_list_names, auth_top);
+	registerFunction(L, "native_reload", l_native_auth_reload, auth_top);
+
 	lua_setfield(L, top, "auth");
+}
+
+// native_auth_read(name)
+int ModApiAuth::l_native_auth_read(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	AuthDatabase *auth_db = getAuthDb(L);
+	AuthEntry authEntry;
+	const char *name = luaL_checkstring(L, 1);
+	if (NativeModApiAuth::native_auth_read(authEntry, auth_db, name))
+		pushAuthEntry(L, authEntry);
+		return 1;
+	return 0;
+}
+
+// native_auth_save(table)
+int ModApiAuth::l_native_auth_save(lua_State *L)
+{
+	//loads auth entry from stack
+	NO_MAP_LOCK_REQUIRED;
+	AuthDatabase *auth_db = getAuthDb(L);
+	if (!auth_db)
+		return 0;
+	luaL_checktype(L, 1, LUA_TTABLE);
+	int table = 1;
+	AuthEntry authEntry;
+	bool fields[5] = {};
+	fields[0] = getintfield(L, table, "id", authEntry.id);
+	fields[1] = getstringfield(L, table, "name", authEntry.name);
+	fields[2] = getstringfield(L, table, "password", authEntry.password);
+	lua_getfield(L, table, "privileges");
+	if (lua_istable(L, -1)) {
+		lua_pushnil(L);
+		while (lua_next(L, -2)) {
+			authEntry.privileges.emplace_back(
+					lua_tostring(L, -2)); // the key, not the value
+			lua_pop(L, 1);
+		}
+	} else {
+		fields[3] = false;
+	}
+	lua_pop(L, 1); // the table
+	fields[4] = getintfield(L, table, "last_login", authEntry.last_login);
+
+	//saves entry in db
+	lua_pushboolean(L, NativeModApiAuth::native_auth_save(authEntry, auth_db, fields));
+	return 1;
+}
+
+// native_auth_create(table)
+int ModApiAuth::l_native_auth_create(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	AuthDatabase *auth_db = getAuthDb(L);
+	luaL_checktype(L, 1, LUA_TTABLE);
+	int table = 1;
+	AuthEntry authEntry;
+	bool fields[4] = {};
+	// no meaningful id field, we assume
+	fields[0] = getstringfield(L, table, "name", authEntry.name);
+	fields[1] = getstringfield(L, table, "password", authEntry.password);
+	lua_getfield(L, table, "privileges");
+	if (lua_istable(L, -1)) {
+		lua_pushnil(L);
+		while (lua_next(L, -2)) {
+			authEntry.privileges.emplace_back(
+					lua_tostring(L, -2)); // the key, not the value
+			lua_pop(L, 1);
+		}
+	} else {
+		fields[2] = false;
+	}
+	lua_pop(L, 1); // the table
+	fields[3] = getintfield(L, table, "last_login", authEntry.last_login);
+
+	if (NativeModApiAuth::native_auth_create(authEntry, auth_db, fields)) {
+		pushAuthEntry(L, authEntry);
+		return 1;
+	}
+	return 0;
+}
+
+// native_auth_delete(name)
+int ModApiAuth::l_native_auth_delete(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	AuthDatabase *auth_db = getAuthDb(L);
+	if (!auth_db)
+		return 0;
+	std::string name(luaL_checkstring(L, 1));
+	lua_pushboolean(L, NativeModApiAuth::native_auth_delete(auth_db, name));
+	return 1;
+}
+
+// native_auth_list_names()
+int ModApiAuth::l_native_auth_list_names(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	AuthDatabase *auth_db = getAuthDb(L);
+	if (!auth_db)
+		return 0;
+	std::vector<std::string> names = NativeModApiAuth::native_auth_list_names(auth_db);
+	lua_createtable(L, names.size(), 0);
+	int table = lua_gettop(L);
+	int i = 1;
+	for (const std::string &name : names) {
+		lua_pushstring(L, name.c_str());
+		lua_rawseti(L, table, i++);
+	}
+	return 1;
+}
+
+// native_auth_reload()
+int ModApiAuth::l_native_auth_reload(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	NativeModApiAuth::native_auth_reload(getAuthDb(L));
+	return 0;
 }
