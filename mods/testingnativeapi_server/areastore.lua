@@ -183,6 +183,22 @@ minetest.register_chatcommand("native_areastore_reserve", {
 	end
 })
 
+minetest.register_chatcommand("test_areastore_reserve", {
+	description = "Asserts lua api and native api behaviors for l_areastore.reserve",
+	func = function(self)
+        local areastore = AreaStore();
+		local lua = areastore:native_reserve(1)
+		local native = reastore:native_reserve(1)
+
+		if lua == native then
+			return true, "(Success) [AreaStore] reserve()"
+		else
+			return false, "(Fail) [AreaStore] reserve()"
+		end
+
+	end
+})
+
 -- remove_area()
 minetest.register_chatcommand("lua_areastore_removearea", {
 	description = "Invokes lua_api > l_areastore.l_remove_area",
@@ -232,6 +248,22 @@ minetest.register_chatcommand("native_areastore_setcacheparams", {
         local areastore = AreaStore();
 		local res = areastore:native_set_cache_params({1, 1, 1})
 		return true, "Success, native_set_cache_params()"
+	end
+})
+
+minetest.register_chatcommand("test_areastore_setcacheparams", {
+	description = "Asserts lua api and native api behaviors for l_areastore_set_cache_params",
+	func = function(self)
+        local areastore = AreaStore();
+		local lua = areastore:set_cache_params({1, 1, 1})
+		local native = areastore:native_set_cache_params({1, 1, 1})
+
+		if lua == native then
+			return true, "(Success) [AreaStore] set_cache_params()"
+		else
+			return false, "(Fail) [AreaStore] set_cache_params()"
+		end
+
 	end
 })
 
@@ -400,6 +432,7 @@ minetest.register_chatcommand("test_areastore", {
 			"removearea",
 			"setcacheparams",
 			"tostring",
+			"fromstring",
 			"tofile",
 			"fromfile"
 		}

@@ -19,6 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "lua_api/l_inventory.h"
 #include "lua_api/l_internal.h"
+#include "lua_api/l_base.h"
 #include "lua_api/l_item.h"
 #include "common/c_converter.h"
 #include "common/c_content.h"
@@ -340,8 +341,8 @@ int InvRef::l_set_list(lua_State *L)
 	return 0;
 }
 
-/*
-int InvRef::native_set_list(lua_State *L)
+
+int InvRef::l_native_set_list(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	InvRef *ref = checkobject(L, 1);
@@ -350,15 +351,21 @@ int InvRef::native_set_list(lua_State *L)
 	if (inv == NULL) {
 		return 0;
 	}
+	int result = 0;
 	InventoryList *list = inv->getList(listname);
-	if (list)
-		read_inventory_list(L, 3, inv, listname, getServer(L), list->getSize());
-	else
-		read_inventory_list(L, 3, inv, listname, getServer(L));
+	std::vector<ItemStack> items = read_inventory_list_helper(L, 3, listname, inv, getServer(L));
+
+	if (list) {
+		int result = NativeInvRef::native_set_list(
+				inv, listname, items, list->getSize());
+	}	
+	else {
+		result = NativeInvRef::native_set_list(inv, listname, items);
+	}
 	reportInventoryChange(L, ref);
-	return 0;
+	return result;
 }
-*/
+
 
 // get_lists(self) -> list of InventoryLists
 int InvRef::l_get_lists(lua_State *L)
@@ -369,34 +376,44 @@ int InvRef::l_get_lists(lua_State *L)
 	if (!inv) {
 		return 0;
 	}
-	std::vector<const InventoryList*> lists = inv->getLists();
+	std::vector<const InventoryList*> lists = inv->getLists();//could be just this
 	std::vector<const InventoryList*>::iterator iter = lists.begin();
 	lua_createtable(L, 0, lists.size());
 	for (; iter != lists.end(); iter++) {
 		const char* name = (*iter)->getName().c_str();
 		lua_pushstring(L, name);
 		push_inventory_list(L, inv, name);
-		lua_rawset(L, -3);
+		lua_rawset(L, -3); 
+		printf("%s\n", name);
 	}
 	return 1;
 }
 
-/*
+
 
 int InvRef::l_native_get_lists(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	InvRef *ref = checkobject(L, 1);
 	Inventory *inv = getinv(L, ref);
-	if (inv == nullptr) {
+	if (!inv) {
 		return 0;
 	}
+	std::vector<const InventoryList *> lists =
+			NativeInvRef::native_get_lists(inv); // could be just this
+	std::vector<const InventoryList *>::iterator iter = lists.begin();
+	lua_createtable(L, 0, lists.size());
+	for (; iter != lists.end(); iter++) {
+		const char *name = (*iter)->getName().c_str();
+		lua_pushstring(L, name);
+		push_inventory_list(L, inv, name);
+		lua_rawset(L, -3); // sets a array, more optimized
+		printf("%s\n", name);
 
-
+	}
 	return 1;
 }
-*/
-
+	
 
 // set_lists(self, lists)
 int InvRef::l_set_lists(lua_State *L)
@@ -419,6 +436,36 @@ int InvRef::l_set_lists(lua_State *L)
 	while (lua_next(L, 2)) {
 		const char *listname = lua_tostring(L, -2);
 		read_inventory_list(L, -1, tempInv, listname, server);
+		lua_pop(L, 1);
+	}
+	inv = tempInv;
+	return 0;
+}
+
+int InvRef::l_native_set_lists(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	InvRef *ref = checkobject(L, 1);
+	Inventory *inv = getinv(L, ref);
+	if (!inv) {
+		return 0;
+	}
+
+	// Make a temporary inventory in case reading fails
+	Inventory *tempInv(inv);
+	tempInv->clear();
+
+	Server *server = getServer(L);
+	std::vector<ItemStack> items;
+	int result = 0;
+			
+
+	lua_pushnil(L);
+	luaL_checktype(L, 2, LUA_TTABLE);
+	while (lua_next(L, 2)) {
+		const char *listname = lua_tostring(L, -2);
+		items = read_inventory_list_helper(L, 3, listname, inv, getServer(L));
+		result = NativeInvRef::native_set_lists(inv, listname, items);
 		lua_pop(L, 1);
 	}
 	inv = tempInv;
@@ -662,9 +709,12 @@ const luaL_Reg InvRef::methods[] = {
 	luamethod(InvRef, set_stack),
 	luamethod(InvRef, native_set_stack),
 	luamethod(InvRef, get_list),
-	luamethod(InvRef, set_list),
-	luamethod(InvRef, get_lists),
-	luamethod(InvRef, set_lists),
+	luamethod(InvRef, set_list), 
+	luamethod(InvRef, native_set_list),
+	luamethod(InvRef, get_lists), 
+	luamethod(InvRef, native_get_lists),
+	luamethod(InvRef, set_lists), 
+	luamethod(InvRef, native_set_lists),
 	luamethod(InvRef, add_item),
 	luamethod(InvRef, room_for_item), 
 	luamethod(InvRef, native_room_for_item),
@@ -749,5 +799,43 @@ void ModApiInventory::Initialize(lua_State *L, int top)
 	API_FCT(remove_detached_inventory_raw);
 	API_FCT(get_inventory);
 }
+
+//Does the Lua part of read inventory List and returns a vector of itemstacks that the native version will use
+
+static std::vector<ItemStack> read_inventory_list_helper(lua_State *L, int tableindex,
+		const char *name, Inventory *inv, Server *srv)
+{
+	if (tableindex < 0)
+		tableindex = lua_gettop(L) + 1 + tableindex;
+
+	std::vector<ItemStack> items;
+	// If nil, delete list
+	if (lua_isnil(L, tableindex)) {
+		inv->deleteList(name);
+		return items;
+	}
+	// Otherwise set list
+	items = read_items(L, tableindex, srv);
+	return items;
+
+}
+
+std::vector<ItemStack> InvRef::prepare_itemStack(lua_State *L)
+{
+	std::string stone = "default:stone";
+	const std::string &s = stone;
+
+	std::string dirt = "default:stone";
+	const std::string &d = dirt;
+
+	ItemStack s1 = ItemStack(s, 99, 0, getServer(L)->idef());
+	ItemStack s2 = ItemStack(d, 99, 0, getServer(L)->idef());
+	std::vector<ItemStack> items;
+	items.push_back(s1);
+	items.push_back(s2);
+
+	return items;
+}
+
 
 

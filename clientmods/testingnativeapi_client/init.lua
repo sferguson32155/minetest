@@ -12,6 +12,7 @@ native_tests = dofile(modpath .. "/native_tests.lua")
 
 -- Load files
 dofile(modpath .. "/camera.lua")
+dofile(modpath .. "/minimap.lua")
 dofile(modpath .. "/item.lua")
 dofile(modpath .. "/other.lua")
 dofile(modpath .. "/client.lua")

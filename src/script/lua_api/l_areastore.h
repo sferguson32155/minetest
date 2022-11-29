@@ -61,6 +61,7 @@ private:
 	static int l_native_from_string(lua_State *L);
 	static int l_native_from_file(lua_State *L);
 
+
 public:
 	AreaStore *as = nullptr;
 
@@ -76,3 +77,6 @@ public:
 
 	static void Register(lua_State *L);
 };
+
+static int deserialization_helper_from_native(
+		lua_State *L, std::tuple<bool, const char *> input);

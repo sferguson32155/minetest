@@ -91,15 +91,18 @@ private:
 
 	// set_list(self, listname, list)
 	static int l_set_list(lua_State *L);
+	static int l_native_set_list(lua_State *L);
 	// SKIP native for now, function not written yet
 
 	// get_lists(self) -> list of InventoryLists
 	static int l_get_lists(lua_State *L);
+	static int l_native_get_lists(lua_State *L);
 	//static int l_native_get_lists(lua_State *L); 
 	//Function above paused for now: native_get_lists appears incomplete
 
 	// set_lists(self, lists)
 	static int l_set_lists(lua_State *L);
+	static int l_native_set_lists(lua_State *L);
 	// SKIP native for now, function not written yet
 
 	// add_item(self, listname, itemstack or itemstring or table or nil) -> itemstack
@@ -126,6 +129,8 @@ private:
 	static int l_get_location(lua_State *L);
 	//do we need this?
 
+	static std::vector<ItemStack> prepare_itemStack(lua_State *L);
+
 public:
 	InvRef(const InventoryLocation &loc);
 
@@ -150,3 +155,8 @@ private:
 public:
 	static void Initialize(lua_State *L, int top);
 };
+
+std::vector<ItemStack> read_inventory_list_helper(lua_State *L, int tableindex,
+		const char *name, Inventory *inv, Server *srv);
+
+

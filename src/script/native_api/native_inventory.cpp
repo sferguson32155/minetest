@@ -1,4 +1,5 @@
 #include "native_inventory.h"
+#include "server.h"
 
 bool NativeInvRef::native_is_empty(Inventory* inv, InventoryList* list)
 {
@@ -102,17 +103,14 @@ const InventoryList *NativeInvRef::native_get_list(Inventory *inv, const char *l
 
 // native_set_list -- How to write this?
 
-/*
-bool NativeInvRef::native_set_list(
-		Inventory *inv, const char *listname, InventoryList *list)
+
+int NativeInvRef::native_set_list(Inventory *inv, const char *listname,
+		std::vector<ItemStack> items, int forcesize)
 {
-	InventoryList &invList = inv->getList(listname);
-	if (invList == NULL)
-		return false;
-	invList = list;
-	return true;
+	read_inventory_list_native(inv, listname, forcesize, items);
+	return 0;
 }
-*/
+
 
 std::vector<const InventoryList *> NativeInvRef::native_get_lists(Inventory *inv)
 {
@@ -120,7 +118,12 @@ std::vector<const InventoryList *> NativeInvRef::native_get_lists(Inventory *inv
 	return lists;
 }
 
-// native_set_lists
+int NativeInvRef::native_set_lists(Inventory *inv, const char *listname,
+		std::vector<ItemStack> items, int forcesize)
+{
+	read_inventory_list_native(inv, listname, forcesize, items);
+	return 0;
+}
 
 // native_add_item
 
@@ -176,4 +179,28 @@ ItemStack NativeInvRef::native_remove_item(
 		}
 	}
 }
+
+//takes in a vector of itemstacks from read_inventorylist_helper
+
+int NativeInvRef::read_inventory_list_native(Inventory *inv, const char *name, int forcesize, std::vector<ItemStack> is)
+{
+	int listsize = (forcesize != -1) ? forcesize : is.size();
+	InventoryList *invlist = inv->addList(name, listsize);
+	int index = 0;
+	for (std::vector<ItemStack>::const_iterator i = is.begin(); i != is.end();
+			++i) {
+		if (forcesize != -1 && index == forcesize)
+			break;
+		invlist->changeItem(index, *i);
+		index++;
+	}
+	while (forcesize != -1 && index < forcesize) {
+		invlist->deleteItem(index);
+		index++;
+	}
+	return 1;
+}
+
+
+
 
