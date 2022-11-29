@@ -34,6 +34,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "map.h"
 #include "util/string.h"
 #include "nodedef.h"
+#include "../native_api/native_client.h"
 
 #define checkCSMRestrictionFlag(flag) \
 	( getClient(L)->checkCSMRestrictionFlag(CSMRestrictionFlags::flag) )
@@ -163,7 +164,7 @@ int ModApiClient::l_get_player_names(lua_State *L)
 	return 1;
 }
 
-// show_formspec(formspec)
+// show_formspec(formname, formspec)
 int ModApiClient::l_show_formspec(lua_State *L)
 {
 	if (!lua_isstring(L, 1) || !lua_isstring(L, 2))
@@ -441,4 +442,360 @@ void ModApiClient::Initialize(lua_State *L, int top)
 	API_FCT(get_builtin_path);
 	API_FCT(get_language);
 	API_FCT(get_csm_restrictions);
+
+	API_FCT(native_get_current_modname);
+	API_FCT(native_get_modpath);
+	API_FCT(native_get_last_run_mod);
+	API_FCT(native_set_last_run_mod);
+	API_FCT(native_print);
+	API_FCT(native_display_chat_message);
+	API_FCT(native_send_chat_message);
+	API_FCT(native_get_chat_size);
+	API_FCT(native_clear_out_chat_queue);
+	API_FCT(native_get_player_names);
+	API_FCT(native_show_formspec);
+	API_FCT(native_send_respawn);
+	API_FCT(native_disconnect);
+	API_FCT(native_gettext);
+	API_FCT(native_get_node_or_nil);
+	API_FCT(native_get_language);
+	API_FCT(native_get_meta);
+	API_FCT(native_sound_play);
+	API_FCT(native_sound_stop);
+	API_FCT(native_sound_fade); // not done right
+	API_FCT(native_get_server_info);
+	API_FCT(native_get_item_def); // unkown itemstrings
+	API_FCT(native_get_node_def);
+	API_FCT(native_get_privilege_list);
+	API_FCT(native_get_builtin_path);
+	API_FCT(native_get_csm_restrictions);
+}
+
+// native_get_current_modname()
+int ModApiClient::l_native_get_current_modname(lua_State *L)
+{
+	lua_rawgeti(L, LUA_REGISTRYINDEX, CUSTOM_RIDX_CURRENT_MOD_NAME);
+	return 1;
+}
+
+// native_get_modpath(modname)
+int ModApiClient::l_native_get_modpath(lua_State *L)
+{
+	std::string modname = readParam<std::string>(L, 1);
+	std::string modpath = NativeModApiClient::native_get_modpath(modname);
+	lua_pushstring(L, modpath.c_str());
+	return 1;
+}
+
+// native_get_last_run_mod()
+int ModApiClient::l_native_get_last_run_mod(lua_State *L)
+{
+	lua_rawgeti(L, LUA_REGISTRYINDEX, CUSTOM_RIDX_CURRENT_MOD_NAME);
+	std::string current_mod = readParam<std::string>(L, -1, "");
+	if (current_mod.empty()) {
+		lua_pop(L, 1);
+		const char* last_mod = NativeModApiClient::native_get_last_run_mod(current_mod, getScriptApiBase(L));
+		lua_pushstring(L, last_mod);
+	}
+	return 1;
+}
+
+// set_last_run_mod(modname)
+int ModApiClient::l_native_set_last_run_mod(lua_State *L)
+{
+	if (!lua_isstring(L, 1))
+		return 0;
+
+	const char *mod = lua_tostring(L, 1);
+	lua_pushboolean(L, NativeModApiClient::native_set_last_run_mod(mod, getScriptApiBase(L)));
+	return 1;
+}
+
+// native_print(text)
+int ModApiClient::l_native_print(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	std::string text = luaL_checkstring(L, 1);
+	NativeModApiClient::native_print(text);
+	return 0;
+}
+
+// native_display_chat_message(message)
+int ModApiClient::l_native_display_chat_message(lua_State *L)
+{
+	if (!lua_isstring(L, 1))
+		return 0;
+
+	std::string message = luaL_checkstring(L, 1);
+	NativeModApiClient::native_display_chat_message(message, getClient(L));
+	lua_pushboolean(L, true);
+	return 1;
+}
+
+// native_send_chat_message(message)
+int ModApiClient::l_native_send_chat_message(lua_State *L)
+{
+	if (!lua_isstring(L, 1))
+		return 0;
+
+	// If server disabled this API, discard
+	if (checkCSMRestrictionFlag(CSM_RF_CHAT_MESSAGES))
+		return 0;
+
+	std::string message = luaL_checkstring(L, 1);
+	NativeModApiClient::native_send_chat_message(message, getClient(L));
+	return 0;
+}
+
+// native_get_chat_size()
+int ModApiClient::l_native_get_chat_size(lua_State *L)
+{
+	int chatSize = NativeModApiClient::native_get_chat_size(getClient(L));
+	lua_pushinteger(L, chatSize);
+	return 1;
+}
+
+// native_clear_out_chat_queue()
+int ModApiClient::l_native_clear_out_chat_queue(lua_State *L)
+{
+	NativeModApiClient::native_clear_out_chat_queue(getClient(L));
+	return 0;
+}
+
+// get_player_names()
+int ModApiClient::l_native_get_player_names(lua_State *L)
+{
+	if (checkCSMRestrictionFlag(CSM_RF_READ_PLAYERINFO))
+		return 0;
+
+	const std::list<std::string>& plist = NativeModApiClient::native_get_player_names(getClient(L));
+
+	//just pushes list to stack (and makes values stack compliant)
+	lua_createtable(L, plist.size(), 0);
+	int newTable = lua_gettop(L);
+	int index = 1;
+	std::list<std::string>::const_iterator iter;
+	for (iter = plist.begin(); iter != plist.end(); ++iter) {
+		lua_pushstring(L, (*iter).c_str());
+		lua_rawseti(L, newTable, index);
+		index++;
+	}
+	return 1;
+}
+
+// native_show_formspec(formspec)
+int ModApiClient::l_native_show_formspec(lua_State *L)
+{
+	if (!lua_isstring(L, 1) || !lua_isstring(L, 2))
+		return 0;
+
+	std::string* formname = new std::string(luaL_checkstring(L, 1));
+	std::string* formspec = new std::string(luaL_checkstring(L, 2));
+	Client* client = getClient(L);
+	lua_pushboolean(L, NativeModApiClient::native_show_formspec(formname, formspec, client));
+	return 1;
+}
+
+// native_send_respawn()
+int ModApiClient::l_native_send_respawn(lua_State *L)
+{
+	NativeModApiClient::native_send_respawn(getClient(L));
+	return 0;
+}
+
+// native_disconnect()
+int ModApiClient::l_native_disconnect(lua_State *L)
+{
+	lua_pushboolean(L, NativeModApiClient::native_disconnect(getClient(L), g_gamecallback));
+	return 1;
+}
+
+// native_gettext(text)
+int ModApiClient::l_native_gettext(lua_State *L)
+{
+	std::string text = std::string(luaL_checkstring(L, 1));
+	lua_pushstring(L, NativeModApiClient::native_gettext(text).c_str());
+	return 1;
+}
+
+// native_get_node_or_nil(pos)
+// pos = {x=num, y=num, z=num}
+int ModApiClient::l_native_get_node_or_nil(lua_State *L)
+{
+	v3s16 pos = read_v3s16(L, 1);
+	Client *client = getClient(L);
+
+	std::tuple<MapNode, const NodeDefManager*> node =
+		 NativeModApiClient::native_get_node_or_nil(pos, client);
+
+	if (std::get<1>(node) != nullptr) {
+		// Return node
+		pushnode(L, std::get<0>(node), std::get<1>(node));
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+// native_get_langauge()
+int ModApiClient::l_native_get_language(lua_State *L)
+{
+	std::tuple<std::string, std::string> lang = NativeModApiClient::native_get_language();
+	lua_pushstring(L, std::get<0>(lang).c_str());
+	lua_pushstring(L, std::get<1>(lang).c_str());
+	return 2;
+}
+
+// native_get_meta(pos)
+int ModApiClient::l_native_get_meta(lua_State *L)
+{
+	v3s16 p = read_v3s16(L, 1);
+
+	// check restrictions first
+	bool pos_ok;
+	getClient(L)->CSMGetNode(p, &pos_ok);
+	if (!pos_ok)
+		return 0;
+
+	NodeMetaRef::createClient(L, NativeModApiClient::native_get_meta(p, getEnv(L)));
+	return 1;
+}
+
+// native_sound_play(spec, parameters)
+int ModApiClient::l_native_sound_play(lua_State *L)
+{
+	Client *client = getClient(L);
+
+	SimpleSoundSpec spec;
+	read_soundspec(L, 1, spec);
+
+	float gain = 1.0f;
+	float pitch = 1.0f;
+	bool looped = false;
+	v3f* pos = nullptr;
+	s32 handle;
+
+	if (lua_istable(L, 2)) {
+		getfloatfield(L, 2, "gain", gain);
+		getfloatfield(L, 2, "pitch", pitch);
+		getboolfield(L, 2, "loop", looped);
+
+		lua_getfield(L, 2, "pos");
+		if (!lua_isnil(L, -1)) {
+			v3f pos = read_v3f(L, -1) * BS;
+			lua_pop(L, 1);
+		}
+	}
+
+	handle = NativeModApiClient::native_sound_play(client, spec, gain, pitch, looped, pos);
+	lua_pushinteger(L, handle);
+
+	return 1;
+}
+
+// native_sound_stop(handle)
+int ModApiClient::l_native_sound_stop(lua_State *L)
+{
+	s32 handle = luaL_checkinteger(L, 1);
+	NativeModApiClient::native_sound_stop(handle, getClient(L));
+	return 0;
+}
+
+// native_sound_fade(handle, step, gain)
+int ModApiClient::l_native_sound_fade(lua_State *L)
+{
+	s32 handle = luaL_checkinteger(L, 1);
+	float step = readParam<float>(L, 2);
+	float gain = readParam<float>(L, 3);
+	NativeModApiClient::native_sound_fade(handle, step, gain, getClient(L));
+	return 0;
+}
+
+// native_get_server_info()
+int ModApiClient::l_native_get_server_info(lua_State *L)
+{
+	std::tuple<std::string, std::string, int, int> info 
+		= NativeModApiClient::native_get_server_info(getClient(L));
+
+	lua_newtable(L);
+	lua_pushstring(L, std::get<0>(info).c_str());
+	lua_setfield(L, -2, "address");
+	lua_pushstring(L, std::get<1>(info).c_str());
+	lua_setfield(L, -2, "ip");
+	lua_pushinteger(L, std::get<2>(info));
+	lua_setfield(L, -2, "port");
+	lua_pushinteger(L, std::get<3>(info));
+	lua_setfield(L, -2, "protocol_version");
+	return 1;
+}
+
+// native_get_item_def(itemstring)
+int ModApiClient::l_native_get_item_def(lua_State *L)
+{
+	if (checkCSMRestrictionFlag(CSM_RF_READ_ITEMDEFS))
+		return 0;
+
+	if (!lua_isstring(L, 1))
+		return 0;
+	std::string name = readParam<std::string>(L, 1);
+
+	const ItemDefinition* itemDef = NativeModApiClient::native_get_item_def(getGameDef(L), name);
+	if (itemDef == nullptr)
+		return 0;
+
+	push_item_definition_full(L, *itemDef);
+
+	return 1;
+}
+
+// native_get_node_def(nodename)
+int ModApiClient::l_native_get_node_def(lua_State *L)
+{
+	if (!lua_isstring(L, 1))
+		return 0;
+	std::string name = readParam<std::string>(L, 1);
+
+	if (checkCSMRestrictionFlag(CSM_RF_READ_NODEDEFS))
+		return 0;
+
+	const ContentFeatures* cf = NativeModApiClient::native_get_node_def(getGameDef(L), name);
+	if (cf->name != name) // Unknown node. | name = <whatever>, cf.name = ignore
+		return 0;
+
+	push_content_features(L, *cf);
+
+	return 1;
+}
+
+// native_get_privilege_list()
+int ModApiClient::l_native_get_privilege_list(lua_State *L)
+{
+	Client *client = getClient(L);
+	lua_newtable(L);
+	const std::unordered_set<std::string>& list = NativeModApiClient::native_get_privilege_list(client);
+	for (const std::string &priv : list) {
+		lua_pushboolean(L, true);
+		lua_setfield(L, -2, priv.c_str());
+	}
+	return 1;
+}
+
+// native_get_builtin_path()
+int ModApiClient::l_native_get_builtin_path(lua_State *L)
+{
+	lua_pushstring(L, NativeModApiClient::native_get_builtin_path().c_str());
+	return 1;
+}
+
+// native_get_csm_restrictions()
+int ModApiClient::l_native_get_csm_restrictions(lua_State *L)
+{
+	std::map<const char *, bool> restrictions = 
+		NativeModApiClient::native_get_csm_restrictions(getClient(L), native_flagdesc_csm_restriction);
+
+	lua_newtable(L);
+	for (auto iter = restrictions.begin(); iter != restrictions.end(); iter++) {
+		setboolfield(L, -1, iter->first, iter->second);
+	}
+	return 1;
 }

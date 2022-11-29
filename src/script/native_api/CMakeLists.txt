@@ -1,5 +1,6 @@
 set(common_SCRIPT_NATIVE_API_SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/native_areastore.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/native_auth.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/native_inventory.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/native_item.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/native_particles.cpp

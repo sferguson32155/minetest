@@ -10,9 +10,13 @@ local modpath = minetest.get_modpath("testingnativeapi_server")
 -- Load test suite
 native_tests = dofile(modpath .. "/native_tests.lua")
 
--- Load files
+-- Load class files
+dofile(modpath .. "/auth.lua")
 dofile(modpath .. "/areastore.lua")
 dofile(modpath .. "/inventory.lua")
+dofile(modpath .. "/particles.lua")
+
+-- Load helper files
 dofile(modpath .. "/other.lua")
 dofile(modpath .. "/server_test.lua")
-dofile(modpath .. "/particles.lua")
+dofile(modpath .. "/client_tools.lua")
