@@ -8,17 +8,24 @@ p2.x = tonumber(100)
 p2.y = tonumber(100)
 p2.z = tonumber(100)
 
+local p3 = {}
+p3.x = tonumber(101)
+p3.y = tonumber(101)
+p3.z = tonumber(101)
+
+local p4 = {}
+p4.x = tonumber(200)
+p4.y = tonumber(200)
+p4.z = tonumber(200)
+
 -- get_area()
 minetest.register_chatcommand("lua_areastore_getarea", {
 	description = "Invokes lua_api > l_areastore.l_get_area",
 	func = function(self)
         local areastore = AreaStore();
 		local res = areastore:get_area(1, true, true)
-		print("Success, get_area() returned: ")
-        for key, value in pairs(res) do
-    		print(key, value)
-		end
-		return true, "Returned"..res
+        
+		return true, "Success,get_area() Returned"..dump(res)
 	end
 })
 
@@ -27,11 +34,8 @@ minetest.register_chatcommand("native_areastore_getarea", {
 	func = function(self)
         local areastore = AreaStore();
 		local res = areastore:native_get_area(1, true, true)
-		print("Success, native_get_area() returned: ")
-        for key, value in pairs(res) do
-    		print(key, value)
-		end
-		return true, ""
+
+		return true, "Success, native_get_area() Returned"..dump(res)
 	end
 })
 
@@ -82,7 +86,7 @@ minetest.register_chatcommand("test_areastore_getareasforpos", {
         local areastore = AreaStore();
 		local lua = areastore:get_areas_for_pos(p1, true, true)
 		local native = areastore:native_get_areas_for_pos(p1, true, true)
-		if lua == native then
+		if dump(lua) == dump(native) then
 			return true, "(Success) [AreaStore] get_areas_for_pos()"
 		else
 			return false, "(Fail) [AreaStore] get_areas_for_pos()"
@@ -123,7 +127,7 @@ minetest.register_chatcommand("test_areastore_getareasinarea", {
         local areastore = AreaStore();
 		local lua = areastore:get_areas_in_area(p1, p2, true, true, true)
 		local native = areastore:native_get_areas_in_area(p1, p2, true, true, true)
-		if lua == native then
+		if dump(lua) == dump(native) then
 			return true, "(Success) [AreaStore] get_areas_in_area()"
 		else
 			return false, "(Fail) [AreaStore] get_areas_in_area()"
@@ -137,7 +141,7 @@ minetest.register_chatcommand("lua_areastore_insertarea", {
 	func = function(self)
         local areastore = AreaStore();
 		local res = areastore:insert_area(p1, p2, "test", 1)
-		return true, "Success, insert_area() returned: "..res
+		return true, "Success, insert_area() returned: "..tostring(res)
 	end
 })
 
@@ -155,8 +159,9 @@ minetest.register_chatcommand("test_areastore_insertarea", {
 	func = function(self)
         local areastore = AreaStore();
 		local lua = areastore:insert_area(p1, p2, "test", 1)
-		local native = areastore:native_insert_area(p1, p2, "test", 1)
-		if lua == native then
+		local native = areastore:native_insert_area(p3, p4, "test2", 2)
+		
+		if (dump(lua) + 1) == native then
 			return true, "(Success) [AreaStore] insert_area()"
 		else
 			return false, "(Fail) [AreaStore] insert_area()"
@@ -188,7 +193,7 @@ minetest.register_chatcommand("test_areastore_reserve", {
 	func = function(self)
         local areastore = AreaStore();
 		local lua = areastore:native_reserve(1)
-		local native = reastore:native_reserve(1)
+		local native = areastore:native_reserve(1)
 
 		if lua == native then
 			return true, "(Success) [AreaStore] reserve()"

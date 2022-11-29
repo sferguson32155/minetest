@@ -94,7 +94,8 @@ int NativeAreaStore::native_insert_area(LuaAreaStore *o, v3s16 edge1,
 
 	// Insert & assign a new ID if necessary
 	if (!ast->insertArea(&a))
-		return -1;
+		return 0;
+	//changed from -1, may not be necessary.
 
 	return a.id;
 }
