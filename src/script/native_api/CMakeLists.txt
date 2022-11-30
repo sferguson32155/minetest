@@ -7,6 +7,7 @@ set(common_SCRIPT_NATIVE_API_SRCS
 	PARENT_SCOPE)
 
 set(client_SCRIPT_NATIVE_API_SRCS
+	${CMAKE_CURRENT_SOURCE_DIR}/native_minimap.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/native_camera.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/native_client.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/native_particles_local.cpp
