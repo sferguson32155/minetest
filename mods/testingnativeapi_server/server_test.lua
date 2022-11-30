@@ -5,7 +5,10 @@ minetest.register_chatcommand("test_server_classes", {
 
 		--fill this with all the class names to be tested
 		local server_classes = {
-			"areastore"
+			"areastore",
+			"auth",
+			"inventory",
+			"particles"
 		}
 
 		native_tests.clear_file();
