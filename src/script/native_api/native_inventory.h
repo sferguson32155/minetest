@@ -39,7 +39,7 @@ public:
 
 	//native_get_lists
 
-	static std::vector<const InventoryList *> native_get_lists(Inventory *inv);
+	//native_set_list
 
 	static int native_set_lists(Inventory *inv, const char *listname,
 			std::vector<ItemStack> items, int forcesize = -1);
