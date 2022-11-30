@@ -74,42 +74,62 @@ private:
 	// set_width(self, listname, size)
 	static int l_set_width(lua_State *L);
 
+	static int l_native_set_width(lua_State *L);
+
 	// get_stack(self, listname, i) -> itemstack
 	static int l_get_stack(lua_State *L);
 
+	static int l_native_get_stack(lua_State *L);
+
 	// set_stack(self, listname, i, stack) -> true/false
 	static int l_set_stack(lua_State *L);
+	static int l_native_set_stack(lua_State *L);
 
 	// get_list(self, listname) -> list or nil
 	static int l_get_list(lua_State *L);
+	//SKIP native for now, function not written yet
 
 	// set_list(self, listname, list)
 	static int l_set_list(lua_State *L);
+	static int l_native_set_list(lua_State *L);
+	// SKIP native for now, function not written yet
 
 	// get_lists(self) -> list of InventoryLists
 	static int l_get_lists(lua_State *L);
+	static int l_native_get_lists(lua_State *L);
+	//static int l_native_get_lists(lua_State *L); 
+	//Function above paused for now: native_get_lists appears incomplete
 
 	// set_lists(self, lists)
 	static int l_set_lists(lua_State *L);
+	static int l_native_set_lists(lua_State *L);
+	// SKIP native for now, function not written yet
 
 	// add_item(self, listname, itemstack or itemstring or table or nil) -> itemstack
 	// Returns the leftover stack
 	static int l_add_item(lua_State *L);
+	// SKIP native for now, function not written yet
 
 	// room_for_item(self, listname, itemstack or itemstring or table or nil) -> true/false
 	// Returns true if the item completely fits into the list
 	static int l_room_for_item(lua_State *L);
+	static int l_native_room_for_item(lua_State *L);
 
 	// contains_item(self, listname, itemstack or itemstring or table or nil, [match_meta]) -> true/false
 	// Returns true if the list contains the given count of the given item name
 	static int l_contains_item(lua_State *L);
+	static int l_native_contains_item(lua_State *L);
 
 	// remove_item(self, listname, itemstack or itemstring or table or nil) -> itemstack
 	// Returns the items that were actually removed
 	static int l_remove_item(lua_State *L);
+	static int l_native_remove_item(lua_State *L);
 
 	// get_location() -> location (like get_inventory(location))
 	static int l_get_location(lua_State *L);
+	//do we need this?
+
+	static std::vector<ItemStack> prepare_itemStack(lua_State *L);
 
 public:
 	InvRef(const InventoryLocation &loc);
@@ -135,3 +155,8 @@ private:
 public:
 	static void Initialize(lua_State *L, int top);
 };
+
+std::vector<ItemStack> read_inventory_list_helper(lua_State *L, int tableindex,
+		const char *name, Inventory *inv, Server *srv);
+
+

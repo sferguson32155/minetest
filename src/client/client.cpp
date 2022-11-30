@@ -1217,6 +1217,11 @@ void Client::sendChatMessage(const std::wstring &message)
 	}
 }
 
+int Client::getChatSize()
+{
+	return m_out_chat_queue.size();
+}
+
 void Client::clearOutChatQueue()
 {
 	m_out_chat_queue = std::queue<std::wstring>();

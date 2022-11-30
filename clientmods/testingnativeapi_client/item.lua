@@ -218,7 +218,7 @@ minetest.register_chatcommand("lua_item_get_meta", {
 		return true, "Success, get_meta() returned: "..res
 	end
 })
-
+--broken
 minetest.register_chatcommand("native_item_get_meta", {
 	description = "Invokes lua_api > l_item.l_native_get_meta",
 	func = function(self)
@@ -458,7 +458,7 @@ minetest.register_chatcommand("lua_item_to_table", {
 		return true, "Success, to_table() returned: "..tostring(res)
 	end
 })
-
+-- broken, crashes 
 minetest.register_chatcommand("native_item_to_table", {
 	description = "Invokes lua_api > l_item.l_native_to_table",
 	func = function(self)
@@ -548,7 +548,7 @@ minetest.register_chatcommand("lua_item_is_known", {
 		return true, "Success, is_known() returned: "..tostring(res)
 	end
 })
-
+-- broken
 minetest.register_chatcommand("native_item_is_known", {
 	description = "Invokes lua_api > l_item.l_native_is_known",
 	func = function(self)
@@ -569,7 +569,7 @@ minetest.register_chatcommand("test_item_is_known", {
 		end
 	end
 })
-
+-- come back
 -- get_definition()
 minetest.register_chatcommand("lua_item_get_definition", {
 	description = "Invokes lua_api > l_item.l_get_definition",
@@ -632,6 +632,7 @@ minetest.register_chatcommand("test_item_get_tool_capabilities", {
 		end
 	end
 })
+
 -- add_wear()
 minetest.register_chatcommand("lua_item_add_wear", {
 	description = "Invokes lua_api > l_item.l_add_wear",
@@ -662,35 +663,7 @@ minetest.register_chatcommand("test_item_add_wear", {
 	end
 })
 
--- add_wear_by_uses()
-minetest.register_chatcommand("lua_item_add_wear_by_uses", {
-	description = "Invokes lua_api > l_item.l_add_wear_by_uses",
-	func = function(self)
-		local res = stack:add_wear_by_uses(20)
-		return true, "Success, add_wear_by_uses() returned: "..tostring(res)
-	end
-})
-
-minetest.register_chatcommand("native_item_add_wear_by_uses", {
-	description = "Invokes lua_api > l_item.l_native_add_wear_by_uses",
-	func = function(self)
-		local res = stack:native_add_wear_by_uses(20)
-		return true, "Success, native_add_wear_by_uses() returned: "..tostring(res)
-	end
-})
-
-minetest.register_chatcommand("test_item_add_wear_by_uses", {
-	description = "Tests lua vs native API for add_wear_by_uses()",
-	func = function(self)
-		local lua = stack:add_wear_by_uses(20)
-		local native = stack:native_add_wear_by_uses(20)
-		if lua == native then
-			return true, "(Success) [Item] add_wear_by_uses()"
-		else
-			return false, "(Fail) [Item] add_wear_by_uses()"
-		end
-	end
-})
+-- add_wear_by_uses() is not supported in CPP API
 
 -- add_item()
 minetest.register_chatcommand("lua_item_add_item", {
@@ -818,35 +791,46 @@ minetest.register_chatcommand("test_item_peek_item", {
 	end
 })
 
--- equals()
-minetest.register_chatcommand("lua_item_equals", {
-	description = "Invokes lua_api > l_item.l_equals",
-	func = function(self)
-		stack2 = ItemStack("default:stone 99")
-		local res = stack:equals(stack2)
-		return true, "Success, equals() returned: "..tostring(res)
-	end
-})
+-- equals() is not supported
 
-minetest.register_chatcommand("native_item_equals", {
-	description = "Invokes lua_api > l_item.l_native_equals",
-	func = function(self)
-		stack2 = ItemStack("default:stone 99")
-		local res = stack:native_equals(stack2)
-		return true, "Success, native_equals() returned: "..tostring(res)
-	end
-})
+--command to test entire class
+minetest.register_chatcommand("test_item", {
+	description = "testing all item methods",
+	func = function()
 
-minetest.register_chatcommand("test_item_equals", {
-	description = "Tests lua vs native API for equals()",
-	func = function(self)
-		stack2 = ItemStack("default:stone 99")
-		local lua = stack:equals(stack2)
-		local native = stack:native_equals(stack2)
-		if lua == native then
-			return true, "(Success) [Item] equals()"
-		else
-			return false, "(Fail) [Item] equals()"
-		end
+		local methods = {
+			"is_empty",
+			"get_name",
+			"set_name",
+			"get_count",
+			"set_count",
+			"get_wear",
+			"set_wear",
+			"get_meta",
+			"set_meta",
+			"get_metadata",
+			"set_metadata",
+			"get_description",
+			"set_description",
+			"get_short_description",
+			"set_short_description",
+			"clear",
+			"replace",
+			"to_string",
+			"to_table",
+			"get_stack_max",
+			"get_free_space",
+			"is_known",
+			"get_definition",
+			"get_tool_capabilities",
+			"add_wear",
+			"add_item",
+			"item_fits",
+			"take_item",
+			"peek_item"
+		}
+
+		return native_tests.test_class("item", methods), 
+		"Item tests completed."
 	end
 })

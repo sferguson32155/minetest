@@ -24,6 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "client/client.h"
 #include "client/minimap.h"
 #include "settings.h"
+#include "../native_api/native_minimap.h"
 
 LuaMinimap::LuaMinimap(Minimap *m) : m_minimap(m)
 {
@@ -57,6 +58,16 @@ int LuaMinimap::l_get_pos(lua_State *L)
 	return 1;
 }
 
+int LuaMinimap::l_native_get_pos(lua_State *L)
+{
+	LuaMinimap *ref = checkobject(L, 1);
+	Minimap *m = getobject(ref);
+
+	push_v3s16(L, NativeMiniMap::native_get_pos(m));
+	return 1;
+}
+
+
 int LuaMinimap::l_set_pos(lua_State *L)
 {
 	LuaMinimap *ref = checkobject(L, 1);
@@ -66,12 +77,32 @@ int LuaMinimap::l_set_pos(lua_State *L)
 	return 1;
 }
 
+
+int LuaMinimap::l_native_set_pos(lua_State *L)
+{
+	LuaMinimap *ref = checkobject(L, 1);
+	Minimap *m = getobject(ref);
+
+	m->setPos(read_v3s16(L, 2));
+	return 1;
+}
+
+
 int LuaMinimap::l_get_angle(lua_State *L)
 {
 	LuaMinimap *ref = checkobject(L, 1);
 	Minimap *m = getobject(ref);
 
 	lua_pushinteger(L, m->getAngle());
+	return 1;
+}
+
+int LuaMinimap::l_native_get_angle(lua_State *L)
+{
+	LuaMinimap *ref = checkobject(L, 1);
+	Minimap *m = getobject(ref);
+
+	lua_pushinteger(L, NativeMiniMap::native_get_angle(m));
 	return 1;
 }
 
@@ -84,12 +115,34 @@ int LuaMinimap::l_set_angle(lua_State *L)
 	return 1;
 }
 
+
+int LuaMinimap::l_native_set_angle(lua_State *L)
+{
+	LuaMinimap *ref = checkobject(L, 1);
+	Minimap *m = getobject(ref);
+
+	f32 angle = lua_tointeger(L, 2);
+
+	m->setAngle(angle);
+	return 1;
+}
+
+
 int LuaMinimap::l_get_mode(lua_State *L)
 {
 	LuaMinimap *ref = checkobject(L, 1);
 	Minimap *m = getobject(ref);
 
 	lua_pushinteger(L, m->getModeIndex());
+	return 1;
+}
+
+int LuaMinimap::l_native_get_mode(lua_State *L)
+{
+	LuaMinimap *ref = checkobject(L, 1);
+	Minimap *m = getobject(ref);
+
+	lua_pushinteger(L, NativeMiniMap::native_get_mode(m));
 	return 1;
 }
 
@@ -106,6 +159,20 @@ int LuaMinimap::l_set_mode(lua_State *L)
 	return 1;
 }
 
+int LuaMinimap::l_native_set_mode(lua_State *L)
+{
+	LuaMinimap *ref = checkobject(L, 1);
+	Minimap *m = getobject(ref);
+
+	u32 mode = lua_tointeger(L, 2);
+	if (mode >= m->getMaxModeIndex())
+		return 0;
+
+	NativeMiniMap::native_set_mode(m, mode);
+	return 1;
+}
+
+
 int LuaMinimap::l_set_shape(lua_State *L)
 {
 	LuaMinimap *ref = checkobject(L, 1);
@@ -114,6 +181,19 @@ int LuaMinimap::l_set_shape(lua_State *L)
 		return 0;
 
 	m->setMinimapShape((MinimapShape)((int)lua_tonumber(L, 2)));
+	return 0;
+}
+
+int LuaMinimap::l_native_set_shape(lua_State *L)
+{
+	LuaMinimap *ref = checkobject(L, 1);
+	Minimap *m = getobject(ref);
+	if (!lua_isnumber(L, 2))
+		return 0;
+
+	int shape = (int)(lua_tonumber(L, 2)); //can this be done?
+
+	NativeMiniMap::native_set_shape(m, shape);
 	return 0;
 }
 
@@ -126,8 +206,19 @@ int LuaMinimap::l_get_shape(lua_State *L)
 	return 1;
 }
 
+int LuaMinimap::l_native_get_shape(lua_State *L)
+{
+	LuaMinimap *ref = checkobject(L, 1);
+	Minimap *m = getobject(ref);
+
+	lua_pushnumber(L, NativeMiniMap::native_get_shape(m));
+	return 1;
+}
+
+
 int LuaMinimap::l_show(lua_State *L)
 {
+	std::cout << "do we get here? " << std::endl;
 	// If minimap is disabled by config, don't show it.
 	if (!g_settings->getBool("enable_minimap"))
 		return 1;
@@ -148,6 +239,28 @@ int LuaMinimap::l_show(lua_State *L)
 	return 1;
 }
 
+int LuaMinimap::l_native_show(lua_State *L)
+{
+	// If minimap is disabled by config, don't show it.
+	if (!g_settings->getBool("enable_minimap"))
+		return 1;
+
+	Client *client = getClient(L);
+	assert(client);
+
+	LuaMinimap *ref = checkobject(L, 1);
+	Minimap *m = getobject(ref);
+
+	// This is not very adapted to new minimap mode management. Btw, tried
+	// to do something compatible.
+
+	if (m->getModeIndex() == 0 && m->getMaxModeIndex() > 0)
+		m->setModeIndex(1);
+
+	NativeMiniMap::native_show(m, client);
+	return 1;
+}
+
 int LuaMinimap::l_hide(lua_State *L)
 {
 	Client *client = getClient(L);
@@ -165,6 +278,25 @@ int LuaMinimap::l_hide(lua_State *L)
 	client->showMinimap(false);
 	return 1;
 }
+
+int LuaMinimap::l_native_hide(lua_State *L)
+{
+	Client *client = getClient(L);
+	assert(client);
+
+	LuaMinimap *ref = checkobject(L, 1);
+	Minimap *m = getobject(ref);
+
+	// This is not very adapted to new minimap mode management. Btw, tried
+	// to do something compatible.
+
+	if (m->getModeIndex() != 0)
+		m->setModeIndex(0);
+
+	NativeMiniMap::native_hide(m, client);
+	return 1;
+}
+
 
 LuaMinimap *LuaMinimap::checkobject(lua_State *L, int narg)
 {
@@ -218,14 +350,25 @@ void LuaMinimap::Register(lua_State *L)
 const char LuaMinimap::className[] = "Minimap";
 const luaL_Reg LuaMinimap::methods[] = {
 	luamethod(LuaMinimap, show),
+	luamethod(LuaMinimap, native_show),
 	luamethod(LuaMinimap, hide),
+	luamethod(LuaMinimap, native_hide),
 	luamethod(LuaMinimap, get_pos),
+	luamethod(LuaMinimap, native_get_pos),
 	luamethod(LuaMinimap, set_pos),
+	luamethod(LuaMinimap, native_set_pos),
 	luamethod(LuaMinimap, get_angle),
+	luamethod(LuaMinimap, native_get_angle),
 	luamethod(LuaMinimap, set_angle),
+	luamethod(LuaMinimap, native_set_angle),
 	luamethod(LuaMinimap, get_mode),
+	luamethod(LuaMinimap, native_get_mode),
 	luamethod(LuaMinimap, set_mode),
+	luamethod(LuaMinimap, native_set_mode),
 	luamethod(LuaMinimap, set_shape),
+	luamethod(LuaMinimap, native_set_shape),
 	luamethod(LuaMinimap, get_shape),
+	luamethod(LuaMinimap, native_get_shape),
+
 	{0,0}
 };

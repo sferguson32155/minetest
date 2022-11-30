@@ -1,4 +1,5 @@
 #include "native_inventory.h"
+#include "server.h"
 
 bool NativeInvRef::native_is_empty(Inventory* inv, InventoryList* list)
 {
@@ -90,7 +91,26 @@ bool NativeInvRef::native_set_stack(
 
 // native_get_list
 
-// native_set_list
+const InventoryList *NativeInvRef::native_get_list(Inventory *inv, const char *listname)
+{
+	if (inv) {
+		return inv->getList(listname);
+		// do I return a ref here?
+	} else {
+		return nullptr;
+	}
+}
+
+// native_set_list -- How to write this?
+
+
+int NativeInvRef::native_set_list(Inventory *inv, const char *listname,
+		std::vector<ItemStack> items, int forcesize)
+{
+	read_inventory_list_native(inv, listname, forcesize, items);
+	return 0;
+}
+
 
 std::vector<const InventoryList *> NativeInvRef::native_get_lists(Inventory *inv)
 {
@@ -98,9 +118,31 @@ std::vector<const InventoryList *> NativeInvRef::native_get_lists(Inventory *inv
 	return lists;
 }
 
-// native_set_lists
+int NativeInvRef::native_set_lists(Inventory *inv, const char *listname,
+		std::vector<ItemStack> items, int forcesize)
+{
+	read_inventory_list_native(inv, listname, forcesize, items);
+	return 0;
+}
 
 // native_add_item
+
+/*
+bool NativeInvRef::native_add_item(Inventory *inv, InventoryList *list, ItemStack item,
+const char *listname)
+{
+	/*
+
+	if (list) {
+		ItemStack leftover = list->addItem(item);
+		if (leftover.count != item.count)
+			inv->addItem(listname, leftover);
+	} else {
+		inv->addItem(listname, item);
+	}
+}
+	*/
+
 
 bool NativeInvRef::native_room_for_item(
 		Inventory *inv, InventoryList *list, ItemStack item)
@@ -137,4 +179,28 @@ ItemStack NativeInvRef::native_remove_item(
 		}
 	}
 }
+
+//takes in a vector of itemstacks from read_inventorylist_helper
+
+int NativeInvRef::read_inventory_list_native(Inventory *inv, const char *name, int forcesize, std::vector<ItemStack> is)
+{
+	int listsize = (forcesize != -1) ? forcesize : is.size();
+	InventoryList *invlist = inv->addList(name, listsize);
+	int index = 0;
+	for (std::vector<ItemStack>::const_iterator i = is.begin(); i != is.end();
+			++i) {
+		if (forcesize != -1 && index == forcesize)
+			break;
+		invlist->changeItem(index, *i);
+		index++;
+	}
+	while (forcesize != -1 && index < forcesize) {
+		invlist->deleteItem(index);
+		index++;
+	}
+	return 1;
+}
+
+
+
 

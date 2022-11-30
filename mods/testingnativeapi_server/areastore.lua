@@ -14,11 +14,11 @@ minetest.register_chatcommand("lua_areastore_getarea", {
 	func = function(self)
         local areastore = AreaStore();
 		local res = areastore:get_area(1, true, true)
-		print("Success, native_get_area() returned: ")
+		print("Success, get_area() returned: ")
         for key, value in pairs(res) do
     		print(key, value)
 		end
-		return true, ""
+		return true, "Returned"..res
 	end
 })
 
@@ -55,7 +55,7 @@ minetest.register_chatcommand("lua_areastore_getareasforpos", {
 	func = function(self)
         local areastore = AreaStore();
 		local res = areastore:get_areas_for_pos(p1, true, true)
-		print("Success, native_get_areas_for_pos() returned: ")
+		print("Success, get_areas_for_pos() returned: ")
         for key, value in pairs(res) do
     		print(key, value)
 		end
@@ -183,6 +183,22 @@ minetest.register_chatcommand("native_areastore_reserve", {
 	end
 })
 
+minetest.register_chatcommand("test_areastore_reserve", {
+	description = "Asserts lua api and native api behaviors for l_areastore.reserve",
+	func = function(self)
+        local areastore = AreaStore();
+		local lua = areastore:native_reserve(1)
+		local native = reastore:native_reserve(1)
+
+		if lua == native then
+			return true, "(Success) [AreaStore] reserve()"
+		else
+			return false, "(Fail) [AreaStore] reserve()"
+		end
+
+	end
+})
+
 -- remove_area()
 minetest.register_chatcommand("lua_areastore_removearea", {
 	description = "Invokes lua_api > l_areastore.l_remove_area",
@@ -235,13 +251,30 @@ minetest.register_chatcommand("native_areastore_setcacheparams", {
 	end
 })
 
+minetest.register_chatcommand("test_areastore_setcacheparams", {
+	description = "Asserts lua api and native api behaviors for l_areastore_set_cache_params",
+	func = function(self)
+        local areastore = AreaStore();
+		local lua = areastore:set_cache_params({1, 1, 1})
+		local native = areastore:native_set_cache_params({1, 1, 1})
+
+		if lua == native then
+			return true, "(Success) [AreaStore] set_cache_params()"
+		else
+			return false, "(Fail) [AreaStore] set_cache_params()"
+		end
+
+	end
+})
+
 -- to_string()
 minetest.register_chatcommand("lua_areastore_tostring", {
 	description = "Invokes lua_api > l_areastore.l_to_string",
 	func = function(self)
         local areastore = AreaStore();
+		areastore:insert_area(p1, p2, "test-tostring", 3)
 		local res = areastore:to_string()
-		return true, "Success, to_string() returned: "..res
+		return true, "Success, to_string() returned: "..tostring(res)
 	end
 })
 
@@ -249,6 +282,7 @@ minetest.register_chatcommand("native_areastore_tostring", {
 	description = "Invokes lua_api > l_areastore.l_native_to_string > native_areastore.native_to_string",
 	func = function(self)
         local areastore = AreaStore();
+		areastore:insert_area(p1, p2, "test-tostring", 3)
 		local res = areastore:native_to_string()
 		return true, "Success, native_to_string() returned: "..tostring(res)
 	end
@@ -258,6 +292,7 @@ minetest.register_chatcommand("test_areastore_tostring", {
 	description = "Asserts lua api and native api behaviors for l_areastore.to_string",
 	func = function(self)
         local areastore = AreaStore();
+		areastore:insert_area(p1, p2, "test-tostring", 3)
 		local lua = areastore:to_string()
 		local native = areastore:native_to_string()
 		if lua == native then
@@ -269,12 +304,15 @@ minetest.register_chatcommand("test_areastore_tostring", {
 })
 
 -- to_file()
+--Current location is in the directory of the world
+
 minetest.register_chatcommand("lua_areastore_tofile", {
 	description = "Invokes lua_api > l_areastore.l_to_file",
 	func = function(self)
         local areastore = AreaStore();
-		local res = areastore:to_file("test")
-		return true, "Success, to_file() returned: "..res
+		areastore:insert_area(p1, p2, "test", 1)
+		local res = areastore:to_file(minetest.get_worldpath().."/test.txt")
+		return true, "Success, to_file() returned: "..tostring(res)
 	end
 })
 
@@ -282,8 +320,9 @@ minetest.register_chatcommand("native_areastore_tofile", {
 	description = "Invokes lua_api > l_areastore.l_native_to_file > native_areastore.native_to_file",
 	func = function(self)
         local areastore = AreaStore();
-		local res = areastore:native_to_file("test")
-		return true, "Success, native_to_file() returned: "..tofile(res)
+		areastore:insert_area(p1, p2, "test", 1)
+		local res = areastore:native_to_file(minetest.get_worldpath().."/test.txt")
+		return true, "Success, native_to_file() returned: "..tostring(res)
 	end
 })
 
@@ -291,8 +330,9 @@ minetest.register_chatcommand("test_areastore_tofile", {
 	description = "Asserts lua api and native api behaviors for l_areastore.to_file",
 	func = function(self)
         local areastore = AreaStore();
-		local lua = areastore:to_file("test")
-		local native = areastore:native_to_file("test")
+		areastore:insert_area(p1, p2, "test-both", 3)
+		local lua = areastore:to_file(minetest.get_worldpath().."/test.txt")
+		local native = areastore:native_to_file(minetest.get_worldpath().."/test2.txt")
 		if lua == native then
 			return true, "(Success) [AreaStore] to_file()"
 		else
@@ -306,7 +346,9 @@ minetest.register_chatcommand("lua_areastore_fromstring", {
 	description = "Invokes lua_api > l_areastore.l_from_string",
 	func = function(self)
         local areastore = AreaStore();
-		local res = areastore:from_string(1, "test")
+		areastore:insert_area(p1, p2, "test-tostring", 3)
+		local str = areastore:to_string()
+		local res = areastore:from_string(str)
 		return true, "Success, from_string() returned: "..tostring(res)
 	end
 })
@@ -315,7 +357,9 @@ minetest.register_chatcommand("native_areastore_fromstring", {
 	description = "Invokes lua_api > l_areastore.l_native_from_string > native_areastore.native_from_string",
 	func = function(self)
         local areastore = AreaStore();
-		local res = areastore:native_from_string(1, "test")
+		areastore:insert_area(p1, p2, "test-tostring", 3)
+		local str = areastore:to_string()
+		local res = areastore:native_from_string(str)
 		return true, "Success, native_from_string() returned: "..tostring(res)
 	end
 })
@@ -324,8 +368,10 @@ minetest.register_chatcommand("test_areastore_fromstring", {
 	description = "Asserts lua api and native api behaviors for l_areastore.from_string",
 	func = function(self)
         local areastore = AreaStore();
-		local lua = areastore:from_string(1, "test")
-		local native = areastore:native_from_string(1, "test")
+		areastore:insert_area(p1, p2, "test-tostring", 3)
+		local str = areastore:to_string()
+		local lua = areastore:from_string(str)
+		local native = areastore:native_from_string(str)
 		if lua == native then
 			return true, "(Success) [AreaStore] from_string()"
 		else
@@ -339,7 +385,9 @@ minetest.register_chatcommand("lua_areastore_fromfile", {
 	description = "Invokes lua_api > l_areastore.l_from_file",
 	func = function(self)
         local areastore = AreaStore();
-		local res = areastore:from_file(1, "test")
+		areastore:insert_area(p1, p2, "test-read", 3)
+		areastore:to_file(minetest.get_worldpath().."/test2.txt")
+		local res = areastore:from_file(minetest.get_worldpath().."/test2.txt")
 		return true, "Success, from_file() returned: "..tostring(res)
 	end
 })
@@ -348,7 +396,9 @@ minetest.register_chatcommand("native_areastore_fromfile", {
 	description = "Invokes lua_api > l_areastore.l_native_from_file > native_areastore.native_from_file",
 	func = function(self)
         local areastore = AreaStore();
-		local res = areastore:native_from_file(1, "test")
+		areastore:insert_area(p1, p2, "test-read", 3)
+		areastore:to_file(minetest.get_worldpath().."/test2.txt")
+		local res = areastore:native_from_file(minetest.get_worldpath().."/test2.txt")
 		return true, "Success, native_from_file() returned: "..tostring(res)
 	end
 })
@@ -357,12 +407,37 @@ minetest.register_chatcommand("test_areastore_fromfile", {
 	description = "Asserts lua api and native api behaviors for l_areastore.from_file",
 	func = function(self)
         local areastore = AreaStore();
-		local lua = areastore:from_file(1, "test")
-		local native = areastore:native_from_file(1, "test")
+		areastore:insert_area(p1, p2, "test-read", 3)
+		local lua = areastore:from_file(minetest.get_worldpath().."/test2.txt")
+		local native = areastore:native_from_file(minetest.get_worldpath().."/test2.txt")
 		if lua == native then
 			return true, "(Success) [AreaStore] from_file()"
 		else
 			return false, "(Fail) [AreaStore] from_file()"
 		end
+	end
+})
+
+--command to test entire class
+minetest.register_chatcommand("test_areastore", {
+	description = "testing all areastore methods",
+	func = function()
+
+		local methods = {
+			"getarea",
+			"getareasforpos",
+			"getareasinarea",
+			"insertarea",
+			"reserve",
+			"removearea",
+			"setcacheparams",
+			"tostring",
+			"fromstring",
+			"tofile",
+			"fromfile"
+		}
+
+		return native_tests.test_class("areastore", methods), 
+		"Areastore tests completed. See server_dump.txt for details."
 	end
 })

@@ -103,11 +103,7 @@ minetest.register_chatcommand("lua_camera_getfov", {
 	description = "Invokes lua_api > l_camera.l_get_fov",
 	func = function(self)
 		local res = minetest.camera:get_fov()
-		print("Success, get_fov() returned:")
-		for key, value in pairs(res) do
-    		print(key, value)
-		end
-		return true, ""
+		return true, minetest.serialize(res)
 	end
 })
 
@@ -115,11 +111,7 @@ minetest.register_chatcommand("native_camera_getfov", {
 	description = "Invokes lua_api > l_camera.l_native_get_fov > native_fov.native_get_fov",
 	func = function(self)
 		local res = minetest.camera:native_get_fov()
-		print("Success, get_fov() returned:")
-		for key, value in pairs(res) do
-    		print(key, value)
-		end
-		return true, ""
+		return true, minetest.serialize(res)
 	end
 })
 
@@ -128,7 +120,7 @@ minetest.register_chatcommand("test_camera_getfov", {
 	func = function(self)
 		local lua = minetest.camera:get_fov()
 		local native = minetest.camera:native_get_fov()
-		if lua == native then
+		if minetest.serialize(lua) == minetest.serialize(native) then
 			return true, "(Success) [camera] get_fov()"
 		else
 			return false, "(Fail) [camera] get_fov()"
@@ -141,11 +133,7 @@ minetest.register_chatcommand("lua_camera_getpos", {
 	description = "Invokes lua_api > l_camera.l_get_pos",
 	func = function(self)
 		local res = minetest.camera:get_pos()
-		print("Success, get_pos() returned:")
-		for key, value in pairs(res) do
-    		print(key, value)
-		end
-		return true, ""
+		return true, minetest.serialize(res)
 	end
 })
 
@@ -153,11 +141,7 @@ minetest.register_chatcommand("native_camera_getpos", {
 	description = "Invokes lua_api > l_camera.l_native_get_pos > native_pos.native_get_pos",
 	func = function(self)
 		local res = minetest.camera:native_get_pos()
-		print("Success, get_pos() returned:")
-		for key, value in pairs(res) do
-    		print(key, value)
-		end
-		return true, ""
+		return true, minetest.serialize(res)
 	end
 })
 
@@ -166,7 +150,7 @@ minetest.register_chatcommand("test_camera_getpos", {
 	func = function(self)
 		local lua = minetest.camera:get_pos()
 		local native = minetest.camera:native_get_pos()
-		if lua == native then
+		if minetest.serialize(lua) == minetest.serialize(native) then
 			return true, "(Success) [camera] get_pos()"
 		else
 			return false, "(Fail) [camera] get_pos()"
@@ -179,11 +163,7 @@ minetest.register_chatcommand("lua_camera_getoffset", {
 	description = "Invokes lua_api > l_camera.l_get_offset",
 	func = function(self)
 		local res = minetest.camera:get_offset()
-		print("Success, get_offset() returned:")
-		for key, value in pairs(res) do
-    		print(key, value)
-		end
-		return true, ""
+		return true, minetest.serialize(res)
 	end
 })
 
@@ -191,11 +171,7 @@ minetest.register_chatcommand("native_camera_getoffset", {
 	description = "Invokes lua_api > l_camera.l_native_get_offset > native_offset.native_get_offset",
 	func = function(self)
 		local res = minetest.camera:native_get_offset()
-		print("Success, get_offset() returned:")
-		for key, value in pairs(res) do
-    		print(key, value)
-		end
-		return true, ""
+		return true, minetest.serialize(res)
 	end
 })
 
@@ -204,7 +180,7 @@ minetest.register_chatcommand("test_camera_getoffset", {
 	func = function(self)
 		local lua = minetest.camera:get_offset()
 		local native = minetest.camera:native_get_offset()
-		if lua == native then
+		if minetest.serialize(lua) == minetest.serialize(native) then
 			return true, "(Success) [camera] get_offset()"
 		else
 			return false, "(Fail) [camera] get_offset()"
@@ -217,11 +193,7 @@ minetest.register_chatcommand("lua_camera_getlookdir", {
 	description = "Invokes lua_api > l_camera.l_get_look_dir",
 	func = function(self)
 		local res = minetest.camera:get_look_dir()
-		print("Success, get_look_dir() returned:")
-		for key, value in pairs(res) do
-    		print(key, value)
-		end
-		return true, ""
+		return true, minetest.serialize(res)
 	end
 })
 
@@ -229,11 +201,7 @@ minetest.register_chatcommand("native_camera_getlookdir", {
 	description = "Invokes lua_api > l_camera.l_native_get_look_dir > native_look_dir.native_get_look_dir",
 	func = function(self)
 		local res = minetest.camera:native_get_look_dir()
-		print("Success, native_get_look_dir() returned:")
-		for key, value in pairs(res) do
-    		print(key, value)
-		end
-		return true, ""
+		return true, minetest.serialize(res)
 	end
 })
 
@@ -242,7 +210,8 @@ minetest.register_chatcommand("test_camera_getlookdir", {
 	func = function(self)
 		local lua = minetest.camera:get_look_dir()
 		local native = minetest.camera:native_get_look_dir()
-		if lua == native then
+
+		if minetest.serialize(lua) == minetest.serialize(native) then
 			return true, "(Success) [camera] get_look_dir()"
 		else
 			return false, "(Fail) [camera] get_look_dir()"
@@ -337,5 +306,27 @@ minetest.register_chatcommand("test_camera_getaspectratio", {
 		else
 			return false, "(Fail) [camera] get_aspect_ratio()"
 		end
+	end
+})
+
+--command to test entire class
+minetest.register_chatcommand("test_camera", {
+	description = "testing all camera methods",
+	func = function()
+
+		local methods = {
+			"getcamera",
+			"setcamera",
+			"getfov",
+			"getpos",
+			"getoffset",
+			"getlookdir",
+			"getlookhorizontal",
+			"getlookvertical",
+			"getaspectratio"
+		}
+
+		return native_tests.test_class("camera", methods), 
+		"Camera tests completed. See console for details."
 	end
 })

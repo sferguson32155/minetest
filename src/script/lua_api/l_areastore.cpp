@@ -442,9 +442,9 @@ static inline void push_areas_from_native(lua_State *L,
 	}
 }
 
-static int deserialization_helper_from_native(lua_State *L, std::tuple<bool*, const char*> input)
+static int deserialization_helper_from_native(lua_State *L, std::tuple<bool, const char*> input)
 {
-	lua_pushboolean(L, *std::get<0>(input));
+	lua_pushboolean(L, std::get<0>(input));
 	if (std::get<1>(input) != nullptr) {
 		lua_pushstring(L, std::get<1>(input));
 		return 2;
@@ -639,7 +639,7 @@ int LuaAreaStore::l_native_from_string(lua_State *L)
 	size_t len;
 	const char *str = luaL_checklstring(L, 2, &len);
 
-	std::tuple<bool*, const char*> result = NativeAreaStore::native_from_string(o, str);
+	std::tuple<bool, const char*> result = NativeAreaStore::native_from_string(o, str);
 
 	return deserialization_helper_from_native(L, result);
 }
@@ -654,7 +654,7 @@ int LuaAreaStore::l_native_from_file(lua_State *L)
 	const char *filename = luaL_checkstring(L, 2);
 	CHECK_SECURE_PATH(L, filename, false);
 
-	std::tuple<bool *, const char *> result =
+	std::tuple<bool, const char *> result =
 			NativeAreaStore::native_from_file(o, filename);
 
 	return deserialization_helper_from_native(L, result);
