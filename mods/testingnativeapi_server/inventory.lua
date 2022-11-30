@@ -706,7 +706,6 @@ minetest.register_chatcommand("test_inventory", {
 			"setstack",
 			"setlist",
 			"getlists",
-			"setlists",
 			"roomforitem",
 			"containsitem",
 			"removeitem"
