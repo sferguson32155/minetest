@@ -112,3 +112,4 @@ CMakeDoxy*
 compile_commands.json
 *.apk
 *.zip
+/CMakeSettings.json

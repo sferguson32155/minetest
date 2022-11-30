@@ -151,7 +151,7 @@ int LuaItemStack::l_get_meta(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	ItemStackMetaRef::create(L, &o->m_stack);
+	ItemStackMetaRef::create(L, &(o->m_stack));
 	return 1;
 }
 
@@ -492,6 +492,7 @@ void LuaItemStack::Register(lua_State *L)
 
 const char LuaItemStack::className[] = "ItemStack";
 const luaL_Reg LuaItemStack::methods[] = {
+	//{"is_empty", class::l_is_empty}
 	luamethod(LuaItemStack, is_empty),
 	luamethod(LuaItemStack, get_name),
 	luamethod(LuaItemStack, set_name),
@@ -615,7 +616,7 @@ int LuaItemStack::l_native_get_meta(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 	LuaItemStack *o = checkobject(L, 1);
-	ItemStackMetaRef::create(L, &NativeItemStack::native_get_meta(o));
+	ItemStackMetaRef::create(L, (NativeItemStack::native_get_meta(o)));
 	return 1;
 }
 

@@ -70,9 +70,9 @@ bool NativeItemStack::native_set_wear(LuaItemStack *o, int wear)
     return status;
 }
 
-ItemStack NativeItemStack::native_get_meta(LuaItemStack *o)
+ItemStack *NativeItemStack::native_get_meta(LuaItemStack *o)
 {
-	ItemStack item = o->m_stack;
+	ItemStack *item = &o->m_stack;
 	return item;
 }
 
@@ -94,15 +94,15 @@ bool NativeItemStack::native_set_metadata(LuaItemStack *o, size_t len, const cha
 
 const char* NativeItemStack::native_get_description(LuaItemStack *o, IGameDef *gamedef)
 {
-	ItemStack &item = o->m_stack;
-	std::string desc = item.getDescription(gamedef->idef());
+	ItemStack *item = &o->m_stack;
+	std::string desc = item->getDescription(gamedef->idef());
     return desc.c_str();
 }
 
 const char *NativeItemStack::native_get_short_description(LuaItemStack *o, IGameDef *gamedef)
 {
-	ItemStack &item = o->m_stack;
-	std::string desc = item.getShortDescription(gamedef->idef());
+	ItemStack *item = &o->m_stack;
+	std::string desc = item->getShortDescription(gamedef->idef());
     return desc.c_str();
 }
 
@@ -123,15 +123,15 @@ bool NativeItemStack::native_replace(LuaItemStack *o, ItemStack *itemstack)
 
 const char* NativeItemStack::native_to_string(LuaItemStack *o)
 {
-	ItemStack &item = o->m_stack;
-    return item.getItemString().c_str();
+	ItemStack *item = &o->m_stack;
+    return item->getItemString().c_str();
 }
 
 std::tuple<const char *, int, int, const std::string &, std::vector<std::tuple<std::string, std::string>>> NativeItemStack::native_to_table(LuaItemStack *o)
 {
-	ItemStack &item = o->m_stack;
+	ItemStack *item = &o->m_stack;
 
-    const StringMap &fields = item.metadata.getStrings();
+    const StringMap &fields = item->metadata.getStrings();
 	std::vector<std::tuple<std::string, std::string>> fielddata(fields.size());
 
     for (const auto &field : fields) {
@@ -146,10 +146,10 @@ std::tuple<const char *, int, int, const std::string &, std::vector<std::tuple<s
     std::tuple<const char *, u16, u16, const std::string &,
 		    std::vector<std::tuple<std::string, std::string>>>
 		    result = make_tuple(
-        item.name.c_str(),
-        item.count,
-        item.wear,
-        item.metadata.getString(""),
+        item->name.c_str(),
+        item->count,
+        item->wear,
+        item->metadata.getString(""),
         fielddata
     );
 
@@ -171,8 +171,8 @@ int NativeItemStack::native_get_free_space(LuaItemStack *o, IGameDef *gamedef)
 
 bool NativeItemStack::native_is_known(LuaItemStack *o, IGameDef *gamedef)
 {
-	ItemStack &item = o->m_stack;
-    return item.isKnown(gamedef->idef());
+	ItemStack *item = &o->m_stack;
+    return item->isKnown(gamedef->idef());
 }
 
 const char * NativeItemStack::native_get_definition(LuaItemStack *o){
@@ -182,8 +182,8 @@ const char * NativeItemStack::native_get_definition(LuaItemStack *o){
 
 ToolCapabilities NativeItemStack::native_get_tool_capabilities(LuaItemStack *o, IGameDef *gamedef)
 {
-	ItemStack &item = o->m_stack;
-    return item.getToolCapabilities(gamedef->idef());
+	ItemStack *item = &o->m_stack;
+    return item->getToolCapabilities(gamedef->idef());
 }
 
 bool NativeItemStack::native_add_wear(LuaItemStack *o, int amount, IGameDef *gamedef)

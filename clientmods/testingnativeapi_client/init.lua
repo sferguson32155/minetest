@@ -16,5 +16,5 @@ local modpath = minetest.get_modpath("testingnativeapi_client")
 
 -- Load files
 dofile(modpath .. "/camera.lua")
---dofile(modpath .. "/item.lua")
+dofile(modpath .. "/item.lua")
 dofile(modpath .. "/other.lua")

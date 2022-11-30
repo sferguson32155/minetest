@@ -29,6 +29,7 @@ public:
 	//native_get_list
 
 	//native_set_list
+	bool native_set_list(Inventory *inv, const char *listname, InventoryList *list);
 
 	static std::vector<const InventoryList *> native_get_lists(Inventory* inv);
 
