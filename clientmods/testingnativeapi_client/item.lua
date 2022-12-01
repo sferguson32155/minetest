@@ -783,7 +783,7 @@ minetest.register_chatcommand("test_item_peek_item", {
 	func = function(self)
 		local lua = stack:peek_item(20)
 		local native = stack:native_peek_item(20)
-		if lua == native then
+		if tostring(lua) == tostring(native) then
 			return true, "(Success) [Item] peek_item()"
 		else
 			return false, "(Fail) [Item] peek_item()"
@@ -817,12 +817,12 @@ minetest.register_chatcommand("test_item", {
 			"clear",
 			"replace",
 			"to_string",
-			"to_table",
+			--"to_table",
 			"get_stack_max",
 			"get_free_space",
 			"is_known",
-			"get_definition",
-			"get_tool_capabilities",
+			--"get_definition",
+			--"get_tool_capabilities",
 			"add_wear",
 			"add_item",
 			"item_fits",
