@@ -20,7 +20,7 @@ public:
 	static bool native_set_count(LuaItemStack *o, int count);
 	static int native_get_wear(LuaItemStack *o);
 	static bool native_set_wear(LuaItemStack *o, int wear);
-	static ItemStack native_get_meta(LuaItemStack *o);
+	static ItemStack* native_get_meta(LuaItemStack *o);
 	static const char *native_get_metadata(LuaItemStack *o);
 	static bool native_set_metadata(LuaItemStack *o, size_t len, const char *ptr);
 	static const char* native_get_description(LuaItemStack *o, IGameDef *gamedef);

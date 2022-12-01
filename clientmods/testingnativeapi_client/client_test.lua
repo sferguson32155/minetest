@@ -6,8 +6,9 @@ minetest.register_chatcommand("test_client_classes", {
 		--fill this with all the class names to be tested
 		local client_classes = {
 			"camera",
-      "client",
-			"minimap"
+      		"client",
+			"minimap",
+			"item"
 		}
 
 		--test each class
