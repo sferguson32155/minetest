@@ -35,41 +35,56 @@ private:
 
 	// get(self, key) -> value
 	static int l_get(lua_State *L);
+	static int l_native_get(lua_State *L);
 
 	// get_bool(self, key) -> boolean
 	static int l_get_bool(lua_State *L);
+	static int l_native_get_bool(lua_State *L);
 
 	// get_np_group(self, key) -> noiseparam
 	static int l_get_np_group(lua_State *L);
+	static int l_native_get_np_group(lua_State *L);
 
 	// get_flags(self, key) -> key/value table
 	static int l_get_flags(lua_State *L);
 
 	// set(self, key, value)
 	static int l_set(lua_State *L);
+	static int l_native_set(lua_State *L);
 
 	// set_bool(self, key, value)
 	static int l_set_bool(lua_State *L);
+	static int l_native_set_bool(lua_State *L);
 
 	// set_np_group(self, key, value)
 	static int l_set_np_group(lua_State *L);
+	static int l_native_set_np_group(lua_State *L);
 
 	// remove(self, key) -> success
 	static int l_remove(lua_State *L);
+	static int l_native_remove(lua_State *L);
 
 	// get_names(self) -> {key1, ...}
 	static int l_get_names(lua_State *L);
+	static int l_native_get_names(lua_State *L);
 
 	// write(self) -> success
 	static int l_write(lua_State *L);
+	static int l_native_write(lua_State *L);
 
 	// to_table(self) -> {[key1]=value1,...}
 	static int l_to_table(lua_State *L);
+	static int l_native_to_table(lua_State *L);
 
+	
 	Settings *m_settings = nullptr;
 	std::string m_filename;
 	bool m_is_own_settings = false;
 	bool m_write_allowed = true;
+
+	//Helpers?
+
+	
 
 public:
 	LuaSettings(Settings *settings, const std::string &filename);
@@ -85,4 +100,8 @@ public:
 	static LuaSettings *checkobject(lua_State *L, int narg);
 
 	static void Register(lua_State *L);
+
+	Settings *l_getSettings();
+	std::string l_getFilename();
+	bool l_getWriteAllowed();
 };

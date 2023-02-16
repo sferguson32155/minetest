@@ -15,6 +15,8 @@ dofile(modpath .. "/auth.lua")
 dofile(modpath .. "/areastore.lua")
 dofile(modpath .. "/inventory.lua")
 dofile(modpath .. "/particles.lua")
+dofile(modpath .. "/settings.lua")
+dofile(modpath .. "/noise.lua")
 
 -- Load helper files
 dofile(modpath .. "/other.lua")

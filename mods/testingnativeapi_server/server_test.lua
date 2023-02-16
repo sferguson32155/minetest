@@ -8,7 +8,8 @@ minetest.register_chatcommand("test_server_classes", {
 			"areastore",
 			"auth",
 			"inventory",
-			"particles"
+			"particles",
+			"noise"
 		}
 
 		native_tests.clear_file();

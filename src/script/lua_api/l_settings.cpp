@@ -24,6 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "settings.h"
 #include "noise.h"
 #include "log.h"
+#include "../native_api/native_settings.h"
 
 
 #define SET_SECURITY_CHECK(L, name) \
@@ -90,6 +91,25 @@ int LuaSettings::l_get(lua_State* L)
 	return 1;
 }
 
+int LuaSettings::l_native_get(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaSettings *o = checkobject(L, 1);
+
+	Settings *s = o->m_settings;
+
+	std::string key = std::string(luaL_checkstring(L, 2));
+	std::string res = NativeSettings::native_get(o, key);
+
+	if (res == "") {
+		lua_pushnil(L);
+	} else {
+		lua_pushstring(L, res.c_str());
+	}
+
+	return 1;
+}
+
 // get_bool(self, key) -> boolean
 int LuaSettings::l_get_bool(lua_State* L)
 {
@@ -99,6 +119,26 @@ int LuaSettings::l_get_bool(lua_State* L)
 	std::string key = std::string(luaL_checkstring(L, 2));
 	if (o->m_settings->exists(key)) {
 		bool value = o->m_settings->getBool(key);
+		lua_pushboolean(L, value);
+	} else {
+		// Push default value
+		if (lua_isboolean(L, 3))
+			lua_pushboolean(L, readParam<bool>(L, 3));
+		else
+			lua_pushnil(L);
+	}
+
+	return 1;
+}
+
+int LuaSettings::l_native_get_bool(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaSettings *o = checkobject(L, 1);
+
+	std::string key = std::string(luaL_checkstring(L, 2));
+	if (o->m_settings->exists(key)) {
+		bool value = NativeSettings::native_get_bool(o, key);
 		lua_pushboolean(L, value);
 	} else {
 		// Push default value
@@ -121,6 +161,23 @@ int LuaSettings::l_get_np_group(lua_State *L)
 	if (o->m_settings->exists(key)) {
 		NoiseParams np;
 		o->m_settings->getNoiseParams(key, np);
+		push_noiseparams(L, &np);
+	} else {
+		lua_pushnil(L);
+	}
+
+	return 1;
+}
+
+int LuaSettings::l_native_get_np_group(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaSettings *o = checkobject(L, 1);
+
+	std::string key = std::string(luaL_checkstring(L, 2));
+	if (o->m_settings->exists(key)) {
+		NoiseParams np;
+		NativeSettings::native_get_np_group(o, key, np);
 		push_noiseparams(L, &np);
 	} else {
 		lua_pushnil(L);
@@ -169,6 +226,21 @@ int LuaSettings::l_set(lua_State* L)
 	return 0;
 }
 
+int LuaSettings::l_native_set(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaSettings *o = checkobject(L, 1);
+
+	std::string key = std::string(luaL_checkstring(L, 2));
+	const char *value = luaL_checkstring(L, 3);
+
+	SET_SECURITY_CHECK(L, key);
+
+	NativeSettings::native_set(o, key, value);
+
+	return 0;
+}
+
 // set_bool(self, key, value)
 int LuaSettings::l_set_bool(lua_State* L)
 {
@@ -181,6 +253,21 @@ int LuaSettings::l_set_bool(lua_State* L)
 	SET_SECURITY_CHECK(L, key);
 
 	o->m_settings->setBool(key, value);
+
+	return 1;
+}
+
+int LuaSettings::l_native_set_bool(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaSettings *o = checkobject(L, 1);
+
+	std::string key = std::string(luaL_checkstring(L, 2));
+	bool value = readParam<bool>(L, 3);
+
+	SET_SECURITY_CHECK(L, key);
+
+	bool b = NativeSettings::native_set_bool(o,key,value);
 
 	return 1;
 }
@@ -202,6 +289,22 @@ int LuaSettings::l_set_np_group(lua_State *L)
 	return 0;
 }
 
+int LuaSettings::l_native_set_np_group(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaSettings *o = checkobject(L, 1);
+
+	std::string key = std::string(luaL_checkstring(L, 2));
+	NoiseParams value;
+	read_noiseparams(L, 3, &value);
+
+	SET_SECURITY_CHECK(L, key);
+
+	NativeSettings::native_set_np_group(o, key, value);
+
+	return 0;
+}
+
 // remove(self, key) -> success
 int LuaSettings::l_remove(lua_State* L)
 {
@@ -218,6 +321,23 @@ int LuaSettings::l_remove(lua_State* L)
 	return 1;
 }
 
+// remove(self, key) -> success
+int LuaSettings::l_native_remove(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaSettings *o = checkobject(L, 1);
+
+	std::string key = std::string(luaL_checkstring(L, 2));
+
+	SET_SECURITY_CHECK(L, key);
+
+	bool success = NativeSettings::native_remove(o,key);
+	lua_pushboolean(L, success);
+
+	return 1;
+}
+
+
 // get_names(self) -> {key1, ...}
 int LuaSettings::l_get_names(lua_State* L)
 {
@@ -229,6 +349,23 @@ int LuaSettings::l_get_names(lua_State* L)
 	lua_newtable(L);
 	for (unsigned int i=0; i < keys.size(); i++)
 	{
+		lua_pushstring(L, keys[i].c_str());
+		lua_rawseti(L, -2, i + 1);
+	}
+
+	return 1;
+}
+
+// get_names(self) -> {key1, ...}
+int LuaSettings::l_native_get_names(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaSettings *o = checkobject(L, 1);
+
+	std::vector<std::string> keys = NativeSettings::native_get_names(o);
+
+	lua_newtable(L);
+	for (unsigned int i = 0; i < keys.size(); i++) {
 		lua_pushstring(L, keys[i].c_str());
 		lua_rawseti(L, -2, i + 1);
 	}
@@ -253,6 +390,16 @@ int LuaSettings::l_write(lua_State* L)
 	return 1;
 }
 
+int LuaSettings::l_native_write(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaSettings *o = checkobject(L, 1);
+
+	bool success = NativeSettings::native_write(o);
+	lua_pushboolean(L, success);
+
+	return 1;
+}
 // to_table(self) -> {[key1]=value1,...}
 int LuaSettings::l_to_table(lua_State* L)
 {
@@ -269,6 +416,39 @@ int LuaSettings::l_to_table(lua_State* L)
 
 	return 1;
 }
+
+int LuaSettings::l_native_to_table(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	LuaSettings *o = checkobject(L, 1);
+
+	std::vector<std::string> keys = NativeSettings::native_to_table(o);
+
+	lua_newtable(L);
+	for (const std::string &key : keys) {
+		lua_pushstring(L, o->m_settings->get(key).c_str());
+		lua_setfield(L, -2, key.c_str());
+	}
+
+	return 1;
+}
+
+Settings* LuaSettings::l_getSettings()
+{
+	return m_settings;
+}
+
+std::string LuaSettings::l_getFilename()
+{
+	return m_filename;
+}
+
+
+bool LuaSettings::l_getWriteAllowed()
+{
+	return m_write_allowed;
+}
+
 
 
 void LuaSettings::Register(lua_State* L)
@@ -327,15 +507,25 @@ LuaSettings* LuaSettings::checkobject(lua_State* L, int narg)
 const char LuaSettings::className[] = "Settings";
 const luaL_Reg LuaSettings::methods[] = {
 	luamethod(LuaSettings, get),
+	luamethod(LuaSettings, native_get),
 	luamethod(LuaSettings, get_bool),
+	luamethod(LuaSettings, native_get_bool),
 	luamethod(LuaSettings, get_np_group),
+	luamethod(LuaSettings, native_get_np_group),
 	luamethod(LuaSettings, get_flags),
 	luamethod(LuaSettings, set),
+	luamethod(LuaSettings, native_set),
 	luamethod(LuaSettings, set_bool),
+	luamethod(LuaSettings, native_set_bool),
 	luamethod(LuaSettings, set_np_group),
+	luamethod(LuaSettings, native_set_np_group),
 	luamethod(LuaSettings, remove),
+	luamethod(LuaSettings, native_remove),
 	luamethod(LuaSettings, get_names),
+	luamethod(LuaSettings, native_get_names),
 	luamethod(LuaSettings, write),
+	luamethod(LuaSettings, native_write),
 	luamethod(LuaSettings, to_table),
+	luamethod(LuaSettings, native_to_table),
 	{0,0}
 };
