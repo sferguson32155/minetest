@@ -71,13 +71,27 @@ class LuaPerlinNoiseMap : public ModApiBase
 	static int gc_object(lua_State *L);
 
 	static int l_get_2d_map(lua_State *L);
+	static int l_native_get_2d_map(lua_State *L);
+
 	static int l_get_2d_map_flat(lua_State *L);
+	static int l_native_get_2d_map_flat(lua_State *L);
+
 	static int l_get_3d_map(lua_State *L);
+	static int l_native_get_3d_map(lua_State *L);
+
 	static int l_get_3d_map_flat(lua_State *L);
+	static int l_native_get_3d_map_flat(lua_State *L);
 
 	static int l_calc_2d_map(lua_State *L);
+	static int l_native_calc_2d_map(lua_State *L);
+
 	static int l_calc_3d_map(lua_State *L);
+	static int l_native_calc_3d_map(lua_State *L);
+
 	static int l_get_map_slice(lua_State *L);
+	static int l_native_get_map_slice(lua_State *L);
+
+	
 
 public:
 	LuaPerlinNoiseMap(NoiseParams *np, s32 seed, v3s16 size);
@@ -91,6 +105,9 @@ public:
 	static LuaPerlinNoiseMap *checkobject(lua_State *L, int narg);
 
 	static void Register(lua_State *L);
+
+	Noise *getNoise() { return noise; }
+	bool getMis3d() { return m_is3d; }
 };
 
 /*

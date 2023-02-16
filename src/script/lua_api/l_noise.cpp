@@ -24,6 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "log.h"
 #include "porting.h"
 #include "util/numeric.h"
+#include "../native_api/native_noise.h"
 
 ///////////////////////////////////////
 /*
@@ -182,6 +183,29 @@ int LuaPerlinNoiseMap::l_get_2d_map(lua_State *L)
 	return 1;
 }
 
+int LuaPerlinNoiseMap::l_native_get_2d_map(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	size_t i = 0;
+
+	LuaPerlinNoiseMap *o = checkobject(L, 1);
+	v2f p = readParam<v2f>(L, 2);
+
+	Noise *n = NativeNoise::native_get_2d_map(o,p);
+
+	lua_createtable(L, n->sy, 0);
+	for (u32 y = 0; y != n->sy; y++) {
+		lua_createtable(L, n->sx, 0);
+		for (u32 x = 0; x != n->sx; x++) {
+			lua_pushnumber(L, n->result[i++]);
+			lua_rawseti(L, -2, x + 1);
+		}
+		lua_rawseti(L, -2, y + 1);
+	}
+	return 1;
+}
+
+
 
 int LuaPerlinNoiseMap::l_get_2d_map_flat(lua_State *L)
 {
@@ -208,6 +232,31 @@ int LuaPerlinNoiseMap::l_get_2d_map_flat(lua_State *L)
 	return 1;
 }
 
+int LuaPerlinNoiseMap::l_native_get_2d_map_flat(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaPerlinNoiseMap *o = checkobject(L, 1);
+	v2f p = readParam<v2f>(L, 2);
+	bool use_buffer = lua_istable(L, 3);
+
+	auto r = NativeNoise::native_get_2d_map_flat(o, p, use_buffer);
+	auto n = std::get<0>(r);
+	use_buffer = std::get<1>(r);
+
+	size_t maplen = n->sx * n->sy;
+
+	if (use_buffer)
+		lua_pushvalue(L, 3);
+	else
+		lua_createtable(L, maplen, 0);
+
+	for (size_t i = 0; i != maplen; i++) {
+		lua_pushnumber(L, n->result[i]);
+		lua_rawseti(L, -2, i + 1);
+	}
+	return 1;
+}
 
 int LuaPerlinNoiseMap::l_get_3d_map(lua_State *L)
 {
@@ -239,6 +288,35 @@ int LuaPerlinNoiseMap::l_get_3d_map(lua_State *L)
 	return 1;
 }
 
+int LuaPerlinNoiseMap::l_native_get_3d_map(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	size_t i = 0;
+
+	LuaPerlinNoiseMap *o = checkobject(L, 1);
+	v3f p = check_v3f(L, 2);
+
+	if (!NativeNoise::mapis3d(o))
+		return 0;
+
+	auto n = NativeNoise::native_get_3d_map(o, p);
+
+	lua_createtable(L, n->sz, 0);
+	for (u32 z = 0; z != n->sz; z++) {
+		lua_createtable(L, n->sy, 0);
+		for (u32 y = 0; y != n->sy; y++) {
+			lua_createtable(L, n->sx, 0);
+			for (u32 x = 0; x != n->sx; x++) {
+				lua_pushnumber(L, n->result[i++]);
+				lua_rawseti(L, -2, x + 1);
+			}
+			lua_rawseti(L, -2, y + 1);
+		}
+		lua_rawseti(L, -2, z + 1);
+	}
+	return 1;
+}
+
 
 int LuaPerlinNoiseMap::l_get_3d_map_flat(lua_State *L)
 {
@@ -248,11 +326,40 @@ int LuaPerlinNoiseMap::l_get_3d_map_flat(lua_State *L)
 	v3f p                = check_v3f(L, 2);
 	bool use_buffer      = lua_istable(L, 3);
 
-	if (!o->m_is3d)
+	if (!NativeNoise::mapis3d(o))
 		return 0;
 
 	Noise *n = o->noise;
 	n->perlinMap3D(p.X, p.Y, p.Z);
+
+	size_t maplen = n->sx * n->sy * n->sz;
+
+	if (use_buffer)
+		lua_pushvalue(L, 3);
+	else
+		lua_createtable(L, maplen, 0);
+
+	for (size_t i = 0; i != maplen; i++) {
+		lua_pushnumber(L, n->result[i]);
+		lua_rawseti(L, -2, i + 1);
+	}
+	return 1;
+}
+
+int LuaPerlinNoiseMap::l_native_get_3d_map_flat(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaPerlinNoiseMap *o = checkobject(L, 1);
+	v3f p = check_v3f(L, 2);
+	bool use_buffer = lua_istable(L, 3);
+
+	if (!NativeNoise::mapis3d(o))
+		return 0;
+
+	auto r = NativeNoise::native_get_3d_map_flat(o, p, use_buffer);
+	auto n = std::get<0>(r);
+	use_buffer = std::get<1>(r);
 
 	size_t maplen = n->sx * n->sy * n->sz;
 
@@ -282,6 +389,19 @@ int LuaPerlinNoiseMap::l_calc_2d_map(lua_State *L)
 	return 0;
 }
 
+int LuaPerlinNoiseMap::l_native_calc_2d_map(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaPerlinNoiseMap *o = checkobject(L, 1);
+	v2f p = readParam<v2f>(L, 2);
+
+	NativeNoise::native_calc_2d_map(o, p);
+
+	return 0;
+}
+
+
 int LuaPerlinNoiseMap::l_calc_3d_map(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
@@ -294,6 +414,22 @@ int LuaPerlinNoiseMap::l_calc_3d_map(lua_State *L)
 
 	Noise *n = o->noise;
 	n->perlinMap3D(p.X, p.Y, p.Z);
+
+	return 0;
+}
+
+
+int LuaPerlinNoiseMap::l_native_calc_3d_map(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaPerlinNoiseMap *o = checkobject(L, 1);
+	v3f p = check_v3f(L, 2);
+
+	if (!NativeNoise::mapis3d(o))
+		return 0;
+
+	NativeNoise::native_calc_3d_map(o,p);
 
 	return 0;
 }
@@ -319,6 +455,31 @@ int LuaPerlinNoiseMap::l_get_map_slice(lua_State *L)
 		v3u16(n->sx, n->sy, n->sz),
 		v3u16(slice_offset.X, slice_offset.Y, slice_offset.Z),
 		v3u16(slice_size.X, slice_size.Y, slice_size.Z));
+
+	return 1;
+}
+
+int LuaPerlinNoiseMap::l_native_get_map_slice(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+
+	LuaPerlinNoiseMap *o = checkobject(L, 1);
+	v3s16 slice_offset = read_v3s16(L, 2);
+	v3s16 slice_size = read_v3s16(L, 3);
+	bool use_buffer = lua_istable(L, 4);
+
+	Noise *n = o->noise;
+
+	auto s = NativeNoise::native_get_map_slice(
+			o, slice_offset, slice_size, use_buffer);
+
+	if (use_buffer)
+		lua_pushvalue(L, 4);
+	else
+		lua_newtable(L);
+
+	write_array_slice_float(L, lua_gettop(L), n->result,
+	std::get<0>(s), std::get<1>(s), std::get<2>(s));
 
 	return 1;
 }
@@ -390,12 +551,19 @@ void LuaPerlinNoiseMap::Register(lua_State *L)
 const char LuaPerlinNoiseMap::className[] = "PerlinNoiseMap";
 luaL_Reg LuaPerlinNoiseMap::methods[] = {
 	luamethod_aliased(LuaPerlinNoiseMap, get_2d_map,      get2dMap),
+	luamethod_aliased(LuaPerlinNoiseMap, native_get_2d_map, native_get2d_Map),
 	luamethod_aliased(LuaPerlinNoiseMap, get_2d_map_flat, get2dMap_flat),
+	luamethod_aliased(LuaPerlinNoiseMap, native_get_2d_map_flat, native_get2dMap_flat),
 	luamethod_aliased(LuaPerlinNoiseMap, calc_2d_map,     calc2dMap),
+	luamethod_aliased(LuaPerlinNoiseMap, native_calc_2d_map, native_calc2dMap),
 	luamethod_aliased(LuaPerlinNoiseMap, get_3d_map,      get3dMap),
+	luamethod_aliased(LuaPerlinNoiseMap, native_get_3d_map, native_get3dMap),
 	luamethod_aliased(LuaPerlinNoiseMap, get_3d_map_flat, get3dMap_flat),
+	luamethod_aliased(LuaPerlinNoiseMap, native_get_3d_map_flat, native_get3dMap_flat),
 	luamethod_aliased(LuaPerlinNoiseMap, calc_3d_map,     calc3dMap),
+	luamethod_aliased(LuaPerlinNoiseMap, native_calc_3d_map, native_calc3dMap),
 	luamethod_aliased(LuaPerlinNoiseMap, get_map_slice,   getMapSlice),
+	luamethod_aliased(LuaPerlinNoiseMap, native_get_map_slice, native_getMapSlice),
 	{0,0}
 };
 
