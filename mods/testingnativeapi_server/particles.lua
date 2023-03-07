@@ -27,8 +27,6 @@ texture = "default_wood.png",
 playername = "singleplayer",
 }
 
-count = 0
-
 minetest.register_chatcommand("lua_particles_addparticle", { 
 	description = "Invokes lua_api > l_particles.l_add_particle",
 	func = function(self)
@@ -68,7 +66,6 @@ minetest.register_chatcommand("lua_particles_addparticlespawner", {
 		then 
 			return false, "Fail, add_particlespawner() was not called."
 		else
-			count = count + 1
 			return true, "Success, add_particlespawner() was called."
 		end
 	end
@@ -83,7 +80,6 @@ minetest.register_chatcommand("native_particles_addparticlespawner", {
 		then 
 			return false, "Fail, native_add_particlespawner() was not called."
 		else
-			count = count + 1
 			return true, "Success, native_add_particlespawner() was called."
 		end
 	end
@@ -106,17 +102,13 @@ minetest.register_chatcommand("test_particles_addparticlespawner", {
 minetest.register_chatcommand("lua_particles_delparticlespawner", {
 	description = "Invokes lua_api > l_particles.l_delete_particlespawner",
 	func = function(self)
-		if (spawner_id == -1 or count <= 0)  
+		if (spawner_id == null or spawner_id == 0)  
 		then
 			return false, "There is no particlespawner to delete!"
 		else
 			print(spawner_id)
-			minetest.delete_particlespawner(spawner_id)
-			if (count >= 0) 
-			then 
-				spawner_id = spawner_id - 1
-				count = count - 1
-			end
+			minetest.delete_particlespawner(spawner_id, particlespawner.playername)
+			spawner_id = spawner_id - 1
 			return true, "Success, delete_particlespawner() deleted the particlespawner."
 		end
 	end
@@ -125,16 +117,11 @@ minetest.register_chatcommand("lua_particles_delparticlespawner", {
 minetest.register_chatcommand("native_particles_delparticlespawner", {
 	description = "Invokes lua_api > l_particles.l_delete_particlespawner",
 	func = function(self)
-		if (spawner_id == -1 or count <= 0)  
+		if (spawner_id == null)  
 		then
 			return false, "There is no particlespawner to delete!"
 		else
-			print(minetest.native_delete_particlespawner(spawner_id))
-			if (count >= 0) 
-			then 
-				spawner_id = spawner_id - 1
-				count = count - 1
-			end
+			print(minetest.native_delete_particlespawner(spawner_id, particlespawner.playername))
 			return true, "Success, native_delete_particlespawner() deleted the particlespawner."
 		end
 	end
