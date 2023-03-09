@@ -13,7 +13,7 @@ class NativeLocalPlayer
 public:
 	static v3f native_get_velocity(LocalPlayer *p);
 	static int native_get_hp(LocalPlayer *p);
-	static std::string native_get_name(LocalPlayer *p);
+	static const char* native_get_name(LocalPlayer *p);
 	static u16 native_get_wield_index(LocalPlayer *p);
 	static ItemStack native_get_wielded_item(LocalPlayer *p);
 
@@ -29,9 +29,9 @@ public:
 	static v3f native_get_last_pos(LocalPlayer *p);
 	static v3f native_get_last_velocity(LocalPlayer *p);
 
-	static int native_get_last_look_vertical(LocalPlayer *p);
-	static int native_get_last_look_horizontal(LocalPlayer *p);
-	static const PlayerControl &native_get_control(LocalPlayer *p);
+	static float native_get_last_look_vertical(LocalPlayer *p);
+	static float native_get_last_look_horizontal(LocalPlayer *p);
+	static const PlayerControl& native_get_control(LocalPlayer *p);
 	static int native_get_breath(LocalPlayer *p);
 	static v3f native_get_pos(LocalPlayer *p);
 
@@ -41,7 +41,7 @@ public:
 	static ItemGroupList native_get_armour_groups(LocalPlayer *p);
 	static u32 native_hud_add(LocalPlayer *p, HudElement *elem);
 
-	static HudElement *native_hud_remove(LocalPlayer *p, HudElement *element, u32 id);
+	static HudElement *native_hud_remove(LocalPlayer *p, u32 id);
 	static HudElement *native_hud_change(LocalPlayer *p, u32 id);
 	static HudElement *native_hud_get(LocalPlayer *p, u32 id);
 };

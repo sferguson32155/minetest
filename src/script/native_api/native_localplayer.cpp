@@ -10,7 +10,7 @@ int NativeLocalPlayer::native_get_hp(LocalPlayer *p)
 	return p->hp;
 }
 
-std::string NativeLocalPlayer::native_get_name(LocalPlayer *p)
+const char* NativeLocalPlayer::native_get_name(LocalPlayer *p)
 {
 	return p->getName();
 }
@@ -85,12 +85,12 @@ v3f NativeLocalPlayer::native_get_last_velocity(LocalPlayer *p)
 
 //RETURN to this, may be issue
 
-int NativeLocalPlayer::native_get_last_look_vertical(LocalPlayer *p)
+float NativeLocalPlayer::native_get_last_look_vertical(LocalPlayer *p)
 {
 	return -1.0 * p->last_pitch * core::DEGTORAD;
 }
 
-int NativeLocalPlayer::native_get_last_look_horizontal(LocalPlayer *p)
+float NativeLocalPlayer::native_get_last_look_horizontal(LocalPlayer *p)
 {
 	return (p->last_yaw + 90.) * core::DEGTORAD;
 }
@@ -158,7 +158,7 @@ u32 NativeLocalPlayer::native_hud_add(LocalPlayer *p, HudElement *elem)
 	return p->addHud(elem);
 }
 
-HudElement *NativeLocalPlayer::native_hud_remove(LocalPlayer *p, HudElement *elem, u32 id)
+HudElement *NativeLocalPlayer::native_hud_remove(LocalPlayer *p, u32 id)
 {
 	return p->removeHud(id);
 }
