@@ -85,14 +85,16 @@ v3f NativeLocalPlayer::native_get_last_velocity(LocalPlayer *p)
 
 //RETURN to this, may be issue
 
-float NativeLocalPlayer::native_get_last_look_vertical(LocalPlayer *p)
+double NativeLocalPlayer::native_get_last_look_vertical(LocalPlayer *p)
 {
-	return -1.0 * p->last_pitch * core::DEGTORAD;
+	double a = -1.0 * p->last_pitch * core::DEGTORAD;
+	std::cout << a << std::endl;
+	return a;
 }
 
-float NativeLocalPlayer::native_get_last_look_horizontal(LocalPlayer *p)
+double NativeLocalPlayer::native_get_last_look_horizontal(LocalPlayer *p)
 {
-	return (p->last_yaw + 90.) * core::DEGTORAD;
+	return ((p->last_yaw + 90.) * core::DEGTORAD);
 }
 
 //Return --unsure 
@@ -112,19 +114,19 @@ v3f NativeLocalPlayer::native_get_pos(LocalPlayer *p)
 	return p->getPosition();
 }
 
-std::vector<int> NativeLocalPlayer::native_get_movement_acceleration(
+std::vector<float> NativeLocalPlayer::native_get_movement_acceleration(
 		LocalPlayer *p)
 {
-	std::vector<int> movA;
+	std::vector<float> movA;
 	movA.push_back(p->movement_acceleration_default);
 	movA.push_back(p->movement_acceleration_air);
 	movA.push_back(p->movement_acceleration_fast);
 
 	return movA;
 }
-std::vector<int> NativeLocalPlayer::native_get_movement_speed(LocalPlayer *p)
+std::vector<float> NativeLocalPlayer::native_get_movement_speed(LocalPlayer *p)
 {
-	std::vector<int> movS;
+	std::vector<float> movS;
 	
 	movS.push_back(p->movement_speed_walk);
 	movS.push_back(p->movement_speed_crouch);
@@ -135,14 +137,13 @@ std::vector<int> NativeLocalPlayer::native_get_movement_speed(LocalPlayer *p)
 	return movS;
 }
 
-std::vector<int> NativeLocalPlayer::native_get_movement(LocalPlayer *p)
+std::vector<float> NativeLocalPlayer::native_get_movement(LocalPlayer *p)
 {
-	std::vector<int> mov;
+	std::vector<float> mov;
 
 	mov.push_back(p->movement_liquid_fluidity);
 	mov.push_back(p->movement_liquid_fluidity_smooth);
 	mov.push_back(p->movement_liquid_sink);
-	mov.push_back(p->movement_speed_climb);
 	mov.push_back(p->movement_gravity);
 
 	return mov;
@@ -166,7 +167,7 @@ HudElement *NativeLocalPlayer::native_hud_remove(LocalPlayer *p, u32 id)
 HudElement *NativeLocalPlayer::native_hud_change(LocalPlayer *p, u32 id)
 {
 	HudElement *e = p->getHud(id);
-	if (!e) {
+	if (e) {
 		return e;
 	} else
 		return nullptr;

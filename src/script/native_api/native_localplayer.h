@@ -29,15 +29,15 @@ public:
 	static v3f native_get_last_pos(LocalPlayer *p);
 	static v3f native_get_last_velocity(LocalPlayer *p);
 
-	static float native_get_last_look_vertical(LocalPlayer *p);
-	static float native_get_last_look_horizontal(LocalPlayer *p);
+	static double native_get_last_look_vertical(LocalPlayer *p);
+	static double native_get_last_look_horizontal(LocalPlayer *p);
 	static const PlayerControl& native_get_control(LocalPlayer *p);
 	static int native_get_breath(LocalPlayer *p);
 	static v3f native_get_pos(LocalPlayer *p);
 
-	static std::vector<int> native_get_movement_acceleration(LocalPlayer *p);
-	static std::vector<int> native_get_movement_speed(LocalPlayer *p);
-	static std::vector<int> native_get_movement(LocalPlayer *p);
+	static std::vector<float> native_get_movement_acceleration(LocalPlayer *p);
+	static std::vector<float> native_get_movement_speed(LocalPlayer *p);
+	static std::vector<float> native_get_movement(LocalPlayer *p);
 	static ItemGroupList native_get_armour_groups(LocalPlayer *p);
 	static u32 native_hud_add(LocalPlayer *p, HudElement *elem);
 

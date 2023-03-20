@@ -365,7 +365,7 @@ int LuaLocalPlayer::l_get_last_look_vertical(lua_State *L)
 int LuaLocalPlayer::l_native_get_last_look_vertical(lua_State *L)
 {
 	LocalPlayer *player = getobject(L, 1);
-	float r = NativeLocalPlayer::native_get_last_look_vertical(player);
+	auto r = NativeLocalPlayer::native_get_last_look_vertical(player);
 	lua_pushnumber(L, r);
 	return 1;
 }
@@ -381,7 +381,7 @@ int LuaLocalPlayer::l_get_last_look_horizontal(lua_State *L)
 int LuaLocalPlayer::l_native_get_last_look_horizontal(lua_State *L)
 {
 	LocalPlayer *player = getobject(L, 1);
-	float r = NativeLocalPlayer::native_get_last_look_horizontal(player);
+	auto r = NativeLocalPlayer::native_get_last_look_horizontal(player);
 	lua_pushnumber(L, r);
 	return 1;
 }
@@ -496,16 +496,16 @@ int LuaLocalPlayer::l_get_movement_acceleration(lua_State *L)
 int LuaLocalPlayer::l_native_get_movement_acceleration(lua_State *L)
 {
 	LocalPlayer *player = getobject(L, 1);
-
+	std::vector<float> mA = NativeLocalPlayer::native_get_movement_acceleration(player);
 
 	lua_newtable(L);
-	lua_pushnumber(L, player->movement_acceleration_default);
+	lua_pushnumber(L, mA[0]);
 	lua_setfield(L, -2, "default");
 
-	lua_pushnumber(L, player->movement_acceleration_air);
+	lua_pushnumber(L, mA[1]);
 	lua_setfield(L, -2, "air");
 
-	lua_pushnumber(L, player->movement_acceleration_fast);
+	lua_pushnumber(L, mA[2]);
 	lua_setfield(L, -2, "fast");
 
 	return 1;
@@ -538,7 +538,7 @@ int LuaLocalPlayer::l_get_movement_speed(lua_State *L)
 int LuaLocalPlayer::l_native_get_movement_speed(lua_State *L)
 {
 	LocalPlayer *player = getobject(L, 1);
-	std::vector<int> ms = NativeLocalPlayer::native_get_movement_speed(player);
+	std::vector<float> ms = NativeLocalPlayer::native_get_movement_speed(player);
 
 	lua_newtable(L);
 	lua_pushnumber(L, ms[0]);
@@ -587,7 +587,7 @@ int LuaLocalPlayer::l_native_get_movement(lua_State *L)
 {
 	LocalPlayer *player = getobject(L, 1);
 
-	std::vector<int> m = NativeLocalPlayer::native_get_movement(player);
+	std::vector<float> m = NativeLocalPlayer::native_get_movement(player);
 
 	lua_newtable(L);
 
