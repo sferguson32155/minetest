@@ -1135,6 +1135,34 @@ int ObjectRef::l_get_attach(lua_State *L)
 	return 5;
 }
 
+//7-9+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_attach(lua_State *L)
+{
+    GET_ENV_PTR;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    int parent_id;
+    std::string bone;
+    v3f position;
+    v3f rotation;
+    bool force_visible;
+
+    int result = nativeObjectRef::n_get_attach(sao, &parent_id, &bone, &position, &rotation, &force_visible);
+    if (result == 0)
+        return 0;
+
+    ServerActiveObject *parent = env->getActiveObject(parent_id);
+    getScriptApiBase(L)->objectrefGetOrCreate(L, parent);
+    lua_pushlstring(L, bone.c_str(), bone.size());
+    push_v3f(L, position);
+    push_v3f(L, rotation);
+    lua_pushboolean(L, force_visible);
+    return 5;
+}
+
 // get_children(self)
 int ObjectRef::l_get_children(lua_State *L)
 {
@@ -1156,6 +1184,27 @@ int ObjectRef::l_get_children(lua_State *L)
 	return 1;
 }
 
+//7-9+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_children(lua_State *L)
+{
+    GET_ENV_PTR;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    std::unordered_set<int> child_ids = nativeObjectRef::n_get_children(sao);
+    int i = 0;
+
+    lua_createtable(L, child_ids.size(), 0);
+    for (const int id : child_ids) {
+        ServerActiveObject *child = env->getActiveObject(id);
+        getScriptApiBase(L)->objectrefGetOrCreate(L, child);
+        lua_rawseti(L, -2, ++i);
+    }
+    return 1;
+}
+
 // set_detach(self)
 int ObjectRef::l_set_detach(lua_State *L)
 {
@@ -1169,6 +1218,18 @@ int ObjectRef::l_set_detach(lua_State *L)
 	return 0;
 }
 
+//7-9+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_detach(lua_State *L)
+{
+    GET_ENV_PTR;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+	nativeObjectRef::n_set_detach(sao);
+    return 0;
+}
 
 // set_properties(self, properties)
 int ObjectRef::l_set_properties(lua_State *L)
