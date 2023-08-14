@@ -596,6 +596,25 @@ int ObjectRef::l_set_armor_groups(lua_State *L)
 	return 0;
 }
 
+//6-23+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_armor_groups(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    ItemGroupList groups;
+    read_groups(L, 2, groups);
+
+    std::pair<bool, ItemGroupList> result = nativeObjectRef::n_set_armor_groups(sao, groups);
+    if (!result.first) {
+        return 0;
+    }
+
+    return 0;
+}
 
 // get_armor_groups(self)
 int ObjectRef::l_get_armor_groups(lua_State *L)
@@ -607,6 +626,20 @@ int ObjectRef::l_get_armor_groups(lua_State *L)
 		return 0;
 
 	push_groups(L, sao->getArmorGroups());
+	return 1;
+}
+
+//6-23+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_armor_groups(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	ObjectRef *ref = checkobject(L, 1);
+	ServerActiveObject *sao = getobject(ref);
+	if (sao == nullptr)
+		return 0;
+
+	std::map<std::string, int> armorGroups = nativeObjectRef::n_get_armor_groups(sao);
+	push_groups(L, armorGroups);
 	return 1;
 }
 
@@ -627,6 +660,7 @@ int ObjectRef::l_set_animation(lua_State *L)
 	sao->setAnimation(frame_range, frame_speed, frame_blend, frame_loop);
 	return 0;
 }
+
 
 // get_animation(self)
 int ObjectRef::l_get_animation(lua_State *L)
