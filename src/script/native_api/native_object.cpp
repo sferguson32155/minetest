@@ -215,3 +215,23 @@ std::tuple<bool, std::string, v3f, v3f, bool> nativeObjectRef::n_set_attach(Serv
 
 	return std::make_tuple(true, current_bone, current_position, current_rotation, current_force_visible);
 }
+
+//7-9
+int nativeObjectRef::n_get_attach(ServerActiveObject *sao, int *parent_id, std::string *bone, v3f *position, v3f *rotation, bool *force_visible)
+{
+    sao->getAttachment(parent_id, bone, position, rotation, force_visible);
+    return (*parent_id != 0) ? 1 : 0;
+}
+
+std::unordered_set<int> nativeObjectRef::n_get_children(ServerActiveObject* sao)
+{
+    if (sao == nullptr)
+        return std::unordered_set<int>();
+
+    return sao->getAttachmentChildIds();
+}
+
+void nativeModApiObject::n_set_detach(ServerActiveObject *sao)
+{
+    sao->clearParentAttachment();
+}
