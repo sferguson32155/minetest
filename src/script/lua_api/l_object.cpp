@@ -1639,6 +1639,20 @@ int ObjectRef::l_get_acceleration(lua_State *L)
 	return 1;
 }
 
+//8-3+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_acceleration(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    LuaEntitySAO *entitysao = getluaobject(ref);
+    if (entitysao == nullptr)
+        return 0;
+
+    v3f acceleration = nativeObjectRef::n_get_acceleration(entitysao);
+
+    pushFloatPos(L, acceleration);
+    return 1;
+}
 
 // set_rotation(self, rotation)
 int ObjectRef::l_set_rotation(lua_State *L)
@@ -1653,6 +1667,19 @@ int ObjectRef::l_set_rotation(lua_State *L)
 
 	entitysao->setRotation(rotation);
 	return 0;
+}
+
+//8-3+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ModApiObjectRef::l_native_set_rotation(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+
+    ObjectRef *ref = checkobject(L, 1);
+    v3f rotation = check_v3f(L, 2);
+
+    nativeObjectRef::n_set_rotation(ref, rotation);
+
+    return 0;
 }
 
 // get_rotation(self)
