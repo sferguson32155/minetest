@@ -260,6 +260,27 @@ int ObjectRef::l_punch(lua_State *L)
 	return 1;
 }
 
+//6-17+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_punch(lua_State *L) {
+    NO_MAP_LOCK_REQUIRED;
+
+    ObjectRef *ref = checkobject(L, 1);
+    ObjectRef *puncher_ref = checkobject(L, 2);
+    ServerActiveObject *sao = getobject(ref);
+    ServerActiveObject *puncher = getobject(puncher_ref);
+    if (sao == nullptr || puncher == nullptr)
+        return 0;
+
+    float time_from_last_punch = readParam<float>(L, 3, 1000000.0f);
+    ToolCapabilities toolcap = read_tool_capabilities(L, 4);
+    v3f dir = readParam<v3f>(L, 5, sao->getBasePosition() - puncher->getBasePosition());
+
+    float wear = nativeObjectRef::n_punch(sao, puncher, time_from_last_punch, toolcap, dir);
+
+    lua_pushnumber(L, wear);
+    return 1;
+}
+
 // right_click(self, clicker)
 int ObjectRef::l_right_click(lua_State *L)
 {
@@ -273,6 +294,23 @@ int ObjectRef::l_right_click(lua_State *L)
 
 	sao->rightClick(sao2);
 	return 0;
+}
+
+//6-17+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_right_click(lua_State *L) {
+    NO_MAP_LOCK_REQUIRED;
+
+    ObjectRef *ref = checkobject(L, 1);
+    ObjectRef *ref2 = checkobject(L, 2);
+    ServerActiveObject *sao = getobject(ref);
+    ServerActiveObject *sao2 = getobject(ref2);
+
+    if (sao == nullptr || sao2 == nullptr)
+        return 0;
+
+    nativeObjectRef::n_right_click(sao, sao2);
+
+    return 0;
 }
 
 // set_hp(self, hp, reason)
@@ -309,6 +347,36 @@ int ObjectRef::l_set_hp(lua_State *L)
 	return 0;
 }
 
+//6-17+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_hp(lua_State *L) {
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    int hp = readParam<float>(L, 2);
+    PlayerHPChangeReason reason(PlayerHPChangeReason::SET_HP);
+
+    reason.from_mod = true;
+    if (lua_istable(L, 3)) {
+        lua_pushvalue(L, 3);
+
+        lua_getfield(L, -1, "type");
+        if (lua_isstring(L, -1) &&
+                !reason.setTypeFromString(readParam<std::string>(L, -1))) {
+            errorstream << "Bad type given!" << std::endl;
+        }
+        lua_pop(L, 1);
+
+        reason.lua_reference = luaL_ref(L, LUA_REGISTRYINDEX);
+    }
+
+    nativeObjectRef::n_set_hp(sao, hp, reason);
+
+    return 0;
+}
+
 // get_hp(self)
 int ObjectRef::l_get_hp(lua_State *L)
 {
@@ -325,6 +393,18 @@ int ObjectRef::l_get_hp(lua_State *L)
 
 	lua_pushnumber(L, hp);
 	return 1;
+}
+
+//6-17+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_hp(lua_State *L) {
+    NO_MAP_LOCK_REQUIRED;
+
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    int hp = nativeObjectRef::n_get_hp(sao);
+
+    lua_pushnumber(L, hp);
+    return 1;
 }
 
 // get_inventory(self)
@@ -344,6 +424,24 @@ int ObjectRef::l_get_inventory(lua_State *L)
 	return 1;
 }
 
+//6-17+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_inventory(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	ObjectRef *ref = checkobject(L, 1);
+	ServerActiveObject *sao = getobject(ref);
+	if (sao == nullptr)
+		return 0;
+
+	InvRef inv = nativeObjectRef::n_get_inventory(sao);
+	if (inv.exists())
+		inv.push(L);
+	else
+		lua_pushnil(L);
+
+	return 1;
+}
+
 // get_wield_list(self)
 int ObjectRef::l_get_wield_list(lua_State *L)
 {
@@ -356,6 +454,7 @@ int ObjectRef::l_get_wield_list(lua_State *L)
 	lua_pushstring(L, sao->getWieldList().c_str());
 	return 1;
 }
+
 
 // get_wield_index(self)
 int ObjectRef::l_get_wield_index(lua_State *L)
