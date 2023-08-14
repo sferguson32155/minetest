@@ -1072,6 +1072,40 @@ int ObjectRef::l_set_attach(lua_State *L)
 	return 0;
 }
 
+//7-8+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_attach(lua_State *L)
+{
+	GET_ENV_PTR;
+	ObjectRef *ref = checkobject(L, 1);
+	ObjectRef *parent_ref = checkobject(L, 2);
+	ServerActiveObject *sao = getobject(ref);
+	ServerActiveObject *parent = getobject(parent_ref);
+	if (sao == nullptr || parent == nullptr)
+		return 0;
+	if (sao == parent)
+		throw LuaError("ObjectRef::set_attach: attaching object to itself is not allowed.");
+
+	std::string bone = readParam<std::string>(L, 3, "");
+	v3f position = readParam<v3f>(L, 4, v3f(0, 0, 0));
+	v3f rotation = readParam<v3f>(L, 5, v3f(0, 0, 0));
+	bool force_visible = readParam<bool>(L, 6, false);
+
+	std::tuple<bool, std::string, v3f, v3f, bool> result =
+		nativeObjectRef::n_set_attach(sao, parent, bone, position, rotation, force_visible);
+
+	if (std::get<0>(result)) {
+		const std::string &current_bone = std::get<1>(result);
+		const v3f &current_position = std::get<2>(result);
+		const v3f &current_rotation = std::get<3>(result);
+		bool current_force_visible = std::get<4>(result);
+
+		// Do something with the current attachment values if needed
+
+		return 1;
+	}
+
+	return 0;
+}
 
 // get_attach(self)
 int ObjectRef::l_get_attach(lua_State *L)
