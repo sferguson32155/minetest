@@ -1536,6 +1536,30 @@ int ObjectRef::l_add_velocity(lua_State *L)
 	return 0;
 }
 
+//7-29+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_add_velocity(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    v3f vel = checkFloatPos(L, 2);
+
+    if (sao->getType() == ACTIVEOBJECT_TYPE_LUAENTITY)
+    {
+        LuaEntitySAO *entitysao = dynamic_cast<LuaEntitySAO*>(sao);
+        nativeObjectRef::n_add_velocity_lua_entity(entitysao, vel);
+    }
+    else if (sao->getType() == ACTIVEOBJECT_TYPE_PLAYER)
+    {
+        PlayerSAO *playersao = dynamic_cast<PlayerSAO*>(sao);
+        nativeObjectRef::n_add_velocity_player_sao(playersao, vel);
+    }
+
+    return 0;
+}
 
 // get_velocity(self)
 int ObjectRef::l_get_velocity(lua_State *L)
@@ -1561,6 +1585,20 @@ int ObjectRef::l_get_velocity(lua_State *L)
 	return 1;
 }
 
+//7-29+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_velocity(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    v3f vel = nativeObjectRef::n_get_velocity(sao);
+    pushFloatPos(L, vel);
+    return 1;
+}
+
 // set_acceleration(self, acceleration)
 int ObjectRef::l_set_acceleration(lua_State *L)
 {
@@ -1576,6 +1614,17 @@ int ObjectRef::l_set_acceleration(lua_State *L)
 	return 0;
 }
 
+//7-29+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_acceleration(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    v3f acceleration = checkFloatPos(L, 2);
+
+    nativeObjectRef::n_set_acceleration(ref, acceleration);
+    return 0;
+}
+
 // get_acceleration(self)
 int ObjectRef::l_get_acceleration(lua_State *L)
 {
@@ -1589,6 +1638,7 @@ int ObjectRef::l_get_acceleration(lua_State *L)
 	pushFloatPos(L, acceleration);
 	return 1;
 }
+
 
 // set_rotation(self, rotation)
 int ObjectRef::l_set_rotation(lua_State *L)
