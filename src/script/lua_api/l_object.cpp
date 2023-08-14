@@ -1449,6 +1449,42 @@ int ObjectRef::l_get_nametag_attributes(lua_State *L)
 	return 1;
 }
 
+//7-21+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_nametag_attributes(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	ObjectRef *ref = checkobject(L, 1);
+	ServerActiveObject *sao = getobject(ref);
+	if (sao == nullptr)
+		return 0;
+
+	std::tuple<bool, Color, bool, Color, std::string> attributes = nativeObjectRef::n_get_nametag_attributes(sao);
+
+	if (!std::get<0>(attributes))
+		return 0;
+
+	lua_newtable(L);
+
+	push_ARGB8(L, std::get<1>(attributes));
+	lua_setfield(L, -2, "color");
+
+	if (std::get<2>(attributes))
+	{
+		push_ARGB8(L, std::get<3>(attributes));
+		lua_setfield(L, -2, "bgcolor");
+	}
+	else
+	{
+		lua_pushboolean(L, false);
+		lua_setfield(L, -2, "bgcolor");
+	}
+
+	lua_pushstring(L, std::get<4>(attributes).c_str());
+	lua_setfield(L, -2, "text");
+
+	return 1;
+}
+
 /* LuaEntitySAO-only */
 
 // set_velocity(self, velocity)
@@ -1464,6 +1500,17 @@ int ObjectRef::l_set_velocity(lua_State *L)
 
 	sao->setVelocity(vel);
 	return 0;
+}
+
+//7-21+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_velocity(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    v3f vel = checkFloatPos(L, 2);
+
+    nativeObjectRef::n_set_velocity(ref, vel);
+    return 0;
 }
 
 // add_velocity(self, velocity)
