@@ -262,3 +262,25 @@ std::pair<bool, ObjectProperties*> nativeObjectRef::n_get_properties(ServerActiv
 
 	return std::make_pair(true, prop);
 }
+
+//7-20
+bool nativeObjectRef::n_is_player(ObjectRef *ref)
+{
+    return (getplayer(ref) != nullptr);
+}
+
+bool nativeObjectRef::n_set_nametag_attributes(ServerActiveObject *sao, video::SColor nametag_color, video::SColor nametag_bgcolor, const std::string &nametag)
+{
+	if (!sao)
+		return false;
+
+	ObjectProperties *prop = sao->accessObjectProperties();
+	if (!prop)
+		return false;
+
+	prop->nametag_color = nametag_color;
+	prop->nametag_bgcolor = (nametag_bgcolor.getAlpha() == 0) ? nullopt : nametag_bgcolor;
+	prop->nametag = nametag;
+
+	return true;
+}
