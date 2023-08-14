@@ -76,3 +76,31 @@ InvRef nativeObjectRef::n_get_inventory(ServerActiveObject *sao)
 	else
 		return InvRef();
 }
+
+//6-22
+std::string nativeObjectRef::n_get_wield_list(ServerActiveObject *sao) {
+    if (sao == nullptr)
+        return "";
+
+    return sao->getWieldList();
+}
+
+int nativeObjectRef::n_get_wield_index(ServerActiveObject *sao)
+{
+    if (sao == nullptr)
+        return -1;
+
+    int wieldIndex = sao->getWieldIndex() + 1;
+    return wieldIndex;
+}
+
+ItemStack nativeObjectRef::n_get_wielded_item(ServerActiveObject *sao) {
+    ItemStack selected_item;
+    sao->getWieldedItem(&selected_item, nullptr);
+    return selected_item;
+}
+
+bool nativeObjectRef::n_set_wielded_item(ServerActiveObject *sao, const ItemStack &item)
+{
+    return sao->setWieldedItem(item);
+}
