@@ -188,3 +188,30 @@ void nativeObjectRef::n_get_bone_position(ServerActiveObject *sao, const std::st
 {
 	sao->getBonePosition(bone, position, rotation);
 }
+
+//7-8
+//double check this one later
+std::tuple<bool, std::string, v3f, v3f, bool> nativeObjectRef::n_set_attach(ServerActiveObject *sao, ServerActiveObject *parent, const std::string &bone, const v3f &position, const v3f &rotation, bool force_visible)
+{
+	if (sao == nullptr || parent == nullptr)
+		return std::make_tuple(false, "", v3f(0, 0, 0), v3f(0, 0, 0), false);
+	if (sao == parent)
+		throw LuaError("ObjectRef::set_attach: attaching object to itself is not allowed.");
+
+	int parent_id;
+	std::string current_bone;
+	v3f current_position;
+	v3f current_rotation;
+	bool current_force_visible;
+
+	sao->getAttachment(&parent_id, &current_bone, &current_position, &current_rotation, &current_force_visible);
+	if (parent_id) {
+		ServerActiveObject *old_parent = sao->getEnv()->getActiveObject(parent_id);
+		old_parent->removeAttachmentChild(sao->getId());
+	}
+
+	sao->setAttachment(parent->getId(), bone, position, rotation, force_visible);
+	parent->addAttachmentChild(sao->getId());
+
+	return std::make_tuple(true, current_bone, current_position, current_rotation, current_force_visible);
+}
