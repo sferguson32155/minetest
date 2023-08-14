@@ -661,6 +661,23 @@ int ObjectRef::l_set_animation(lua_State *L)
 	return 0;
 }
 
+//7-1+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_animation(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    v2f frame_range = readParam<v2f>(L, 2, v2f(1, 1));
+    float frame_speed = readParam<float>(L, 3, 15.0f);
+    float frame_blend = readParam<float>(L, 4, 0.0f);
+    bool frame_loop = readParam<bool>(L, 5, true);
+
+    nativeObjectRef::n_set_animation(sao, frame_range, frame_speed, frame_blend, frame_loop);
+    return 0;
+}
 
 // get_animation(self)
 int ObjectRef::l_get_animation(lua_State *L)
@@ -677,6 +694,28 @@ int ObjectRef::l_get_animation(lua_State *L)
 	bool frame_loop = true;
 
 	sao->getAnimation(&frames, &frame_speed, &frame_blend, &frame_loop);
+	push_v2f(L, frames);
+	lua_pushnumber(L, frame_speed);
+	lua_pushnumber(L, frame_blend);
+	lua_pushboolean(L, frame_loop);
+	return 4;
+}
+
+//7-1+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_animation(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	ObjectRef *ref = checkobject(L, 1);
+	ServerActiveObject *sao = getobject(ref);
+	if (sao == nullptr)
+		return 0;
+
+	v2f frames = v2f(1, 1);
+	float frame_speed = 15;
+	float frame_blend = 0;
+	bool frame_loop = true;
+
+	nativeObjectRef::n_get_animation(sao, &frames, &frame_speed, &frame_blend, &frame_loop);
 	push_v2f(L, frames);
 	lua_pushnumber(L, frame_speed);
 	lua_pushnumber(L, frame_blend);
@@ -705,6 +744,29 @@ int ObjectRef::l_set_local_animation(lua_State *L)
 	return 1;
 }
 
+//7-1+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_local_animation(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	ObjectRef *ref = checkobject(L, 1);
+	RemotePlayer *player = getplayer(ref);
+	if (player == nullptr)
+		return 0;
+
+	v2s32 frames[4];
+	for (int i = 0; i < 4; i++) {
+		if (!lua_isnil(L, 2 + i))
+			frames[i] = read_v2s32(L, 2 + i);
+	}
+	float frame_speed = readParam<float>(L, 6, 30.0f);
+
+	// Call the C++ function with native interface
+	nativeObjectRef::n_set_local_animation(player, frames, frame_speed);
+
+	lua_pushboolean(L, true);
+	return 1;
+}
+
 // get_local_animation(self)
 int ObjectRef::l_get_local_animation(lua_State *L)
 {
@@ -724,6 +786,28 @@ int ObjectRef::l_get_local_animation(lua_State *L)
 
 	lua_pushnumber(L, frame_speed);
 	return 5;
+}
+
+//7-1+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_local_animation(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    RemotePlayer *player = getplayer(ref);
+    if (player == nullptr)
+        return 0;
+
+    std::pair<std::array<v2s32, 4>, float> animationInfo = nativeObjectRef::n_get_local_animation(player);
+
+    const std::array<v2s32, 4> &frames = animationInfo.first;
+    float frame_speed = animationInfo.second;
+
+    for (const v2s32 &frame : frames) {
+        push_v2s32(L, frame);
+    }
+
+    lua_pushnumber(L, frame_speed);
+    return 5;
 }
 
 // set_eye_offset(self, firstperson, thirdperson)
@@ -747,6 +831,29 @@ int ObjectRef::l_set_eye_offset(lua_State *L)
 	getServer(L)->setPlayerEyeOffset(player, offset_first, offset_third);
 	lua_pushboolean(L, true);
 	return 1;
+}
+
+//7-1+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_eye_offset(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    RemotePlayer *player = getplayer(ref);
+    if (player == nullptr)
+        return 0;
+
+    v3f offset_first = readParam<v3f>(L, 2, v3f(0, 0, 0));
+    v3f offset_third = readParam<v3f>(L, 3, v3f(0, 0, 0));
+
+    // Prevent abuse of offset values (keep player always visible)
+    offset_third.X = rangelim(offset_third.X, -10, 10);
+    offset_third.Z = rangelim(offset_third.Z, -5, 5);
+    /* TODO: if possible: improve the camera collision detection to allow Y <= -1.5) */
+    offset_third.Y = rangelim(offset_third.Y, -10, 15); // 1.5*BS
+
+    nativeObjectRef::n_set_eye_offset(player, offset_first, offset_third);
+    lua_pushboolean(L, true);
+    return 1;
 }
 
 // get_eye_offset(self)
