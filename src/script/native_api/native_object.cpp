@@ -313,3 +313,48 @@ void nativeObjectRef::n_set_velocity(ObjectRef *ref, v3f vel)
 
     sao->setVelocity(vel);
 }
+
+//7-29
+// l_native_add_vel:
+void nativeObjectRef::n_add_velocity_lua_entity(LuaEntitySAO *entitysao, v3f vel)
+{
+    entitysao->addVelocity(vel);
+}
+
+void nativeObjectRef::n_add_velocity_player_sao(PlayerSAO *playersao, v3f vel)
+{
+    playersao->setMaxSpeedOverride(vel);
+    getServer(playersao->getLua())->SendPlayerSpeed(playersao->getPeerID(), vel);
+}
+///////////////////////
+
+
+//Double check this one
+v3f nativeObjectRef::n_get_velocity(ServerActiveObject *sao)
+{
+    if (sao == nullptr)
+        return v3f(0, 0, 0);
+
+    if (sao->getType() == ACTIVEOBJECT_TYPE_LUAENTITY)
+    {
+        LuaEntitySAO *entitysao = dynamic_cast<LuaEntitySAO*>(sao);
+        return entitysao->getVelocity();
+    }
+    else if (sao->getType() == ACTIVEOBJECT_TYPE_PLAYER)
+    {
+        RemotePlayer *player = dynamic_cast<PlayerSAO*>(sao)->getPlayer();
+        return player->getSpeed() / BS;
+    }
+
+    return v3f(0, 0, 0);
+}
+
+void nativeObjectRef::n_set_acceleration(ObjectRef *ref, v3f acceleration)
+{
+    LuaEntitySAO *entitysao = getluaobject(ref);
+    if (entitysao == nullptr)
+        return;
+
+    entitysao->setAcceleration(acceleration);
+}
+
