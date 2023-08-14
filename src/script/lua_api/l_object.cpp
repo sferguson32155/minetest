@@ -870,6 +870,23 @@ int ObjectRef::l_get_eye_offset(lua_State *L)
 	return 2;
 }
 
+//7-4+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_eye_offset(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	ObjectRef *ref = checkobject(L, 1);
+	RemotePlayer *player = getplayer(ref);
+	if (player == nullptr)
+		return 0;
+
+	// Call the C++ function to get eye offset data
+	std::pair<v3f, v3f> eyeOffsets = nativeObjectRef::n_get_eye_offset(player);
+
+	push_v3f(L, eyeOffsets.first);  // Push first-person eye offset
+	push_v3f(L, eyeOffsets.second); // Push third-person eye offset
+	return 2; // Number of return values
+}
+
 // send_mapblock(self, pos)
 int ObjectRef::l_send_mapblock(lua_State *L)
 {
@@ -883,6 +900,23 @@ int ObjectRef::l_send_mapblock(lua_State *L)
 
 	session_t peer_id = player->getPeerId();
 	bool r = getServer(L)->SendBlock(peer_id, pos);
+
+	lua_pushboolean(L, r);
+	return 1;
+}
+
+//7-4+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_send_mapblock(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	ObjectRef *ref = checkobject(L, 1);
+	RemotePlayer *player = getplayer(ref);
+	if (player == nullptr)
+		return 0;
+
+	v3s16 pos = read_v3s16(L, 2);
+
+	bool r = nativeObjectRef::n_send_mapblock(ref, pos);
 
 	lua_pushboolean(L, r);
 	return 1;
@@ -907,6 +941,27 @@ int ObjectRef::l_set_animation_frame_speed(lua_State *L)
 	return 1;
 }
 
+//7-4+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_animation_frame_speed(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    if (!lua_isnil(L, 2))
+    {
+        float frame_speed = readParam<float>(L, 2);
+        nativeObjectRef::n_set_animation_frame_speed(sao, frame_speed);
+        lua_pushboolean(L, true);
+    }
+    else
+    {
+        lua_pushboolean(L, false);
+    }
+    return 1;
+}
 
 // set_bone_position(self, bone, position, rotation)
 int ObjectRef::l_set_bone_position(lua_State *L)
@@ -925,6 +980,23 @@ int ObjectRef::l_set_bone_position(lua_State *L)
 	return 0;
 }
 
+//7-4+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_bone_position(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    std::string bone = readParam<std::string>(L, 2, "");
+    v3f position = readParam<v3f>(L, 3, v3f(0, 0, 0));
+    v3f rotation = readParam<v3f>(L, 4, v3f(0, 0, 0));
+
+    nativeObjectRef::n_set_bone_position(sao, bone, position, rotation);
+    return 0;
+}
+
 // get_bone_position(self, bone)
 int ObjectRef::l_get_bone_position(lua_State *L)
 {
@@ -939,6 +1011,26 @@ int ObjectRef::l_get_bone_position(lua_State *L)
 	v3f position = v3f(0, 0, 0);
 	v3f rotation = v3f(0, 0, 0);
 	sao->getBonePosition(bone, &position, &rotation);
+
+	push_v3f(L, position);
+	push_v3f(L, rotation);
+	return 2;
+}
+
+//7-4+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_bone_position(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	ObjectRef *ref = checkobject(L, 1);
+	ServerActiveObject *sao = getobject(ref);
+	if (sao == nullptr)
+		return 0;
+
+	std::string bone = readParam<std::string>(L, 2, "");
+
+	v3f position = v3f(0, 0, 0);
+	v3f rotation = v3f(0, 0, 0);
+	nativeObjectRef::n_get_bone_position(sao, bone, &position, &rotation);
 
 	push_v3f(L, position);
 	push_v3f(L, rotation);
@@ -979,6 +1071,7 @@ int ObjectRef::l_set_attach(lua_State *L)
 	parent->addAttachmentChild(sao->getId());
 	return 0;
 }
+
 
 // get_attach(self)
 int ObjectRef::l_get_attach(lua_State *L)
