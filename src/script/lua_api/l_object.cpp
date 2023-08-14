@@ -1316,6 +1316,16 @@ int ObjectRef::l_is_player(lua_State *L)
 	return 1;
 }
 
+//7-20+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_is_player(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    bool isPlayer = nativeModApiObject::n_is_player(ref);
+    lua_pushboolean(L, isPlayer);
+    return 1;
+}
+
 // set_nametag_attributes(self, attributes)
 int ObjectRef::l_set_nametag_attributes(lua_State *L)
 {
@@ -1354,6 +1364,54 @@ int ObjectRef::l_set_nametag_attributes(lua_State *L)
 
 	sao->notifyObjectPropertiesModified();
 	lua_pushboolean(L, true);
+	return 1;
+}
+
+//7-20+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_nametag_attributes(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	ObjectRef *ref = checkobject(L, 1);
+	ServerActiveObject *sao = getobject(ref);
+	if (sao == nullptr)
+		return 0;
+
+	ObjectProperties *prop = sao->accessObjectProperties();
+	if (prop == nullptr)
+		return 0;
+
+	video::SColor nametag_color = prop->nametag_color;
+	video::SColor nametag_bgcolor = prop->nametag_bgcolor.value_or(video::SColor(0, 0, 0, 0));
+	std::string nametag = prop->nametag;
+
+	lua_getfield(L, 2, "color");
+	if (!lua_isnil(L, -1)) {
+		video::SColor color = nametag_color;
+		read_color(L, -1, &color);
+		nametag_color = color;
+	}
+	lua_pop(L, 1);
+
+	lua_getfield(L, -1, "bgcolor");
+	if (!lua_isnil(L, -1)) {
+		if (lua_toboolean(L, -1)) {
+			video::SColor color;
+			if (read_color(L, -1, &color))
+				nametag_bgcolor = color;
+		} else {
+			nametag_bgcolor = video::SColor(0, 0, 0, 0);
+		}
+	}
+	lua_pop(L, 1);
+
+	nametag = getstringfield_default(L, 2, "text", nametag);
+
+	bool success = nativeObjectRef::n_set_nametag_attributes(sao, nametag_color, nametag_bgcolor, nametag);
+
+	if (success)
+		sao->notifyObjectPropertiesModified();
+
+	lua_pushboolean(L, success);
 	return 1;
 }
 
