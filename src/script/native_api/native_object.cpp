@@ -127,3 +127,33 @@ std::map<std::string, int> nativeObjectRef::n_get_armor_groups(ServerActiveObjec
 	// Replace 'getArmorGroups()' with the actual function name if different.
 	return sao->getArmorGroups();
 }
+
+//7-1
+void nativeObjectRef:n_set_animation(ServerActiveObject *sao, v2f frame_range, float frame_speed, float frame_blend, bool frame_loop)
+{
+    sao->setAnimation(frame_range, frame_speed, frame_blend, frame_loop);
+}
+
+void nativeObjectRef::n_get_animation(ServerActiveObject *sao, v2f *frames, float *frame_speed, float *frame_blend, bool *frame_loop)
+{
+	sao->getAnimation(frames, frame_speed, frame_blend, frame_loop);
+}
+
+void nativeObjectRef::n_set_local_animation(RemotePlayer *player, v2s32 frames[4], float frame_speed)
+{
+	getServer(L)->setLocalPlayerAnimations(player, frames, frame_speed);
+}
+
+std::pair<std::array<v2s32, 4>, float> nativeObjectRef::n_get_local_animation(RemotePlayer *player)
+{
+    std::array<v2s32, 4> frames;
+    float frame_speed;
+    player->getLocalAnimations(frames.data(), &frame_speed);
+    return std::make_pair(frames, frame_speed);
+}
+
+//Might not be changable
+void nativeObjectRef::n_set_eye_offset(RemotePlayer *player, const v3f &offset_first, const v3f &offset_third)
+{
+    getServer(player)->setPlayerEyeOffset(player, offset_first, offset_third);
+}
