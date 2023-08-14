@@ -358,3 +358,22 @@ void nativeObjectRef::n_set_acceleration(ObjectRef *ref, v3f acceleration)
     entitysao->setAcceleration(acceleration);
 }
 
+//8-3
+v3f nativeObjectRef::n_get_acceleration(LuaEntitySAO *entitysao)
+{
+    if (entitysao == nullptr)
+        return v3f(0, 0, 0);
+
+    return entitysao->getAcceleration();
+}
+
+void nativeObjectRef::n_set_rotation(ObjectRef *ref, v3f rotationDegrees)
+{
+    LuaEntitySAO *entitysao = getluaobject(ref);
+    if (entitysao == nullptr)
+        return;
+
+    v3f rotationRadians = rotationDegrees * core::DEGTORAD;
+
+    entitysao->setRotation(rotationRadians);
+}
