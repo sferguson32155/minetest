@@ -455,6 +455,20 @@ int ObjectRef::l_get_wield_list(lua_State *L)
 	return 1;
 }
 
+//6-22+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_wield_list(lua_State *L) {
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    // Call the native function
+    std::string wieldList = nativeObjectRef::n_get_wield_list(sao);
+
+    lua_pushstring(L, wieldList.c_str());
+    return 1;
+}
 
 // get_wield_index(self)
 int ObjectRef::l_get_wield_index(lua_State *L)
@@ -467,6 +481,20 @@ int ObjectRef::l_get_wield_index(lua_State *L)
 
 	lua_pushinteger(L, sao->getWieldIndex() + 1);
 	return 1;
+}
+
+//6-22+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_wield_index(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (nativeObjectRef::n_get_wield_index(sao) == -1)
+        return 0;
+
+    int wieldIndex = nativeObjectRef::n_get_wield_index(sao); // Reference to n_get_wield_index
+    lua_pushinteger(L, wieldIndex);
+    return 1;
 }
 
 
@@ -488,6 +516,23 @@ int ObjectRef::l_get_wielded_item(lua_State *L)
 	return 1;
 }
 
+//6-22+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_wielded_item(lua_State *L) {
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr) {
+        // Empty ItemStack
+        LuaItemStack::create(L, ItemStack());
+        return 1;
+    }
+
+    // Call the native function to get the wielded item
+    ItemStack selected_item = nativeObjectRef::n_get_wielded_item(sao);
+    LuaItemStack::create(L, selected_item);
+    return 1;
+}
+
 // set_wielded_item(self, item)
 int ObjectRef::l_set_wielded_item(lua_State *L)
 {
@@ -505,6 +550,25 @@ int ObjectRef::l_set_wielded_item(lua_State *L)
 	}
 	lua_pushboolean(L, success);
 	return 1;
+}
+
+//6-22+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_wielded_item(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    ItemStack item = read_item(L, 2, getServer(L)->idef());
+
+    bool success = nativeObjectRef::n_set_wielded_item(sao, item);
+    if (success && sao->getType() == ACTIVEOBJECT_TYPE_PLAYER) {
+        getServer(L)->SendInventory((PlayerSAO *)sao, true);
+    }
+    lua_pushboolean(L, success);
+    return 1;
 }
 
 // set_armor_groups(self, groups)
@@ -531,6 +595,7 @@ int ObjectRef::l_set_armor_groups(lua_State *L)
 	sao->setArmorGroups(groups);
 	return 0;
 }
+
 
 // get_armor_groups(self)
 int ObjectRef::l_get_armor_groups(lua_State *L)
