@@ -235,3 +235,30 @@ void nativeModApiObject::n_set_detach(ServerActiveObject *sao)
 {
     sao->clearParentAttachment();
 }
+
+//7-14
+void nativeObjectRef::n_set_properties(ServerActiveObject *sao, const ObjectProperties &prop)
+{
+    // No map lock required for this function, as it should be called from other C++ functions
+    if (sao == nullptr)
+        return;
+
+    ObjectProperties *objProp = sao->accessObjectProperties();
+    if (objProp == nullptr)
+        return;
+
+    *objProp = prop;
+    sao->notifyObjectPropertiesModified();
+}
+
+std::pair<bool, ObjectProperties*> nativeObjectRef::n_get_properties(ServerActiveObject *sao)
+{
+	if (sao == nullptr)
+		return std::make_pair(false, nullptr);
+
+	ObjectProperties *prop = sao->accessObjectProperties();
+	if (prop == nullptr)
+		return std::make_pair(false, nullptr);
+
+	return std::make_pair(true, prop);
+}
