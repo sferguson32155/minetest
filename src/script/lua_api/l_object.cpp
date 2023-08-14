@@ -1249,6 +1249,25 @@ int ObjectRef::l_set_properties(lua_State *L)
 	return 0;
 }
 
+
+//7-14+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_properties(lua_State *L)
+{
+    NO_MAP_LOCK_REQUIRED;
+
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    ObjectProperties prop;
+    read_object_properties(L, 2, sao, &prop, getServer(L)->idef());
+    
+    nativeObjectRef::n_set_properties(sao, prop);
+
+    return 0;
+}
+
 // get_properties(self)
 int ObjectRef::l_get_properties(lua_State *L)
 {
@@ -1263,6 +1282,27 @@ int ObjectRef::l_get_properties(lua_State *L)
 		return 0;
 
 	push_object_properties(L, prop);
+	return 1;
+}
+
+//7-14+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_properties(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	ObjectRef *ref = checkobject(L, 1);
+	ServerActiveObject *sao = getobject(ref);
+	if (sao == nullptr)
+		return 0;
+
+	ObjectProperties *prop = sao->accessObjectProperties();
+	if (prop == nullptr)
+		return 0;
+
+	std::pair<bool, ObjectProperties*> propertiesPair = nativeObjectRef::n_get_properties(sao);
+	if (!propertiesPair.first)
+		return 0;
+
+	push_object_properties(L, propertiesPair.second);
 	return 1;
 }
 
