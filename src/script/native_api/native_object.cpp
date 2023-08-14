@@ -157,3 +157,34 @@ void nativeObjectRef::n_set_eye_offset(RemotePlayer *player, const v3f &offset_f
 {
     getServer(player)->setPlayerEyeOffset(player, offset_first, offset_third);
 }
+
+//7-4
+std::pair<v3f, v3f> nativeObjectRef::n_get_eye_offset(RemotePlayer *player)
+{
+	return std::make_pair(player->eye_offset_first, player->eye_offset_third);
+}
+
+bool nativeObjectRef::n_send_mapblock(ObjectRef *ref, v3s16 pos)
+{
+	RemotePlayer *player = getplayer(ref);
+	if (player == nullptr)
+		return false;
+
+	session_t peer_id = player->getPeerId();
+	return getServer(ref)->SendBlock(peer_id, pos);
+}
+
+void nativeObjectRef::n_set_animation_frame_speed(ServerActiveObject *sao, float frame_speed)
+{
+    sao->setAnimationSpeed(frame_speed);
+}
+
+void nativeObjectRef::n_set_bone_position(ServerActiveObject *sao, const std::string &bone, const v3f &position, const v3f &rotation)
+{
+    sao->setBonePosition(bone, position, rotation);
+}
+
+void nativeObjectRef::n_get_bone_position(ServerActiveObject *sao, const std::string &bone, v3f *position, v3f *rotation)
+{
+	sao->getBonePosition(bone, position, rotation);
+}
