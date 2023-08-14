@@ -284,3 +284,32 @@ bool nativeObjectRef::n_set_nametag_attributes(ServerActiveObject *sao, video::S
 
 	return true;
 }
+
+//7-21
+std::tuple<bool, Color, bool, Color, std::string> nativeObjectRef::n_get_nametag_attributes(ServerActiveObject *sao)
+{
+	NO_MAP_LOCK_REQUIRED;
+	if (sao == nullptr)
+		return std::make_tuple(false, Color(255, 255, 255, 255), false, Color(0, 0, 0, 0), "");
+
+	ObjectProperties *prop = sao->accessObjectProperties();
+	if (!prop)
+		return std::make_tuple(false, Color(255, 255, 255, 255), false, Color(0, 0, 0, 0), "");
+
+	Color color = prop->nametag_color;
+
+	bool hasBgColor = (prop->nametag_bgcolor != boost::none);
+	Color bgcolor = hasBgColor ? prop->nametag_bgcolor.get() : Color(0, 0, 0, 0);
+
+	std::string text = prop->nametag;
+	return std::make_tuple(true, color, hasBgColor, bgcolor, text);
+}
+
+void nativeObjectRef::n_set_velocity(ObjectRef *ref, v3f vel)
+{
+    LuaEntitySAO *sao = getluaobject(ref);
+    if (sao == nullptr)
+        return;
+
+    sao->setVelocity(vel);
+}
