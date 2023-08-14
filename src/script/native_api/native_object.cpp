@@ -104,3 +104,26 @@ bool nativeObjectRef::n_set_wielded_item(ServerActiveObject *sao, const ItemStac
 {
     return sao->setWieldedItem(item);
 }
+
+//6-23
+std::pair<bool, ItemGroupList> nativeObjectRef::n_set_armor_groups(ServerActiveObject *sao, const ItemGroupList &groups)
+{
+    if (sao == nullptr)
+        return std::make_pair(false, ItemGroupList());
+
+    if (sao->getType() == ACTIVEOBJECT_TYPE_PLAYER) {
+        if (!g_settings->getBool("enable_damage") && !itemgroup_get(groups, "immortal")) {
+            groups["immortal"] = 1;
+        }
+    }
+
+    sao->setArmorGroups(groups);
+    return std::make_pair(true, groups);
+}
+
+std::map<std::string, int> nativeObjectRef::n_get_armor_groups(ServerActiveObject *sao)
+{
+	// Assuming ServerActiveObject has a function getArmorGroups() that returns the armor groups.
+	// Replace 'getArmorGroups()' with the actual function name if different.
+	return sao->getArmorGroups();
+}
