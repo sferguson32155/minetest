@@ -35,6 +35,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "server/player_sao.h"
 #include "server/serverinventorymgr.h"
 
+
+#include "../native_api/native_object.h"
 /*
 	ObjectRef
 */
@@ -114,6 +116,22 @@ int ObjectRef::l_remove(lua_State *L)
 	return 0;
 }
 
+//6-14+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_remove(lua_State *L) {
+    GET_ENV_PTR;
+
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+    if (sao->getType() == ACTIVEOBJECT_TYPE_PLAYER)
+        return 0;
+
+    nativeObjectRef::n_remove(sao);
+
+    return 0;
+}
+
 // get_pos(self)
 int ObjectRef::l_get_pos(lua_State *L)
 {
@@ -125,6 +143,20 @@ int ObjectRef::l_get_pos(lua_State *L)
 
 	push_v3f(L, sao->getBasePosition() / BS);
 	return 1;
+}
+
+//6-14+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_get_pos(lua_State *L) {
+    NO_MAP_LOCK_REQUIRED;
+    
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    push_v3f(L, nativeObjectRef::n_get_pos(sao));
+
+    return 1;
 }
 
 // set_pos(self, pos)
@@ -142,6 +174,21 @@ int ObjectRef::l_set_pos(lua_State *L)
 	return 0;
 }
 
+//6-14+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_set_pos(lua_State *L) {
+    NO_MAP_LOCK_REQUIRED;
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    v3f pos = checkFloatPos(L, 2);
+
+    nativeObjectRef::n_set_pos(sao, pos);
+
+    return 0;
+}
+
 // move_to(self, pos, continuous)
 int ObjectRef::l_move_to(lua_State *L)
 {
@@ -156,6 +203,23 @@ int ObjectRef::l_move_to(lua_State *L)
 
 	sao->moveTo(pos, continuous);
 	return 0;
+}
+
+//6-14+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int ObjectRef::l_native_move_to(lua_State *L) {
+    NO_MAP_LOCK_REQUIRED;
+
+    ObjectRef *ref = checkobject(L, 1);
+    ServerActiveObject *sao = getobject(ref);
+    if (sao == nullptr)
+        return 0;
+
+    v3f pos = checkFloatPos(L, 2);
+    bool continuous = readParam<bool>(L, 3);
+
+    nativeObjectRef::n_move_to(sao, pos, continuous);
+
+    return 0;
 }
 
 // punch(self, puncher, time_from_last_punch, tool_capabilities, dir)
@@ -305,6 +369,7 @@ int ObjectRef::l_get_wield_index(lua_State *L)
 	lua_pushinteger(L, sao->getWieldIndex() + 1);
 	return 1;
 }
+
 
 // get_wielded_item(self)
 int ObjectRef::l_get_wielded_item(lua_State *L)
@@ -537,6 +602,7 @@ int ObjectRef::l_set_animation_frame_speed(lua_State *L)
 	return 1;
 }
 
+
 // set_bone_position(self, bone, position, rotation)
 int ObjectRef::l_set_bone_position(lua_State *L)
 {
@@ -670,6 +736,7 @@ int ObjectRef::l_set_detach(lua_State *L)
 	sao->clearParentAttachment();
 	return 0;
 }
+
 
 // set_properties(self, properties)
 int ObjectRef::l_set_properties(lua_State *L)
@@ -830,6 +897,7 @@ int ObjectRef::l_add_velocity(lua_State *L)
 
 	return 0;
 }
+
 
 // get_velocity(self)
 int ObjectRef::l_get_velocity(lua_State *L)
