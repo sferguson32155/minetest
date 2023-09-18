@@ -11,7 +11,8 @@ minetest.register_chatcommand("test_server_classes", {
 			"particles",
 			"noise",
 			"nodetimer",
-			"rollback"
+			"rollback",
+			"object"
 		}
 
 		native_tests.clear_file();
