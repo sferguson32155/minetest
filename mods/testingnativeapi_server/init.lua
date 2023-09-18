@@ -19,6 +19,8 @@ dofile(modpath .. "/settings.lua")
 dofile(modpath .. "/noise.lua")
 dofile(modpath .. "/nodetimer.lua")
 dofile(modpath .. "/rollback.lua")
+dofile(modpath .. "/object.lua")
+
 
 
 -- Load helper files
