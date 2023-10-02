@@ -80,3 +80,7 @@ Created set eye offset
 	z = 0,
 	x = 0
 }
+
+8:30 - 9:30
+Created Documentation including a video log:
+https://youtu.be/M8OWgBsqMWg
