@@ -26,14 +26,14 @@ minetest.register_chatcommand("lua_object", {
             minetest.log("lua_object_set_armor_groups - Not Working\n")
             minetest.log("lua_object_get_armor_groups\n")
             minetest.log("lua_object_set_animation - Not Working\n")
-            minetest.log("lua_object_get_animation - Not Working\n")
+            minetest.log("lua_object_get_animation\n")
             minetest.log("lua_object_set_local_animation - Not Working\n")
-            minetest.log("lua_object_get_local_animation - Not Working\n")
+            minetest.log("lua_object_get_local_animation\n")
             minetest.log("lua_object_get_eye_offset\n")
         end
         if param == "3" then
             minetest.log("lua_object_set_eye_offset #")
-            minetest.log("")
+            minetest.log("lua_object_send_mapblock")
             minetest.log("")
             minetest.log("")
             minetest.log("")
@@ -79,11 +79,12 @@ minetest.register_chatcommand("lua_object_remove", {
     end,
 })
 
--- native_remove
+
+-- l_remove
 minetest.register_chatcommand("native_object_remove", {
     description = "Test Object Remove",
     func = function(name, param)
-        minetest.log("native_object_remove is running!")
+        minetest.log("lua_object_remove is running!")
         local player = minetest.get_player_by_name(name)
         
         if not player then
@@ -106,7 +107,6 @@ minetest.register_chatcommand("native_object_remove", {
         for i, object in ipairs(saos) do
             if not object:is_player() then
                 minetest.log("Removed: "..object:get_entity_name())
-                --
                 local objectRemove = object:native_remove()
             end
         end
@@ -168,7 +168,7 @@ minetest.register_chatcommand("native_object_get_pos", {
         minetest.log("Size of saos: " .. #saos)
         
         -- Get the position of the first object in saos
-        local firstSaosPos = saos[1]:native_get_pos()
+        local firstSaosPos = saos[1]:get_pos()
         minetest.log("Position of first Reference Object: " .. minetest.pos_to_string(firstSaosPos))
     end,
 })
@@ -236,7 +236,7 @@ minetest.register_chatcommand("native_object_set_pos", {
             -- Check if the object is a player
             if object:is_player() then
                 local v3f = {x = 100, y = 22, z = tonumber(param)}
-                local player_pos = object:native_set_pos(v3f)
+                local player_pos = object:set_pos(v3f)
                 minetest.log("Player " .. object:get_player_name() .. " is at position: " .. minetest.pos_to_string(v3f))
             end
         end
@@ -303,7 +303,7 @@ minetest.register_chatcommand("native_object_move_to", {
         for i, object in ipairs(saos) do
             -- Check if the object is a player
             local v3f = {x = 100, y = 22, z = tonumber(param)}
-            local player_pos = object:native_move_to(v3f, false)
+            local player_pos = object:move_to(v3f, false)
             minetest.log(#saos .. " objects moved to position: " .. minetest.pos_to_string(v3f))
         end
     end,
@@ -641,6 +641,75 @@ minetest.register_chatcommand("lua_object_get_armor_groups", {
     end,
 })
 
+-- set_animation(self, frame_range, frame_speed, frame_blend, frame_loop)
+-- get_animation(self)
+minetest.register_chatcommand("lua_object_get_animation", {
+    description = "Get the object's animation",
+    func = function(name, param)
+        minetest.log("lua_object_get_animation is running!")
+        local player = minetest.get_player_by_name(name)
+        
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local pos = player:get_pos()
+        local saos = minetest.get_objects_inside_radius(pos, 2)
+        
+        -- Check if saos is empty
+        if #saos == 0 then
+            minetest.log("No Active Objects near Player")
+            return
+        end
+        
+        -- Output the size of saos to minetest.log
+        minetest.log("Size of Active Objects Array: " .. #saos)
+
+        if #saos == 2 then
+            -- local plyr = saos[1]
+            local rclk = saos[2]
+            local a = rclk:get_animation()
+            minetest.log("The Current animation information for ".. rclk:get_entity_name().." is "..dump(a))
+        else
+            local plyr = saos[1]
+            local a = plyr:get_animation()
+            minetest.log("The Current animation information for ".. plyr:get_player_name() .." is "..dump(a))
+        end
+    end,
+})
+-- set_local_animation(self, idle, walk, dig, walk_while_dog, frame_speed)
+-- get_local_animation(self)
+minetest.register_chatcommand("lua_object_get_local_animation", {
+    description = "Get the player's animation",
+    func = function(name, param)
+        minetest.log("lua_object_get_local_animation_item is running!")
+        local player = minetest.get_player_by_name(name)
+        
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local pos = player:get_pos()
+        local saos = minetest.get_objects_inside_radius(pos, 2)
+        
+        -- Check if saos is empty
+        if #saos == 0 then
+            minetest.log("No Active Objects near Player")
+            return
+        end
+        
+        -- Output the size of saos to minetest.log
+        minetest.log("Size of Active Objects Array: " .. #saos)
+
+
+        local plyr = saos[1]
+        local a = plyr:get_local_animation()
+        minetest.log("The Current animation information for ".. plyr:get_player_name() .." is "..dump(a))
+    end,
+})
+
 -- get_eye_offset(self)
 minetest.register_chatcommand("lua_object_get_eye_offset", {
     description = "Get the player's current eye offset",
@@ -710,3 +779,62 @@ minetest.register_chatcommand("lua_object_set_eye_offset", {
         end
     end,
 })
+
+-- send_mapblock(self, pos)
+-- Figure out how to trigger it
+minetest.register_chatcommand("lua_object_send_mapblock", {
+    description = "Sends an already loaded mapblock to the player.\nReturns false if nothing was sent (note that this can also mean that the client already has the block)\nResource intensive - use sparsely",
+    func = function(name, param)
+        minetest.log("Sends an already loaded mapblock to the player.\nReturns false if nothing was sent (note that this can also mean that the client already has the block)\nResource intensive - use sparsely")
+        local player = minetest.get_player_by_name(name)
+        
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local pos = player:get_pos()
+        local saos = minetest.get_objects_inside_radius(pos, 2)
+        
+        -- Check if saos is empty
+        if #saos == 0 then
+            minetest.log("No Active Objects near Player")
+            return
+        end
+        
+        -- Output the size of saos to minetest.log
+        minetest.log("Size of Active Objects Array: " .. #saos)
+
+        local plyr = saos[1]
+        local a = plyr:send_mapblock(pos)
+        --local b = player:get_armor_groups()
+        -- minetest.log("The player's armor group information is " ..dump(a:to_string()))
+        if a then
+            minetest.log("Mapblock was sent to player. Responce:  " ..dump(a))
+        else 
+            minetest.log("Mapblock was NOT sent to player. Responce:  " ..dump(a))
+        end
+    end,
+})
+
+--set_animation_frame_speed(self, frame_speed)
+
+--set_bone_position(self, bone, position, rotation)
+
+--get_bone_position(self, bone)
+
+--set_attach(self, parent, bone, position, rotation, force_visable)
+
+--get_attach(self)
+
+--get_children(self)
+
+--set_detach(self)
+
+--set_properties(self, properties)
+
+--get_properties(self)
+
+--is_player(self) Used in most functions
+
+--set_nametag_attributes
