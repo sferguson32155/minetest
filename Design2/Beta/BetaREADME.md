@@ -31,7 +31,7 @@ Each Lua function must incorporate three test functions in the final product. Wh
 **Internal Systems *(Source Code)***
 All Lua systems in the game will be swapped with our Native functions. The testing will ensure seemless and lossless transition between the old and new game engines. 
 
-# Beta Build for Minetest
+# Weekly Summaries
 
 ## Week 1 (9/15 - 9/22)
 Consolidated GitHubs, including MinetestLogs and Minetest-Summer-Logs, to sean-test-branch (current GitHub) to ensure legibility and easier navigation for grading.
@@ -78,6 +78,8 @@ Created a comprehensive checklist for all Lua, native, and comparison tests. Add
 * lua_object_send_mapblock
 * lua_object_get_animation
 * lua_object_get_local_animation
+* native_object_remove
+* native_object_get_pos
 
 ### Chris - Added Functions:
 * lua_object_get_look_pitch
