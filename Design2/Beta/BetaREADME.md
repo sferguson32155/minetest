@@ -103,5 +103,5 @@ Created a comprehensive checklist for all Lua, native, and comparison tests. Add
 - Minetest Native Installation Guide and Files: https://github.com/Lisa-Touchton-DEV/MinetestDocs
 - Design 2 Object's Class Checklist: https://docs.google.com/spreadsheets/d/1PM4jhVm7i4OwgGq1aDPfn8IWj7l7l0uh8i5fXMeRUhU/edit?usp=sharing
 - Sean Ferguson - Working Branch: https://github.com/sferguson32155/minetest/tree/sean-test-branch
-- Songyuhao Shi - Work Log: https://github.com/sf1440/CEN3907Logs
-- Songyuhao Shi - Working Branch: https://github.com/sf1440/Minetest
+- Songyuhao Shi - Work Log: https://docs.google.com/spreadsheets/d/1qtSN0sl43u4A3n5VJuM3343Ox1RSD6h2bfjfHH4yiok/edit?usp=sharing
+- Songyuhao Shi - Working Branch: https://github.com/sf1440/TrackingForMinetest
