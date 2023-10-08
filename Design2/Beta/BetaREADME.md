@@ -39,7 +39,7 @@ Each Lua function must incorporate three test functions in the final product. Wh
 All Lua systems in the game will be swapped with our Native functions. The testing will ensure seemless and lossless transition between the old and new game engines. 
 
 # Outline of Beta Build Work
-
+https://youtu.be/fRYGHO6Qhrs
 ## Week 1 (9/15 - 9/22)
 Consolidated GitHubs, including MinetestLogs and Minetest-Summer-Logs, to sean-test-branch (current GitHub) to ensure legibility and easier navigation for grading.
 Tried fixing issues occurring in the native tests. For example, pathing for the libraries was not linking, the native cpp was not linked with the Minetest project, and the function names for the Lua native functions were not established.
