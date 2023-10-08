@@ -1,8 +1,8 @@
--- Written By Sean Ferguson
+-- Written By Sean Ferguson & Songyuhai Shi
 minetest.log("object_test_obj")
 
 minetest.register_chatcommand("lua_object", {
-    description = "List all avaliable chat commands",
+    description = "List all available chat commands",
     func = function(name, param)
         if param == "" then
             minetest.log("Enter a page number - /lua_object #")
@@ -42,6 +42,43 @@ minetest.register_chatcommand("lua_object", {
             minetest.log("")
             minetest.log("")
             minetest.log("")
+        end
+        --Chris Functions
+        if param == "4" then
+            minetest.log("lua_object_get_breath")
+            minetest.log("lua_object_set_breath #")
+            minetest.log("lua_object_get_meta")
+            minetest.log("lua_object_get_attribute")
+            minetest.log("lua_object_set_attribute #") --Check with Chris
+            minetest.log("lua_object_get_fov")
+            minetest.log("lua_object_set_fov #")
+            minetest.log("lua_object_get_look_dir")
+            minetest.log("lua_object_get_look_pitch")
+            minetest.log("lua_object_get_look_yaw")
+        end
+        if param == "5" then
+            minetest.log("lua_object_get_look_horizontal")
+            minetest.log("lua_object_get_look_vertical")
+            minetest.log("lua_object_set_look_pitch #")
+            minetest.log("lua_object_set_look_yaw #")
+            minetest.log("lua_object_set_look_horizontal #")
+            minetest.log("lua_object_set_look_vertical #")
+            minetest.log("lua_object_set_sky")
+            minetest.log("lua_object_get_sky")
+            minetest.log("lua_object_get_sky_color")
+            minetest.log("lua_object_get_sun")
+        end
+        if param == "6" then
+            minetest.log("lua_object_get_moon")
+            minetest.log("lua_object_set_sun #")
+            minetest.log("lua_object_set_moon #")
+            minetest.log("lua_object")
+            minetest.log("lua_object")
+            minetest.log("lua_object")
+            minetest.log("lua_object")
+            minetest.log("lua_object")
+            minetest.log("lua_object")
+            minetest.log("lua_object")
         end
     end,
 })
@@ -168,7 +205,7 @@ minetest.register_chatcommand("native_object_get_pos", {
         minetest.log("Size of saos: " .. #saos)
         
         -- Get the position of the first object in saos
-        local firstSaosPos = saos[1]:get_pos()
+        local firstSaosPos = saos[1]:native_get_pos()
         minetest.log("Position of first Reference Object: " .. minetest.pos_to_string(firstSaosPos))
     end,
 })
@@ -838,3 +875,645 @@ minetest.register_chatcommand("lua_object_send_mapblock", {
 --is_player(self) Used in most functions
 
 --set_nametag_attributes
+
+-- Chris Functions
+-- l_set_breath
+minetest.register_chatcommand("lua_object_set_breath", {
+    description = "Test Set Breath - /lua_object_set_breath (breath_value)",
+    func = function(name, param)
+        minetest.log("lua_object_set_breath is running!")
+        local player = minetest.get_player_by_name(name)
+
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local breath_value = tonumber(param)
+        if not breath_value then
+            minetest.log("Invalid breath value")
+            return
+        end
+
+        player:set_breath(breath_value)
+        minetest.log("Player breath set to: " .. breath_value)
+    end,
+})
+
+-- l_get_breath
+minetest.register_chatcommand("lua_object_get_breath", {
+    description = "Test Get Breath",
+    func = function(name, param)
+        minetest.log("lua_object_get_breath is running!")
+        local player = minetest.get_player_by_name(name)
+
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local breath = player:get_breath()
+        minetest.log("Player's current breath: " .. breath)
+    end,
+})
+
+-- native_set_breath
+minetest.register_chatcommand("native_object_set_breath", {
+    description = "Test Set Breath - /native_object_set_breath (breath_value)",
+    func = function(name, param)
+        minetest.log("native_object_set_breath is running!")
+        local player = minetest.get_player_by_name(name)
+
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local breath_value = tonumber(param)
+        if not breath_value then
+            minetest.log("Invalid breath value")
+            return
+        end
+
+        player:native_set_breath(breath_value)
+        minetest.log("Player breath set to: " .. breath_value)
+    end,
+})
+
+-- native_get_breath
+minetest.register_chatcommand("native_object_get_breath", {
+    description = "Test Get Breath",
+    func = function(name, param)
+        minetest.log("native_object_get_breath is running!")
+        local player = minetest.get_player_by_name(name)
+
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local breath = player:native_get_breath()
+        minetest.log("Player's current breath: " .. breath)
+    end,
+})
+
+
+
+-- l_set_fov
+minetest.register_chatcommand("lua_object_set_fov", {
+    description = "Test Set FOV - /lua_object_set_fov (degrees) (is_multiplier) (transition_time)",
+    func = function(name, param)
+        minetest.log("lua_object_set_fov is running!")
+        local player = minetest.get_player_by_name(name)
+
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+        
+        local degrees, is_multiplier, transition_time = string.match(param, "^(%-?%d+%.?%d*) (%a+) (%d+%.?%d*)$")
+        degrees = tonumber(degrees)
+        transition_time = tonumber(transition_time)
+        is_multiplier = is_multiplier == "true"
+        
+        if not degrees or is_multiplier == nil or not transition_time then
+            minetest.log("Invalid FOV values")
+            return
+        end
+        
+        player:set_fov(degrees, is_multiplier, transition_time)
+        minetest.log("Player FOV set to: degrees: " .. degrees .. " is_multiplier: " .. tostring(is_multiplier) .. " transition_time: " .. transition_time)
+    end,
+})
+
+-- l_get_fov
+minetest.register_chatcommand("lua_object_get_fov", {
+    description = "Test Get FOV",
+    func = function(name, param)
+        minetest.log("lua_object_get_fov is running!")
+        local player = minetest.get_player_by_name(name)
+        
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+        
+        local degrees, is_multiplier, transition_time = player:get_fov()
+        minetest.log("Player's current FOV: degrees: " .. degrees .. " is_multiplier: " .. tostring(is_multiplier) .. " transition_time: " .. transition_time)
+    end,
+})
+
+-- l_set_attribute
+minetest.register_chatcommand("lua_object_set_attribute", {
+    description = "Test Set Attribute - /lua_object_set_attribute (attribute) (value)",
+    func = function(name, param)
+        minetest.log("lua_object_set_attribute is running!")
+        local player = minetest.get_player_by_name(name)
+        
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+        
+        local attribute, value = string.match(param, "^([^ ]+) (.+)$")
+        
+        if not attribute or not value then
+            minetest.log("Invalid attribute or value")
+            return
+        end
+        
+        player:set_attribute(attribute, value)
+        minetest.log("Player " .. attribute .. " set to: " .. value)
+    end,
+})
+
+-- l_get_attribute
+minetest.register_chatcommand("lua_object_get_attribute", {
+    description = "Test Get Attribute - /lua_object_get_attribute (attribute)",
+    func = function(name, param)
+        minetest.log("lua_object_get_attribute is running!")
+        local player = minetest.get_player_by_name(name)
+        
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+        
+        local attribute = param
+        
+        if not attribute then
+            minetest.log("Invalid attribute")
+            return
+        end
+        
+        local value = player:get_attribute(attribute)
+        minetest.log("Player's " .. attribute .. ": " .. (value or "nil"))
+    end,
+})
+
+-- l_get_meta
+minetest.register_chatcommand("lua_object_get_meta", {
+    description = "Test Get Meta",
+    func = function(name, param)
+        minetest.log("lua_object_get_meta is running!")
+        local player = minetest.get_player_by_name(name)
+        
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+        
+        local meta = player:get_meta()
+        
+        if meta then
+            minetest.log("Player Meta Retrieved")
+        else
+            minetest.log("Failed to Retrieve Player Meta")
+        end
+    end,
+})
+
+
+-- native_set_attribute
+minetest.register_chatcommand("native_set_attribute", {
+    description = "Test Set Attribute",
+    func = function(name, param)
+        minetest.log("native_set_attribute is running!")
+        local player = minetest.get_player_by_name(name)
+
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        -- Assuming param is "attribute value"
+        local attribute, value = string.match(param, "([^ ]+) (.+)")
+        if not attribute or not value then
+            minetest.log("Invalid parameters")
+            return
+        end
+
+        player:native_set_attribute(attribute, value)
+        minetest.log("Attribute " .. attribute .. " set to " .. value)
+    end,
+})
+
+-- native_get_attribute
+minetest.register_chatcommand("native_get_attribute", {
+    description = "Test Get Attribute",
+    func = function(name, param)
+        minetest.log("native_get_attribute is running!")
+        local player = minetest.get_player_by_name(name)
+
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        if not param then
+            minetest.log("Invalid parameter")
+            return
+        end
+
+        local value = player:native_get_attribute(param)
+        if value then
+            minetest.log("Attribute " .. param .. " is " .. value)
+        else
+            minetest.log("Attribute " .. param .. " not found")
+        end
+    end,
+})
+
+-- native_get_meta
+minetest.register_chatcommand("native_get_meta", {
+    description = "Test Get Meta",
+    func = function(name, param)
+        minetest.log("native_get_meta is running!")
+        local player = minetest.get_player_by_name(name)
+
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local meta = player:native_get_meta()
+        if meta then
+            -- As an example, if param is an attribute name, get it from the MetaDataRef
+            if param then
+                local value = meta:get_string(param)
+                if value then
+                    minetest.log("Meta attribute " .. param .. " is " .. value)
+                else
+                    minetest.log("Meta attribute " .. param .. " not found")
+                end
+            else
+                minetest.log("Meta data retrieved")
+            end
+        else
+            minetest.log("Meta data not found")
+        end
+    end,
+})
+
+--native_set_fov
+minetest.register_chatcommand("native_set_fov", {
+    description = "Test Set FOV - /native_set_fov (degrees) (is_multiplier) (transition_time)",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return true, "Player not found"
+        end
+        
+        local degrees, is_multiplier, transition_time = string.match(param, "(%S+)%s*(%S*)%s*(%S*)")
+        
+        degrees = tonumber(degrees)
+        is_multiplier = is_multiplier == "true"
+        transition_time = tonumber(transition_time) or 0 -- default to 0 if not provided
+        
+        if not degrees then
+            return true, "Invalid degrees value"
+        end
+        
+        player:native_set_fov(degrees, is_multiplier, transition_time)
+        return true, "Player FOV set to: " .. degrees .. ", is_multiplier: " .. tostring(is_multiplier) .. ", transition_time: " .. transition_time
+    end,
+})
+
+
+--native_get_fov
+minetest.register_chatcommand("native_get_fov", {
+    description = "Test Get FOV",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return true, "Player not found"
+        end
+        
+        local degrees, is_multiplier, transition_time = player:native_get_fov()
+        return true, "Player's current FOV: " .. degrees .. ", is_multiplier: " .. tostring(is_multiplier) .. ", transition_time: " .. transition_time
+    end,
+})
+
+-- l_get_look_dir
+minetest.register_chatcommand("lua_object_get_look_dir", {
+    description = "Test Look Direction",
+    func = function(name, param)
+        minetest.log("lua_object_get_look_dir is running!")
+        local player = minetest.get_player_by_name(name)
+
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local look_dir = player:get_look_dir()
+        minetest.log("Player's look direction (Lua): " .. minetest.pos_to_string(look_dir))
+    end,
+})
+
+-- native_get_look_dir
+minetest.register_chatcommand("native_object_get_look_dir", {
+    description = "Test Look Direction using native implementation",
+    func = function(name, param)
+        minetest.log("native_object_get_look_dir is running!")
+        local player = minetest.get_player_by_name(name)
+
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local look_dir = player:native_get_look_dir()
+        minetest.log("Player's look direction (Native): " .. minetest.pos_to_string(look_dir))
+    end,
+})
+
+-- DEPRECATED: l_get_look_pitch
+minetest.register_chatcommand("lua_object_get_look_pitch", {
+    description = "Test Deprecated Get Look Pitch",
+    func = function(name, param)
+        minetest.log("lua_object_get_look_pitch is running!")
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local look_pitch = player:get_look_pitch()
+        minetest.log("Deprecated Look Pitch: " .. look_pitch)
+    end,
+})
+
+-- DEPRECATED: l_get_look_yaw
+minetest.register_chatcommand("lua_object_get_look_yaw", {
+    description = "Test Deprecated Get Look Yaw",
+    func = function(name, param)
+        minetest.log("lua_object_get_look_yaw is running!")
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local look_yaw = player:get_look_yaw()
+        minetest.log("Deprecated Look Yaw: " .. look_yaw)
+    end,
+})
+
+-- l_get_look_vertical
+minetest.register_chatcommand("lua_object_get_look_vertical", {
+    description = "Test Get Look Vertical",
+    func = function(name, param)
+        minetest.log("lua_object_get_look_vertical is running!")
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local look_vertical = player:get_look_vertical()
+        minetest.log("Look Vertical: " .. look_vertical)
+    end,
+})
+
+-- l_get_look_horizontal
+minetest.register_chatcommand("lua_object_get_look_horizontal", {
+    description = "Test Get Look Horizontal",
+    func = function(name, param)
+        minetest.log("lua_object_get_look_horizontal is running!")
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local look_horizontal = player:get_look_horizontal()
+        minetest.log("Look Horizontal: " .. look_horizontal)
+    end,
+})
+
+-- Native n_get_look_pitch
+minetest.register_chatcommand("native_object_get_look_pitch", {
+    description = "Test Native Get Look Pitch",
+    func = function(name, param)
+        minetest.log("native_object_get_look_pitch is running!")
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local look_pitch = player:native_get_look_pitch()
+        minetest.log("Native Look Pitch: " .. look_pitch)
+    end,
+})
+
+-- Native n_get_look_yaw
+minetest.register_chatcommand("native_object_get_look_yaw", {
+    description = "Test Native Get Look Yaw",
+    func = function(name, param)
+        minetest.log("native_object_get_look_yaw is running!")
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local look_yaw = player:native_get_look_yaw()
+        minetest.log("Native Look Yaw: " .. look_yaw)
+    end,
+})
+
+-- Native n_get_look_vertical
+minetest.register_chatcommand("native_object_get_look_vertical", {
+    description = "Test Native Get Look Vertical",
+    func = function(name, param)
+        minetest.log("native_object_get_look_vertical is running!")
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local look_vertical = player:native_get_look_vertical()
+        minetest.log("Native Look Vertical: " .. look_vertical)
+    end,
+})
+
+-- Native n_get_look_horizontal
+minetest.register_chatcommand("native_object_get_look_horizontal", {
+    description = "Test Native Get Look Horizontal",
+    func = function(name, param)
+        minetest.log("native_object_get_look_horizontal is running!")
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local look_horizontal = player:native_get_look_horizontal()
+        minetest.log("Native Look Horizontal: " .. look_horizontal)
+    end,
+})
+
+
+-- Lua l_set_look_vertical
+minetest.register_chatcommand("lua_object_set_look_vertical", {
+    description = "Test Lua Set Look Vertical - /lua_object_set_look_vertical (radians)",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local radians = tonumber(param)
+        if not radians then
+            minetest.log("Invalid radian value")
+            return
+        end
+
+        player:set_look_vertical(radians)
+    end,
+})
+
+-- Lua l_set_look_horizontal
+minetest.register_chatcommand("lua_object_set_look_horizontal", {
+    description = "Test Lua Set Look Horizontal - /lua_object_set_look_horizontal (radians)",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local radians = tonumber(param)
+        if not radians then
+            minetest.log("Invalid radian value")
+            return
+        end
+
+        player:set_look_horizontal(radians)
+    end,
+})
+
+-- DEPRECATED: Lua l_set_look_pitch
+minetest.register_chatcommand("lua_object_set_look_pitch", {
+    description = "Test (Deprecated) Lua Set Look Pitch - /lua_object_set_look_pitch (radians)",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local radians = tonumber(param)
+        if not radians then
+            minetest.log("Invalid radian value")
+            return
+        end
+
+        player:set_look_pitch(radians)
+    end,
+})
+
+-- DEPRECATED: Lua l_set_look_yaw
+minetest.register_chatcommand("lua_object_set_look_yaw", {
+    description = "Test (Deprecated) Lua Set Look Yaw - /lua_object_set_look_yaw (radians)",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local radians = tonumber(param)
+        if not radians then
+            minetest.log("Invalid radian value")
+            return
+        end
+
+        player:set_look_yaw(radians)
+    end,
+})
+
+
+-- Native n_set_look_vertical
+minetest.register_chatcommand("native_object_set_look_vertical", {
+    description = "Test Set Look Vertical - /native_object_set_look_vertical (radians)",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local radians = tonumber(param)
+        if not radians then
+            minetest.log("Invalid radian value")
+            return
+        end
+
+        player:native_set_look_vertical(radians)
+    end,
+})
+
+-- Native n_set_look_horizontal
+minetest.register_chatcommand("native_object_set_look_horizontal", {
+    description = "Test Set Look Horizontal - /native_object_set_look_horizontal (radians)",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local radians = tonumber(param)
+        if not radians then
+            minetest.log("Invalid radian value")
+            return
+        end
+
+        player:native_set_look_horizontal(radians)
+    end,
+})
+
+-- DEPRECATED: n_set_look_pitch
+minetest.register_chatcommand("native_object_set_look_pitch", {
+    description = "Test (Deprecated) Set Look Pitch - /native_object_set_look_pitch (radians)",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local radians = tonumber(param)
+        if not radians then
+            minetest.log("Invalid radian value")
+            return
+        end
+
+        player:native_set_look_pitch(radians)
+    end,
+})
+
+-- DEPRECATED: n_set_look_yaw
+minetest.register_chatcommand("native_object_set_look_yaw", {
+    description = "Test (Deprecated) Set Look Yaw - /native_object_set_look_yaw (radians)",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local radians = tonumber(param)
+        if not radians then
+            minetest.log("Invalid radian value")
+            return
+        end
+
+        player:native_set_look_yaw(radians)
+    end,
+})
