@@ -3100,111 +3100,301 @@ void ObjectRef::Register(lua_State *L)
 
 const char ObjectRef::className[] = "ObjectRef";
 luaL_Reg ObjectRef::methods[] = {
-	// ServerActiveObject
-	luamethod(ObjectRef, remove),
-	luamethod_aliased(ObjectRef, get_pos, getpos),
-	luamethod_aliased(ObjectRef, set_pos, setpos),
-	luamethod_aliased(ObjectRef, move_to, moveto),
-	luamethod(ObjectRef, punch),
-	luamethod(ObjectRef, right_click),
-	luamethod(ObjectRef, set_hp),
-	luamethod(ObjectRef, get_hp),
-	luamethod(ObjectRef, get_inventory),
-	luamethod(ObjectRef, get_wield_list),
-	luamethod(ObjectRef, get_wield_index),
-	luamethod(ObjectRef, get_wielded_item),
-	luamethod(ObjectRef, set_wielded_item),
-	luamethod(ObjectRef, set_armor_groups),
-	luamethod(ObjectRef, get_armor_groups),
-	luamethod(ObjectRef, set_animation),
-	luamethod(ObjectRef, get_animation),
-	luamethod(ObjectRef, set_animation_frame_speed),
-	luamethod(ObjectRef, set_bone_position),
-	luamethod(ObjectRef, get_bone_position),
-	luamethod(ObjectRef, set_attach),
-	luamethod(ObjectRef, get_attach),
-	luamethod(ObjectRef, get_children),
-	luamethod(ObjectRef, set_detach),
-	luamethod(ObjectRef, set_properties),
-	luamethod(ObjectRef, get_properties),
-	luamethod(ObjectRef, set_nametag_attributes),
-	luamethod(ObjectRef, get_nametag_attributes),
+    // ServerActiveObject
+    luamethod(ObjectRef, remove),
+    luamethod(ObjectRef, native_remove),
 
-	luamethod_aliased(ObjectRef, set_velocity, setvelocity),
-	luamethod_aliased(ObjectRef, add_velocity, add_player_velocity),
-	luamethod_aliased(ObjectRef, get_velocity, getvelocity),
-	luamethod_dep(ObjectRef, get_velocity, get_player_velocity),
+    luamethod_aliased(ObjectRef, get_pos, getpos),
+    luamethod(ObjectRef, native_get_pos),
+    
+    luamethod(ObjectRef, native_set_pos),
 
-	// LuaEntitySAO-only
-	luamethod_aliased(ObjectRef, set_acceleration, setacceleration),
-	luamethod_aliased(ObjectRef, get_acceleration, getacceleration),
-	luamethod_aliased(ObjectRef, set_yaw, setyaw),
-	luamethod_aliased(ObjectRef, get_yaw, getyaw),
-	luamethod(ObjectRef, set_rotation),
-	luamethod(ObjectRef, get_rotation),
-	luamethod_aliased(ObjectRef, set_texture_mod, settexturemod),
-	luamethod(ObjectRef, get_texture_mod),
-	luamethod_aliased(ObjectRef, set_sprite, setsprite),
-	luamethod(ObjectRef, get_entity_name),
-	luamethod(ObjectRef, get_luaentity),
+    luamethod(ObjectRef, punch),
+    luamethod(ObjectRef, native_punch),
 
-	// Player-only
-	luamethod(ObjectRef, is_player),
-	luamethod(ObjectRef, get_player_name),
-	luamethod(ObjectRef, get_look_dir),
-	luamethod(ObjectRef, get_look_pitch),
-	luamethod(ObjectRef, get_look_yaw),
-	luamethod(ObjectRef, get_look_vertical),
-	luamethod(ObjectRef, get_look_horizontal),
-	luamethod(ObjectRef, set_look_horizontal),
-	luamethod(ObjectRef, set_look_vertical),
-	luamethod(ObjectRef, set_look_yaw),
-	luamethod(ObjectRef, set_look_pitch),
-	luamethod(ObjectRef, get_fov),
-	luamethod(ObjectRef, set_fov),
-	luamethod(ObjectRef, get_breath),
-	luamethod(ObjectRef, set_breath),
-	luamethod(ObjectRef, get_attribute),
-	luamethod(ObjectRef, set_attribute),
-	luamethod(ObjectRef, get_meta),
-	luamethod(ObjectRef, set_inventory_formspec),
-	luamethod(ObjectRef, get_inventory_formspec),
-	luamethod(ObjectRef, set_formspec_prepend),
-	luamethod(ObjectRef, get_formspec_prepend),
-	luamethod(ObjectRef, get_player_control),
-	luamethod(ObjectRef, get_player_control_bits),
-	luamethod(ObjectRef, set_physics_override),
-	luamethod(ObjectRef, get_physics_override),
-	luamethod(ObjectRef, hud_add),
-	luamethod(ObjectRef, hud_remove),
-	luamethod(ObjectRef, hud_change),
-	luamethod(ObjectRef, hud_get),
-	luamethod(ObjectRef, hud_set_flags),
-	luamethod(ObjectRef, hud_get_flags),
-	luamethod(ObjectRef, hud_set_hotbar_itemcount),
-	luamethod(ObjectRef, hud_get_hotbar_itemcount),
-	luamethod(ObjectRef, hud_set_hotbar_image),
-	luamethod(ObjectRef, hud_get_hotbar_image),
-	luamethod(ObjectRef, hud_set_hotbar_selected_image),
-	luamethod(ObjectRef, hud_get_hotbar_selected_image),
-	luamethod(ObjectRef, set_sky),
-	luamethod(ObjectRef, get_sky),
-	luamethod(ObjectRef, get_sky_color),
-	luamethod(ObjectRef, set_sun),
-	luamethod(ObjectRef, get_sun),
-	luamethod(ObjectRef, set_moon),
-	luamethod(ObjectRef, get_moon),
-	luamethod(ObjectRef, set_stars),
-	luamethod(ObjectRef, get_stars),
-	luamethod(ObjectRef, set_clouds),
-	luamethod(ObjectRef, get_clouds),
-	luamethod(ObjectRef, override_day_night_ratio),
-	luamethod(ObjectRef, get_day_night_ratio),
-	luamethod(ObjectRef, set_local_animation),
-	luamethod(ObjectRef, get_local_animation),
-	luamethod(ObjectRef, set_eye_offset),
-	luamethod(ObjectRef, get_eye_offset),
-	luamethod(ObjectRef, send_mapblock),
-	luamethod(ObjectRef, set_minimap_modes),
-	{0,0}
+    luamethod(ObjectRef, right_click),
+    luamethod(ObjectRef, native_right_click),
+
+    luamethod(ObjectRef, set_hp),
+    luamethod(ObjectRef, native_set_hp),
+
+    luamethod(ObjectRef, get_hp),
+    luamethod(ObjectRef, native_get_hp),
+
+    luamethod(ObjectRef, get_inventory),
+    luamethod(ObjectRef, native_get_inventory),
+
+    luamethod(ObjectRef, get_wield_list),
+    luamethod(ObjectRef, native_get_wield_list),
+
+    luamethod(ObjectRef, get_wield_index),
+    luamethod(ObjectRef, native_get_wield_index),
+
+    luamethod(ObjectRef, get_wielded_item),
+    luamethod(ObjectRef, native_get_wielded_item),
+
+    luamethod(ObjectRef, set_wielded_item),
+    luamethod(ObjectRef, native_set_wielded_item),
+
+    luamethod(ObjectRef, set_armor_groups),
+    luamethod(ObjectRef, native_set_armor_groups),
+
+    luamethod(ObjectRef, get_armor_groups),
+    luamethod(ObjectRef, native_get_armor_groups),
+
+    luamethod(ObjectRef, set_animation),
+    luamethod(ObjectRef, native_set_animation),
+
+    luamethod(ObjectRef, get_animation),
+    luamethod(ObjectRef, native_get_animation),
+
+    luamethod(ObjectRef, set_animation_frame_speed),
+    luamethod(ObjectRef, native_set_animation_frame_speed),
+
+    luamethod(ObjectRef, set_bone_position),
+    luamethod(ObjectRef, native_set_bone_position),
+
+    luamethod(ObjectRef, get_bone_position),
+    luamethod(ObjectRef, native_get_bone_position),
+
+    luamethod(ObjectRef, set_attach),
+    luamethod(ObjectRef, native_set_attach),
+
+    luamethod(ObjectRef, get_attach),
+    luamethod(ObjectRef, native_get_attach),
+
+    luamethod(ObjectRef, get_children),
+    luamethod(ObjectRef, native_get_children),
+
+    luamethod(ObjectRef, set_detach),
+    luamethod(ObjectRef, native_set_detach),
+
+    luamethod(ObjectRef, set_properties),
+    luamethod(ObjectRef, native_set_properties),
+
+    luamethod(ObjectRef, get_properties),
+    luamethod(ObjectRef, native_get_properties),
+
+    luamethod(ObjectRef, set_nametag_attributes),
+    luamethod(ObjectRef, native_set_nametag_attributes),
+
+    luamethod(ObjectRef, get_nametag_attributes),
+    luamethod(ObjectRef, native_get_nametag_attributes),
+
+    luamethod_aliased(ObjectRef, set_velocity, setvelocity),
+    luamethod(ObjectRef, native_set_velocity),
+
+    luamethod_aliased(ObjectRef, add_velocity, add_player_velocity),
+    luamethod(ObjectRef, native_add_velocity),
+
+    luamethod_aliased(ObjectRef, get_velocity, getvelocity),
+    luamethod(ObjectRef, native_get_velocity),
+
+    // LuaEntitySAO-only
+    luamethod_aliased(ObjectRef, set_acceleration, setacceleration),
+    luamethod(ObjectRef, native_set_acceleration),
+
+    luamethod_aliased(ObjectRef, get_acceleration, getacceleration),
+    luamethod(ObjectRef, native_get_acceleration),
+
+    luamethod_aliased(ObjectRef, set_yaw, setyaw),
+    luamethod(ObjectRef, native_set_yaw),
+
+    luamethod_aliased(ObjectRef, get_yaw, getyaw),
+    luamethod(ObjectRef, native_get_yaw),
+
+    luamethod(ObjectRef, set_rotation),
+    luamethod(ObjectRef, native_set_rotation),
+
+    luamethod(ObjectRef, get_rotation),
+    luamethod(ObjectRef, native_get_rotation),
+
+    luamethod_aliased(ObjectRef, set_texture_mod, settexturemod),
+    luamethod(ObjectRef, native_set_texture_mod),
+
+    luamethod(ObjectRef, get_texture_mod),
+    luamethod(ObjectRef, native_get_texture_mod),
+
+    luamethod_aliased(ObjectRef, set_sprite, setsprite),
+    luamethod(ObjectRef, native_set_sprite),
+
+    luamethod(ObjectRef, get_entity_name),
+    luamethod(ObjectRef, native_get_entity_name),
+
+    luamethod(ObjectRef, get_luaentity),
+    luamethod(ObjectRef, native_get_luaentity),
+
+    // Player-only
+    luamethod(ObjectRef, is_player),
+    luamethod(ObjectRef, native_is_player),
+
+    luamethod(ObjectRef, get_player_name),
+    luamethod(ObjectRef, native_get_player_name),
+
+    luamethod(ObjectRef, get_look_dir),
+    luamethod(ObjectRef, native_get_look_dir),
+
+    luamethod(ObjectRef, get_look_pitch),
+    luamethod(ObjectRef, native_get_look_pitch),
+
+    luamethod(ObjectRef, get_look_yaw),
+    luamethod(ObjectRef, native_get_look_yaw),
+
+    luamethod(ObjectRef, get_look_vertical),
+    luamethod(ObjectRef, native_get_look_vertical),
+
+    luamethod(ObjectRef, get_look_horizontal),
+    luamethod(ObjectRef, native_get_look_horizontal),
+
+    luamethod(ObjectRef, set_look_horizontal),
+    luamethod(ObjectRef, native_set_look_horizontal),
+
+    luamethod(ObjectRef, set_look_vertical),
+    luamethod(ObjectRef, native_set_look_vertical),
+
+    luamethod(ObjectRef, set_look_yaw),
+    luamethod(ObjectRef, native_set_look_yaw),
+
+    luamethod(ObjectRef, set_look_pitch),
+    luamethod(ObjectRef, native_set_look_pitch),
+
+    luamethod(ObjectRef, get_fov),
+    luamethod(ObjectRef, native_get_fov),
+
+    luamethod(ObjectRef, set_fov),
+    luamethod(ObjectRef, native_set_fov),
+
+    luamethod(ObjectRef, get_breath),
+    luamethod(ObjectRef, native_get_breath),
+
+    luamethod(ObjectRef, set_breath),
+    luamethod(ObjectRef, native_set_breath),
+
+    luamethod(ObjectRef, get_attribute),
+    luamethod(ObjectRef, native_get_attribute),
+
+    luamethod(ObjectRef, set_attribute),
+    luamethod(ObjectRef, native_set_attribute),
+
+    luamethod(ObjectRef, get_meta),
+    luamethod(ObjectRef, native_get_meta),
+
+    luamethod(ObjectRef, set_inventory_formspec),
+    luamethod(ObjectRef, native_set_inventory_formspec),
+
+    luamethod(ObjectRef, get_inventory_formspec),
+    luamethod(ObjectRef, native_get_inventory_formspec),
+
+    luamethod(ObjectRef, set_formspec_prepend),
+    luamethod(ObjectRef, native_set_formspec_prepend),
+
+    luamethod(ObjectRef, get_formspec_prepend),
+    luamethod(ObjectRef, native_get_formspec_prepend),
+
+    luamethod(ObjectRef, get_player_control),
+    luamethod(ObjectRef, native_get_player_control),
+
+    luamethod(ObjectRef, get_player_control_bits),
+    luamethod(ObjectRef, native_get_player_control_bits),
+
+    luamethod(ObjectRef, set_physics_override),
+    luamethod(ObjectRef, native_set_physics_override),
+
+    luamethod(ObjectRef, get_physics_override),
+    luamethod(ObjectRef, native_get_physics_override),
+
+    luamethod(ObjectRef, hud_add),
+    luamethod(ObjectRef, native_hud_add),
+
+    luamethod(ObjectRef, hud_remove),
+    luamethod(ObjectRef, native_hud_remove),
+
+    luamethod(ObjectRef, hud_change),
+    luamethod(ObjectRef, native_hud_change),
+
+    luamethod(ObjectRef, hud_get),
+    luamethod(ObjectRef, native_hud_get),
+
+    luamethod(ObjectRef, hud_set_flags),
+    luamethod(ObjectRef, native_hud_set_flags),
+
+    luamethod(ObjectRef, hud_get_flags),
+    luamethod(ObjectRef, native_hud_get_flags),
+
+    luamethod(ObjectRef, hud_set_hotbar_itemcount),
+    luamethod(ObjectRef, native_hud_set_hotbar_itemcount),
+
+    luamethod(ObjectRef, hud_get_hotbar_itemcount),
+    luamethod(ObjectRef, native_hud_get_hotbar_itemcount),
+
+    luamethod(ObjectRef, hud_set_hotbar_image),
+    luamethod(ObjectRef, native_hud_set_hotbar_image),
+
+    luamethod(ObjectRef, hud_get_hotbar_image),
+    luamethod(ObjectRef, native_hud_get_hotbar_image),
+
+    luamethod(ObjectRef, hud_set_hotbar_selected_image),
+    luamethod(ObjectRef, native_hud_set_hotbar_selected_image),
+
+    luamethod(ObjectRef, hud_get_hotbar_selected_image),
+    luamethod(ObjectRef, native_hud_get_hotbar_selected_image),
+
+    luamethod(ObjectRef, set_sky),
+    luamethod(ObjectRef, native_set_sky),
+
+    luamethod(ObjectRef, get_sky),
+    luamethod(ObjectRef, native_get_sky),
+
+    luamethod(ObjectRef, get_sky_color),
+    luamethod(ObjectRef, native_get_sky_color),
+
+    luamethod(ObjectRef, set_sun),
+    luamethod(ObjectRef, native_set_sun),
+
+    luamethod(ObjectRef, get_sun),
+    luamethod(ObjectRef, native_get_sun),
+
+    luamethod(ObjectRef, set_moon),
+    luamethod(ObjectRef, native_set_moon),
+
+    luamethod(ObjectRef, get_moon),
+    luamethod(ObjectRef, native_get_moon),
+
+    luamethod(ObjectRef, set_stars),
+    luamethod(ObjectRef, native_set_stars),
+
+    luamethod(ObjectRef, get_stars),
+    luamethod(ObjectRef, native_get_stars),
+
+    luamethod(ObjectRef, set_clouds),
+    luamethod(ObjectRef, native_set_clouds),
+
+    luamethod(ObjectRef, get_clouds),
+    luamethod(ObjectRef, native_get_clouds),
+
+    luamethod(ObjectRef, override_day_night_ratio),
+    luamethod(ObjectRef, native_override_day_night_ratio),
+
+    luamethod(ObjectRef, get_day_night_ratio),
+    luamethod(ObjectRef, native_get_day_night_ratio),
+
+    luamethod(ObjectRef, set_local_animation),
+    luamethod(ObjectRef, native_set_local_animation),
+
+    luamethod(ObjectRef, get_local_animation),
+    luamethod(ObjectRef, native_get_local_animation),
+
+    luamethod(ObjectRef, set_eye_offset),
+    luamethod(ObjectRef, native_set_eye_offset),
+
+    luamethod(ObjectRef, get_eye_offset),
+    luamethod(ObjectRef, native_get_eye_offset),
+
+    luamethod(ObjectRef, send_mapblock),
+    luamethod(ObjectRef, native_send_mapblock),
+
+    luamethod(ObjectRef, set_minimap_modes),
+    luamethod(ObjectRef, native_set_minimap_modes),
+
+    {0,0}
 };
