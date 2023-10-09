@@ -2,7 +2,7 @@
 minetest.log("object_test_obj")
 
 minetest.register_chatcommand("lua_object", {
-    description = "List all available chat commands",
+    description = "List all avaliable chat commands",
     func = function(name, param)
         if param == "" then
             minetest.log("Enter a page number - /lua_object #")
@@ -1516,4 +1516,457 @@ minetest.register_chatcommand("native_object_set_look_yaw", {
 
         player:native_set_look_yaw(radians)
     end,
+})
+
+-- Lua Testing for set_sky
+minetest.register_chatcommand("lua_object_set_sky", {
+    description = "Set Sky Parameters",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found!")
+            return
+        end
+        -- Example sky parameters, you can modify as needed
+        local sky_parameters = {
+            base_color = "#ABCDEF",
+            type = "regular",
+            textures = {"sky_texture_1.png", "sky_texture_2.png", },
+            clouds = true,
+            sky_color = {
+                day_sky = "#ABCDEF",
+                day_horizon = "#ABCDEF",
+                dawn_sky = "#ABCDEF",
+                dawn_horizon = "#ABCDEF",
+                night_sky = "#ABCDEF",
+                night_horizon = "#ABCDEF",
+                indoors = "#ABCDEF"
+            }
+        }
+        player:set_sky(sky_parameters)
+        minetest.log("Sky parameters set for player: " .. name)
+    end
+})
+
+-- Native Testing for set_sky
+minetest.register_chatcommand("native_object_set_sky", {
+    description = "Set Sky Parameters using Native Implementation",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found!")
+            return
+        end
+        -- Example sky parameters, you can modify as needed
+        local sky_parameters = {
+            base_color = "#ABCDEF",
+            type = "regular",
+            textures = {"sky_texture_1.png", "sky_texture_2.png",  },
+            clouds = true,
+            sky_color = {
+                day_sky = "#ABCDEF",
+                day_horizon = "#ABCDEF",
+                dawn_sky = "#ABCDEF",
+                dawn_horizon = "#ABCDEF",
+                night_sky = "#ABCDEF",
+                night_horizon = "#ABCDEF",
+                indoors = "#ABCDEF"
+            }
+        }
+        player:native_set_sky(sky_parameters)
+        minetest.log("Sky parameters set using native function for player: " .. name)
+    end
+})
+
+-- Lua Testing for get_sky
+minetest.register_chatcommand("lua_object_get_sky", {
+    description = "Retrieve Sky Parameters",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found!")
+            return
+        end
+        local sky = player:get_sky()
+        -- Here you can process and display the 'sky' data as needed
+        minetest.log(dump(sky))
+    end
+})
+
+-- Native Testing for get_sky
+minetest.register_chatcommand("native_object_get_sky", {
+    description = "Retrieve Sky Parameters using Native Implementation",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found!")
+            return
+        end
+        local sky = player:native_get_sky()
+        -- Here you can process and display the 'sky' data as needed
+        minetest.log(dump(sky))
+    end
+})
+
+
+-- Lua Testing for get_sky_color
+minetest.register_chatcommand("lua_object_get_sky_color", {
+    description = "Retrieve Sky Colors",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found!")
+            return
+        end
+        local sky_color = player:get_sky_color()
+        -- Here you can process and display the 'sky_color' data as needed
+        minetest.log(dump(sky_color))
+    end
+})
+
+-- Native Testing for get_sky_color
+minetest.register_chatcommand("native_object_get_sky_color", {
+    description = "Retrieve Sky Colors using Native Implementation",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found!")
+            return
+        end
+        local sky_color = player:native_get_sky_color()
+        -- Here you can process and display the 'sky_color' data as needed
+        minetest.log(dump(sky_color))
+    end
+})
+
+
+
+-- Lua Testing for set_sun
+minetest.register_chatcommand("lua_object_set_sun", {
+    description = "Test set_sun - /lua_object_set_sun",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local sun_params = {
+            visible = true,
+            texture = "some_texture.png",
+            tonemap = "some_tonemap.png",
+            sunrise = "some_sunrise.png",
+            sunrise_visible = true,
+            scale = 1.0
+        }
+        player:set_sun(sun_params)
+        return true, "Sun parameters set using lua_object_set_sun"
+    end,
+})
+
+-- Lua Testing for get_sun
+minetest.register_chatcommand("lua_object_get_sun", {
+    description = "Test get_sun - /lua_object_get_sun",
+    func = function(name, _)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local sun_params = player:get_sun()
+        -- Here, you can either print the parameters or use them further
+        return true, "Got sun parameters using lua_object_get_sun"
+    end,
+})
+
+-- Lua Testing for set_moon
+minetest.register_chatcommand("lua_object_set_moon", {
+    description = "Test set_moon - /lua_object_set_moon",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local moon_params = {
+            visible = true,
+            texture = "some_moon_texture.png",
+            tonemap = "some_moon_tonemap.png",
+            scale = 1.0
+        }
+        player:set_moon(moon_params)
+        return true, "Moon parameters set using lua_object_set_moon"
+    end,
+})
+
+-- Lua Testing for get_moon
+minetest.register_chatcommand("lua_object_get_moon", {
+    description = "Test get_moon - /lua_object_get_moon",
+    func = function(name, _)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local moon_params = player:get_moon()
+        -- Here, you can either print the parameters or use them further
+        return true, "Got moon parameters using lua_object_get_moon"
+    end,
+})
+
+
+-- Native Testing for set_sun
+minetest.register_chatcommand("native_object_set_sun", {
+    description = "Test set_sun using native call - /native_object_set_sun",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local sun_params = {
+            visible = true,
+            texture = "some_texture.png",
+            tonemap = "some_tonemap.png",
+            sunrise = "some_sunrise.png",
+            sunrise_visible = true,
+            scale = 1.0
+        }
+        player:native_set_sun(sun_params)
+        return true, "Sun parameters set using native_object_set_sun"
+    end,
+})
+
+-- Native Testing for get_sun
+minetest.register_chatcommand("native_object_get_sun", {
+    description = "Test get_sun using native call - /native_object_get_sun",
+    func = function(name, _)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local sun_params = player:native_get_sun()
+        -- Here, you can either print the parameters or use them further
+        return true, "Got sun parameters using native_object_get_sun"
+    end,
+})
+
+-- Native Testing for set_moon
+minetest.register_chatcommand("native_object_set_moon", {
+    description = "Test set_moon using native call - /native_object_set_moon",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local moon_params = {
+            visible = true,
+            texture = "some_moon_texture.png",
+            tonemap = "some_moon_tonemap.png",
+            scale = 1.0
+        }
+        player:native_set_moon(moon_params)
+        return true, "Moon parameters set using native_object_set_moon"
+    end,
+})
+
+-- Native Testing for get_moon
+minetest.register_chatcommand("native_object_get_moon", {
+    description = "Test get_moon using native call - /native_object_get_moon",
+    func = function(name, _)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local moon_params = player:native_get_moon()
+        -- Here, you can either print the parameters or use them further
+        return true, "Got moon parameters using native_object_get_moon"
+    end,
+})
+
+
+
+
+-- Lua Testing for set_stars
+minetest.register_chatcommand("lua_object_set_stars", {
+    description = "Test Set Stars",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+        player:set_stars({
+            visible = true,
+            count = 500,
+            star_color = {a=255, r=255, g=255, b=255},
+            scale = 1.0
+        })
+        minetest.log("Stars set for player: " .. name)
+    end,
+})
+
+-- Lua Testing for get_stars
+minetest.register_chatcommand("lua_object_get_stars", {
+    description = "Test Get Stars",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+        local stars = player:get_stars()
+        minetest.log(dump(stars))
+    end,
+})
+
+-- Lua Testing for set_clouds
+minetest.register_chatcommand("lua_object_set_clouds", {
+    description = "Test Set Clouds",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+        player:set_clouds({
+            density = 0.6,
+            color = {a=255, r=255, g=255, b=255},
+            ambient = {a=255, r=128, g=128, b=128},
+            height = 120,
+            thickness = 16,
+            speed = {x=0, y=2}
+        })
+        minetest.log("Clouds set for player: " .. name)
+    end,
+})
+
+-- Lua Testing for get_clouds
+minetest.register_chatcommand("lua_object_get_clouds", {
+    description = "Test Get Clouds",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+        local clouds = player:get_clouds()
+        minetest.log(dump(clouds))
+    end,
+})
+
+
+-- Native Testing for set_stars
+minetest.register_chatcommand("native_object_set_stars", {
+    description = "Native Test Set Stars",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+        player:native_set_stars({
+            visible = true,
+            count = 500,
+            star_color = {a=255, r=255, g=255, b=255},
+            scale = 1.0
+        })
+        minetest.log("Stars (native) set for player: " .. name)
+    end,
+})
+
+-- Native Testing for get_stars
+minetest.register_chatcommand("native_object_get_stars", {
+    description = "Native Test Get Stars",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+        local stars = player:native_get_stars()
+        minetest.log(dump(stars))
+    end,
+})
+
+-- Native Testing for set_clouds
+minetest.register_chatcommand("native_object_set_clouds", {
+    description = "Native Test Set Clouds",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+        player:native_set_clouds({
+            density = 0.6,
+            color = {a=255, r=255, g=255, b=255},
+            ambient = {a=255, r=128, g=128, b=128},
+            height = 120,
+            thickness = 16,
+            speed = {x=0, y=2}
+        })
+        minetest.log("Clouds (native) set for player: " .. name)
+    end,
+})
+
+-- Native Testing for get_clouds
+minetest.register_chatcommand("native_object_get_clouds", {
+    description = "Native Test Get Clouds",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+        local clouds = player:native_get_clouds()
+        minetest.log(dump(clouds))
+    end,
+})
+
+-- Function to run all lua_object commands and log the results
+-- Automated Testing
+local function run_lua_object_commands_and_log()
+    local log_file = io.open(minetest.get_worldpath() .. "/lua_object_results.txt", "w")  -- Open a text file for writing
+
+    if not log_file then
+        minetest.log("Failed to open log file for writing.")
+        return
+    end
+
+    local total_commands = 0  
+    local passed_commands = 0 
+
+    for command, command_info in pairs(minetest.registered_chatcommands) do
+        if string.match(command, "^lua_object_") then
+            minetest.log("Running lua_object command: " .. command)
+            --function(name, param)
+            local success, result = pcall(command_info.func, "singleplayer", "20")
+            
+            log_file:write("Command: " .. command .. "\n")
+            log_file:write("Result: " .. (success and "Success" or "Error") .. "\n")
+            if (success) then
+                log_file:write("\n")
+                passed_commands = passed_commands + 1
+            else
+                log_file:write("Output:\n" .. (result or "No output") .. "\n\n")
+            end
+
+            total_commands = total_commands + 1
+
+        end
+    end
+
+    log_file:write(passed_commands .. "/" .. total_commands .. " Tests Passed\n")
+    log_file:close()
+    minetest.log("All lua_object commands logged to lua_object_results.txt")
+end
+
+
+-- Register a chat command to run and log lua_object commands
+minetest.register_chatcommand("log_lua_object", {
+    description = "Run and log lua_object commands",
+    func = run_lua_object_commands_and_log,
 })
