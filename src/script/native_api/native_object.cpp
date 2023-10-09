@@ -13,8 +13,13 @@ void nativeObjectRef::n_remove(ServerActiveObject *sao) {
     sao->markForRemoval();
 }
 
-v3f nativeObjectRef::n_get_pos(ServerActiveObject *sao) {
-    return sao->getBasePosition() / BS;
+v3f nativeObjectRef::n_get_pos(ServerActiveObject *sao)
+{
+	if (sao != nullptr) {
+		return sao->getBasePosition();
+	}
+	v3f temp;
+	return temp;
 }
 
 void nativeObjectRef::n_set_pos(ServerActiveObject *sao, const v3f &pos) {
