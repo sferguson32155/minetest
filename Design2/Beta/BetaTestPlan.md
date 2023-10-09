@@ -1,4 +1,4 @@
-# Beta Build for Minetest
+# Beta Test Plan
 ## Overview:
 ### Where to Start:
 To begin with the installation of our Minetest build follow the documentation given in the Minetest installation guide:
