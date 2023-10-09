@@ -17,11 +17,11 @@ When testing, error messages will be created based on unexpected results being f
 The Final Product delivered should maintain the same standard of gameplay while allowing users to interact with the modding section under easier circumstances. The rewriting of the game engine is expected to run at the same speed as the Lua counterpart. Testing should be intuitive and the game should operate similarly to Minetest's current state when the native functions are implemented. 
 
 **Responsiveness**
-When rendering the game, any noticeable FPS drops should be noted and fixed as soon as possible. The game should handle operations that involve significant input/output (I/O) operations efficiently, without causing the CPU to wait idly.
+When recreating the functions, if there is a noticeable difference in FPS check for recursive errors. Otherwise, note the changes and bring up issues with the team. The expected output of a our program is to minimize FPS changes comparatively to the original build. 
 
 ## Build Quality:
 **Robustness**
-Crashes should not occur during regular, unexceptional use of the application. Major or noticeable glitches should be absent from the regular user experience within the master build. Any noticeable bugs should be noted in logs and fixed as soon as possible, or noted in the work-in-progress functions.
+Crashes should not occur during regular, unexceptional use of the application. Major or noticeable glitches should be absent from the regular user experience within the master build. Any noticeable bugs should be noted in logs and fixed as soon as possible, or noted in the work-in-progress functions. Actual FPS tests are not currently implemented but have been brought up in team meetings.
 
 **Consistency**
 The application should consistently produce the same result for the same input and use cases. Any deviations from predictability should have clear and justified reasons.
@@ -39,7 +39,7 @@ Each Lua function must incorporate three test functions in the final product. Wh
 All Lua systems in the game will be swapped with our Native functions. The testing will ensure seemless and lossless transition between the old and new game engines. 
 
 # Outline of Beta Build Work
-https://youtu.be/fRYGHO6Qhrs
+Beta Build Team Video: https://youtu.be/fRYGHO6Qhrs
 ## Week 1 (9/15 - 9/22)
 Consolidated GitHubs, including MinetestLogs and Minetest-Summer-Logs, to sean-test-branch (current GitHub) to ensure legibility and easier navigation for grading.
 Tried fixing issues occurring in the native tests. For example, pathing for the libraries was not linking, the native cpp was not linked with the Minetest project, and the function names for the Lua native functions were not established.
