@@ -118,20 +118,19 @@ int ObjectRef::l_remove(lua_State *L)
 
 //6-14+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // native_get_pos(self)
-int ObjectRef::l_native_get_pos(lua_State *L)
+int ObjectRef::l_native_remove(lua_State *L)
 {
-	NO_MAP_LOCK_REQUIRED;
+	GET_ENV_PTR;
+
 	ObjectRef *ref = checkobject(L, 1);
 	ServerActiveObject *sao = getobject(ref);
+	if (sao == nullptr)
+		return 0;
+	if (sao->getType() == ACTIVEOBJECT_TYPE_PLAYER)
+		return 0;
 
-	v3f position = nativeObjectRef::native_get_pos(sao);
-	v3f temp;
+	return nativeObjectRef::native_remove(sao);
 
-	if (position != temp) {
-		push_v3f(L, position / BS);
-		return 1;
-	}
-	return 0;
 }
 
 // get_pos(self)
@@ -148,17 +147,21 @@ int ObjectRef::l_get_pos(lua_State *L)
 }
 
 //6-14+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-int ObjectRef::l_native_get_pos(lua_State *L) {
-    NO_MAP_LOCK_REQUIRED;
-    
-    ObjectRef *ref = checkobject(L, 1);
-    ServerActiveObject *sao = getobject(ref);
-    if (sao == nullptr)
-        return 0;
+// native_get_pos(self)
+int ObjectRef::l_native_get_pos(lua_State *L)
+{
+	NO_MAP_LOCK_REQUIRED;
+	ObjectRef *ref = checkobject(L, 1);
+	ServerActiveObject *sao = getobject(ref);
 
-    push_v3f(L, nativeObjectRef::n_get_pos(sao));
+	v3f position = nativeObjectRef::native_get_pos(sao);
+	v3f temp;
 
-    return 1;
+	if (position != temp) {
+		push_v3f(L, position / BS);
+		return 1;
+	}
+	return 0;
 }
 
 // set_pos(self, pos)
