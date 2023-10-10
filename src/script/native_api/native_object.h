@@ -91,4 +91,64 @@ public:
     static v3f nativeObjectRef::n_get_acceleration(LuaEntitySAO *entitysao);
 
     static void nativeObjectRef::n_set_rotation(ObjectRef *ref, v3f rotationDegrees);
+
+    static void n_set_breath(ServerActiveObject *sao, u16 breath);
+
+    static u16 n_get_breath(ServerActiveObject *sao);
+
+    static void n_set_attribute(ServerActiveObject *sao, const std::string &attribute, const std::string &value);
+
+    static std::string n_get_attribute(ServerActiveObject *sao, const std::string &attribute);
+
+    static PlayerMetaRef *n_get_meta(ServerActiveObject *sao);
+
+    static void n_set_fov(ServerActiveObject *sao, float degrees, bool is_multiplier, float transition_time);
+
+    static PlayerFovSpec n_get_fov(ServerActiveObject *sao);
+
+    static std::string n_get_player_name(ServerActiveObject *sao);
+
+    static v3f n_get_look_dir(ServerActiveObject *sao);
+
+    static float n_get_look_pitch(ServerActiveObject *sao);
+
+    static float n_get_look_yaw(ServerActiveObject *sao);
+
+    static float n_get_look_vertical(ServerActiveObject *sao);
+
+    static float n_get_look_horizontal(ServerActiveObject *sao);
+
+    static void n_set_look_vertical(ServerActiveObject *sao, float radians);
+
+    static void n_set_look_horizontal(ServerActiveObject *sao, float radians);
+
+    static void n_set_look_pitch(ServerActiveObject *sao, float radians); // DEPRECATED
+
+    static void _set_look_yaw(ServerActiveObject *sao, float radians); // DEPRECATED
+
+    static SkyboxParams table_to_skybox_params(lua_State *L, int index);
+
+    static void push_sky_color_to_lua(lua_State *L, const SkyColor& color);
+
+    static void n_set_sky(ServerActiveObject* sao, lua_State *L, int index);
+
+    static void n_get_sky(ServerActiveObject* sao, lua_State *L);
+
+    static void n_get_sky_color(ServerActiveObject* sao, lua_State *L);
+
+    static void n_set_sun(RemotePlayer *player, const SunParams &params);
+
+    static SunParams n_get_sun(RemotePlayer *player);
+
+    static void n_set_moon(RemotePlayer *player, const MoonParams &params);
+
+    static MoonParams n_get_moon(RemotePlayer *player);
+
+    static void n_set_stars(ServerActiveObject *sao, const StarParams &params);
+
+    static StarParams n_get_stars(ServerActiveObject *sao);
+
+    static void n_set_clouds(ServerActiveObject *sao, const CloudParams &params);
+
+    static CloudParams n_get_clouds(ServerActiveObject *sao);
 };
