@@ -382,3 +382,311 @@ void nativeObjectRef::n_set_rotation(ObjectRef *ref, v3f rotationDegrees)
 
     entitysao->setRotation(rotationRadians);
 }
+
+void nativeObjectRef::n_set_breath(ServerActiveObject *sao, u16 breath)
+{
+	PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+	if (playersao) {
+		playersao->setBreath(breath);
+	}
+}
+
+u16 nativeObjectRef::n_get_breath(ServerActiveObject *sao)
+{
+	PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+	if (playersao) {
+		return playersao->getBreath();
+	}
+	return 0; // Or a suitable default value if playersao is nullptr
+}
+
+
+
+
+void nativeObjectRef::n_set_attribute(ServerActiveObject *sao, const std::string &attribute,
+		const std::string &value)
+{
+	PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+	if (playersao) {
+		if (value.empty()) {
+			playersao->getMeta().removeString(attribute);
+		} else {
+			playersao->getMeta().setString(attribute, value);
+		}
+	}
+}
+
+std::string nativeObjectRef::n_get_attribute(ServerActiveObject *sao, const std::string &attribute)
+{
+	PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+	if (playersao) {
+		std::string value;
+		if (playersao->getMeta().getStringToRef(attribute, value)) {
+			return value;
+		}
+	}
+	return "";
+}
+
+PlayerMetaRef *nativeObjectRef::n_get_meta(ServerActiveObject *sao)
+{
+	PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+	if (playersao) {
+		return &playersao->getMeta();
+	}
+	return nullptr;
+}
+
+
+void nativeObjectRef::n_set_fov(ServerActiveObject *sao, float degrees, bool is_multiplier,
+		float transition_time)
+{
+	RemotePlayer *player = dynamic_cast<RemotePlayer *>(sao);
+	if (player) {
+		player->setFov({degrees, is_multiplier, transition_time});
+		// Assuming you have access to the server instance
+		// getServer()->SendPlayerFov(player->getPeerId());  // Adjust as needed
+	}
+}
+
+PlayerFovSpec nativeObjectRef::n_get_fov(ServerActiveObject *sao)
+{
+	RemotePlayer *player = dynamic_cast<RemotePlayer *>(sao);
+	if (player) {
+		return player->getFov();
+	}
+	return {}; // Return a default or error value as appropriate for your system
+}
+
+namespace nativeObjectRef
+{
+
+std::string nativeObjectRef::n_get_player_name(ServerActiveObject *sao)
+{
+	RemotePlayer *player = dynamic_cast<RemotePlayer *>(sao);
+	if (player) {
+		return player->getName();
+	}
+	return "";
+}
+
+}
+
+
+// Declaration
+v3f nativeObjectRef::n_get_look_dir(ServerActiveObject *sao);
+
+// Definition
+v3f nativeObjectRef::n_get_look_dir(ServerActiveObject *sao) {
+    PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+    if (!playersao) {
+	// Return a zero vector or a suitable default if playersao is nullptr
+	return v3f(0, 0, 0);
+    }
+
+    float pitch = playersao->getRadLookPitchDep();
+    float yaw = playersao->getRadYawDep();
+    return v3f(std::cos(pitch) * std::cos(yaw), std::sin(pitch), std::cos(pitch) *
+std::sin(yaw));
+}
+
+
+
+float nativeObjectRef::n_get_look_pitch(ServerActiveObject *sao) {
+	PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+	if (playersao) {
+	    return playersao->getRadLookPitchDep();
+	}
+	return 0.0; // Or a suitable default value.
+}
+
+float nativeObjectRef::n_get_look_yaw(ServerActiveObject *sao) {
+	PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+	if (playersao) {
+	    return playersao->getRadYawDep();
+	}
+	return 0.0; // Or a suitable default value.
+}
+
+float nativeObjectRef::n_get_look_vertical(ServerActiveObject *sao) {
+	PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+	if (playersao) {
+	    return playersao->getRadLookPitch();
+	}
+	return 0.0; // Or a suitable default value.
+}
+
+float nativeObjectRef::n_get_look_horizontal(ServerActiveObject *sao) {
+	PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+	if (playersao) {
+	    return playersao->getRadRotation().Y;
+	}
+	return 0.0; // Or a suitable default value.
+}
+
+
+void nativeObjectRef::n_set_look_vertical(ServerActiveObject *sao, float radians) {
+    PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+    if (playersao) {
+	playersao->setLookPitchAndSend(radians * core::RADTODEG);
+    }
+}
+
+void nativeObjectRef::n_set_look_horizontal(ServerActiveObject *sao, float radians) {
+    PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+    if (playersao) {
+	playersao->setPlayerYawAndSend(radians * core::RADTODEG);
+    }
+}
+
+// DEPRECATED
+void nativeObjectRef::n_set_look_pitch(ServerActiveObject *sao, float radians) {
+    PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+    if (playersao) {
+	playersao->setLookPitchAndSend(radians * core::RADTODEG);
+    }
+}
+
+// DEPRECATED
+void nativeObjectRef::_set_look_yaw(ServerActiveObject *sao, float radians) {
+    PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+    if (playersao) {
+	playersao->setPlayerYawAndSend(radians * core::RADTODEG);
+    }
+}
+
+
+
+
+    // Conversion: Lua table -> SkyboxParams
+SkyboxParams nativeObjectRef::table_to_skybox_params(lua_State *L, int index) {
+	SkyboxParams params;
+	// Assume table is at the top of the stack.
+
+	// Extract bgcolor from the table
+	lua_getfield(L, index, "bgcolor");
+	params.bgcolor = read_ARGB8(L, -1); // Convert Lua color to C++ color.
+	lua_pop(L, 1);
+
+	// Similar conversions for other members of SkyboxParams...
+	// ...
+
+	return params;
+}
+
+    // Conversion: SkyColor -> Lua table
+void nativeObjectRef::push_sky_color_to_lua(lua_State *L, const SkyColor& color) {
+	lua_newtable(L);
+	// Assuming SkyColor has members like day_sky, day_horizon, etc.
+	push_ARGB8(L, color.day_sky);
+	lua_setfield(L, -2, "day_sky");
+	// ... similar pushes for other members ...
+}
+
+void nativeObjectRef::n_set_sky(ServerActiveObject* sao, lua_State *L, int index) {
+	RemotePlayer* player = dynamic_cast<RemotePlayer*>(sao);
+	if (!player) {
+	    lua_pushstring(L, "Invalid player object.");
+	    lua_error(L);
+	    return;
+	}
+
+	SkyboxParams params = table_to_skybox_params(L, index);
+	player->setSky(params);
+}
+
+void nativeObjectRef::n_get_sky(ServerActiveObject* sao, lua_State *L) {
+	RemotePlayer* player = dynamic_cast<RemotePlayer*>(sao);
+	if (!player) {
+	    lua_pushstring(L, "Invalid player object.");
+	    lua_error(L);
+	    return;
+	}
+
+	SkyboxParams params = player->getSkyParams();
+	// Convert params to Lua table and push to Lua stack.
+	// This function assumes you have the conversion functions ready.
+	skybox_params_to_table(L, params);
+}
+
+void nativeObjectRef::n_get_sky_color(ServerActiveObject* sao, lua_State *L) {
+	RemotePlayer* player = dynamic_cast<RemotePlayer*>(sao);
+	if (!player) {
+	    lua_pushstring(L, "Invalid player object.");
+	    lua_error(L);
+	    return;
+	}
+
+	SkyColor color = player->getSkyParams().sky_color;
+	// Convert color to Lua table and push to Lua stack.
+	push_sky_color_to_lua(L, color);
+}
+
+
+// Native version of set_sun
+void nativeObjectRef::n_set_sun(RemotePlayer *player, const SunParams &params) {
+    if (player) {
+	player->getServer()->setSun(player, params);
+    }
+}
+
+// Native version of get_sun
+SunParams nativeObjectRef::n_get_sun(RemotePlayer *player) {
+    if (player) {
+	return player->getSunParams();
+    }
+    // Return default or null SunParams if player is nullptr. Adjust as necessary.
+    return SunParams();
+}
+
+// Native version of set_moon
+void nativeObjectRef::n_set_moon(RemotePlayer *player, const MoonParams &params) {
+    if (player) {
+	player->getServer()->setMoon(player, params);
+    }
+}
+
+// Native version of get_moon
+MoonParams nativeObjectRef::n_get_moon(RemotePlayer *player) {
+    if (player) {
+	return player->getMoonParams();
+    }
+    // Return default or null MoonParams if player is nullptr. Adjust as necessary.
+    return MoonParams();
+}
+
+
+    // For set_stars, considering it has a struct StarParams for its parameter
+void nativeObjectRef::n_set_stars(ServerActiveObject *sao, const StarParams &params){
+	PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+	if (playersao) {
+	    playersao->setStarParams(params);
+	}
+}
+
+    // For get_stars, assuming it returns StarParams
+StarParams nativeObjectRef::n_get_stars(ServerActiveObject *sao){
+	PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+	if (playersao) {
+	    return playersao->getStarParams();
+	}
+	return StarParams(); // Returning default StarParams
+}
+
+    // For set_clouds, considering it has a struct CloudParams for its parameter
+void nativeObjectRef::n_set_clouds(ServerActiveObject *sao, const CloudParams &params){
+	PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+	if (playersao) {
+	    playersao->setCloudParams(params);
+	}
+}
+
+    // For get_clouds, assuming it returns CloudParams
+CloudParams nativeObjectRef::n_get_clouds(ServerActiveObject *sao){
+	PlayerSAO *playersao = dynamic_cast<PlayerSAO *>(sao);
+	if (playersao) {
+	    return playersao->getCloudParams();
+	}
+	return CloudParams(); // Returning default CloudParams
+}
+
