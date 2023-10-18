@@ -1,4 +1,4 @@
--- Written By Sean Ferguson & Songyuhai Shi
+-- Written By Sean Ferguson
 minetest.log("object_test_obj")
 
 minetest.register_chatcommand("lua_object", {
@@ -273,7 +273,7 @@ minetest.register_chatcommand("native_object_set_pos", {
             -- Check if the object is a player
             if object:is_player() then
                 local v3f = {x = 100, y = 22, z = tonumber(param)}
-                local player_pos = object:set_pos(v3f)
+                local player_pos = object:native_set_pos(v3f)
                 minetest.log("Player " .. object:get_player_name() .. " is at position: " .. minetest.pos_to_string(v3f))
             end
         end
@@ -340,7 +340,7 @@ minetest.register_chatcommand("native_object_move_to", {
         for i, object in ipairs(saos) do
             -- Check if the object is a player
             local v3f = {x = 100, y = 22, z = tonumber(param)}
-            local player_pos = object:move_to(v3f, false)
+            local player_pos = object:native_move_to(v3f, false)
             minetest.log(#saos .. " objects moved to position: " .. minetest.pos_to_string(v3f))
         end
     end,
@@ -451,6 +451,37 @@ minetest.register_chatcommand("lua_object_set_hp", {
     end,
 })
 
+--set_hp
+minetest.register_chatcommand("native_object_set_hp", {
+    description = "Set the player's current HP - 0-20",
+    func = function(name, param)
+        minetest.log("native_object_set_hp is running!")
+        local player = minetest.get_player_by_name(name)
+        
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local pos = player:get_pos()
+        local saos = minetest.get_objects_inside_radius(pos, 2)
+        
+        -- Check if saos is empty
+        if #saos == 0 then
+            minetest.log("No Active Objects near Player")
+            return
+        end
+        
+        -- Output the size of saos to minetest.log
+        minetest.log("Size of Active Objects Array: " .. #saos)
+        for i, object in ipairs(saos) do
+            local a = object:native_set_hp(tonumber(param), "set_hp")
+            minetest.log("The object's HP was set to " ..param)
+            minetest.log("The object's HP is currently " ..dump(a))
+        end
+    end,
+})
+
 --get_hp
 -- get_hp(self)
 minetest.register_chatcommand("lua_object_get_hp", {
@@ -477,6 +508,36 @@ minetest.register_chatcommand("lua_object_get_hp", {
         minetest.log("Size of Active Objects Array: " .. #saos)
         for i, object in ipairs(saos) do
             local a = object:get_hp()
+            minetest.log("The object's HP is currently " ..dump(a))
+        end
+    end,
+})
+
+-- get_hp(self)
+minetest.register_chatcommand("native_object_get_hp", {
+    description = "Get the player's current HP",
+    func = function(name, param)
+        minetest.log("native_object_get_hp is running!")
+        local player = minetest.get_player_by_name(name)
+        
+        if not player then
+            minetest.log("Player not found")
+            return
+        end
+
+        local pos = player:get_pos()
+        local saos = minetest.get_objects_inside_radius(pos, 2)
+        
+        -- Check if saos is empty
+        if #saos == 0 then
+            minetest.log("No Active Objects near Player")
+            return
+        end
+        
+        -- Output the size of saos to minetest.log
+        minetest.log("Size of Active Objects Array: " .. #saos)
+        for i, object in ipairs(saos) do
+            local a = object:native_get_hp()
             minetest.log("The object's HP is currently " ..dump(a))
         end
     end,
@@ -1964,9 +2025,53 @@ local function run_lua_object_commands_and_log()
     minetest.log("All lua_object commands logged to lua_object_results.txt")
 end
 
+-- Function to run all native_object commands and log the results
+-- Automated Testing
+local function run_native_object_commands_and_log()
+    local log_file = io.open(minetest.get_worldpath() .. "/native_object_results.txt", "w")  -- Open a text file for writing
+
+    if not log_file then
+        minetest.log("Failed to open log file for writing.")
+        return
+    end
+
+    local total_commands = 0  
+    local passed_commands = 0 
+
+    for command, command_info in pairs(minetest.registered_chatcommands) do
+        if string.match(command, "^native_object_") then
+            minetest.log("Running native_object command: " .. command)
+            --function(name, param)
+            local success, result = pcall(command_info.func, "singleplayer", "20")
+            
+            log_file:write("Command: " .. command .. "\n")
+            log_file:write("Result: " .. (success and "Success" or "Error") .. "\n")
+            if (success) then
+                log_file:write("\n")
+                passed_commands = passed_commands + 1
+            else
+                log_file:write("Output:\n" .. (result or "No output") .. "\n\n")
+            end
+
+            total_commands = total_commands + 1
+
+        end
+    end
+
+    log_file:write(passed_commands .. "/" .. total_commands .. " Tests Passed\n")
+    log_file:close()
+    minetest.log("All native_object commands logged to native_object_results.txt")
+end
+
 
 -- Register a chat command to run and log lua_object commands
 minetest.register_chatcommand("log_lua_object", {
     description = "Run and log lua_object commands",
     func = run_lua_object_commands_and_log,
+})
+
+-- Register a chat command to run and log native_object commands
+minetest.register_chatcommand("log_native_object", {
+    description = "Run and log native_object commands",
+    func = run_native_object_commands_and_log,
 })
