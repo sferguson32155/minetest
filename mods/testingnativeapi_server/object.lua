@@ -1,4 +1,4 @@
--- Written By Sean Ferguson
+-- Written By Sean Ferguson and Songyuhao Shi
 minetest.log("object_test_obj")
 
 minetest.register_chatcommand("lua_object", {
@@ -2003,12 +2003,18 @@ local function run_lua_object_commands_and_log()
     for command, command_info in pairs(minetest.registered_chatcommands) do
         if string.match(command, "^lua_object_") then
             minetest.log("Running lua_object command: " .. command)
-            --function(name, param)
+
+            local start_time = os.clock()  -- Record the start time
             local success, result = pcall(command_info.func, "singleplayer", "20")
-            
+            local end_time = os.clock()  -- Record the end time
+
+            local execution_time = end_time - start_time  -- Calculate the execution time
+
             log_file:write("Command: " .. command .. "\n")
             log_file:write("Result: " .. (success and "Success" or "Error") .. "\n")
-            if (success) then
+            log_file:write("Execution Time: " .. execution_time .. " seconds\n")
+
+            if success then
                 log_file:write("\n")
                 passed_commands = passed_commands + 1
             else
@@ -2016,7 +2022,6 @@ local function run_lua_object_commands_and_log()
             end
 
             total_commands = total_commands + 1
-
         end
     end
 
@@ -2041,12 +2046,18 @@ local function run_native_object_commands_and_log()
     for command, command_info in pairs(minetest.registered_chatcommands) do
         if string.match(command, "^native_object_") then
             minetest.log("Running native_object command: " .. command)
-            --function(name, param)
+
+            local start_time = os.clock()  -- Record the start time
             local success, result = pcall(command_info.func, "singleplayer", "20")
-            
+            local end_time = os.clock()  -- Record the end time
+
+            local execution_time = end_time - start_time  -- Calculate the execution time
+
             log_file:write("Command: " .. command .. "\n")
             log_file:write("Result: " .. (success and "Success" or "Error") .. "\n")
-            if (success) then
+            log_file:write("Execution Time: " .. execution_time .. " seconds\n")
+
+            if success then
                 log_file:write("\n")
                 passed_commands = passed_commands + 1
             else
@@ -2054,7 +2065,6 @@ local function run_native_object_commands_and_log()
             end
 
             total_commands = total_commands + 1
-
         end
     end
 
@@ -2062,6 +2072,7 @@ local function run_native_object_commands_and_log()
     log_file:close()
     minetest.log("All native_object commands logged to native_object_results.txt")
 end
+
 
 
 -- Register a chat command to run and log lua_object commands
