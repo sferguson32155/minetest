@@ -25,7 +25,20 @@ Cacti Council
 
 
 ## Important Links for Our Project
-* Insert Links to Internal PDFs
+
+
+## Helpful Links for Minetest Resources
+Server-side API: https://minetest.gitlab.io/minetest/class-reference/
+Client-side API: https://github.com/minetest/minetest/blob/master/doc/client_lua_api.md
+
+Mod Book: https://minetest.org/modbook/
+Minetest Wiki: https://minetest.gitlab.io/minetest/class-reference/
+
+Programming in Lua: https://www.lua.org/pil/contents.html#P4
+C++ Refernece: https://en.cppreference.com/w/cpp
+GIT Tutorial: https://git-scm.com/docs/gittutorial
+
+Modding Guide https://github.com/cacticouncil/minetest/blob/master/doc/modding_guide.md
   
 ## Citations
 [1] Noelene Callaghan (2016) Investigating the role of Minecraft in educational learning environments, Educational Media International, 53:4, 244-260, DOI: 10.1080/09523987.2016.1254877  
