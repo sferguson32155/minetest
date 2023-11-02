@@ -97,13 +97,23 @@ Finished up tutorials and figured out how to output debug text in the logging fi
 * 
 
 ## Known Bugs/Issues
-* logging requires editing of main.cpp and the file location of debug.txt. This is only an issue because it need to be located in the world file to interact with the 
+* Logging requires editing of main.cpp and the file location of debug.txt. This is only an issue because it needs to be located in the world file to interact with the log command. This means that the world name must be hard-coded into the debug directory.
+* ~~Native Tests - Not working, Linker error, new functions unrecognized~~
+* ~~Set HP - Unknown Input Params~~
+* Punch - Unknown Input Params (self, puncher, time from last punch, tool capabilities, direction)
+* Set Animation - Unknown Input Params (self, frame_range, frame_speed, frame_blend, frame_loop)
+* Set Local Animation - Unknown Input Params (self, idle, walk, dig, walk_while_dig, frame_speed)
+* Send Mapblock - Unknown test trigger
+* Set Sun - Input Param too Long (self, sun_paramters)
+* Set Moon - Input Param too Long (self, moon_paramters)
+* ~~Customized Pictures - Where to store/link custom images~~
 
 ## Important Links:
 - Minetest Native API Github: [https://github.com/cacticouncil/minetest](https://github.com/cacticouncil/minetest/tree/native-api)
 - Design 2 Object's Class Checklist: https://docs.google.com/spreadsheets/d/1PM4jhVm7i4OwgGq1aDPfn8IWj7l7l0uh8i5fXMeRUhU/edit?usp=sharing
 - Design 2 Working Branch: https://github.com/sferguson32155/minetest/tree/sean-test-branch
 - Songyuhao Shi - Work Log: https://docs.google.com/spreadsheets/d/1qtSN0sl43u4A3n5VJuM3343Ox1RSD6h2bfjfHH4yiok/edit?usp=sharing
+
 ## Citations
 [1] Noelene Callaghan (2016) Investigating the role of Minecraft in educational learning environments, Educational Media International, 53:4, 244-260, DOI: 10.1080/09523987.2016.1254877  
 [2] Tiobe index. TIOBE. (2022, June 3). Retrieved April 25, 2023, from https://www.tiobe.com/tiobe-index/
