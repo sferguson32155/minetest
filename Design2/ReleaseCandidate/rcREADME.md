@@ -8,13 +8,13 @@
 
 ## Usability:
 **Interface**
-Testing functions should have an intuitive naming convention, i.e. l_object.cpp function name l_set_pos should be called through “/lua_object_set_pos”. Outputs from the testing data will output to the console command.
+Testing functions should have an intuitive naming convention, i.e. l_object.cpp function name l_set_pos should be called through “/lua_object_set_pos”. Outputs from the testing data will output to the console command. We've created automated logging systems that time responsiveness of functions and output necessary debugging information for ease of testing.
 
 **Navigation**
-When testing, error messages will be created based on unexpected results being fed to the testing functions. Using logs, such as “minetest.logs(“output error message here”..variable)” should be used wherever possible.
+When testing, error messages will be created based on unexpected results being fed to the testing functions. Using logs, such as “minetest.logs(“output error message here”..variable)” should be used wherever possible. The logging method also gives line number error code responses without crashing the game as running the code normally would.
 
 **Perception**
-The Final Product delivered should maintain the same standard of gameplay while allowing users to interact with the modding section under easier circumstances. The rewriting of the game engine is expected to run at the same speed as the Lua counterpart. Testing should be intuitive and the game should operate similarly to Minetest's current state when the native functions are implemented. 
+The Final Product delivered should maintain the same standard of gameplay while allowing users to interact with the modding section under easier circumstances. The rewriting of the game engine is expected to run at the same speed as the Lua counterpart. Testing should be intuitive and the game should operate similarly to Minetest's current state when the native functions are implemented. To ensure this we added the function operation time testing in logging method.
 
 **Responsiveness**
 When recreating the functions, if there is a noticeable difference in FPS check for recursive errors. Otherwise, note the changes and bring up issues with the team. The expected output of our program is to minimize FPS changes comparatively to the original build. 
@@ -24,7 +24,7 @@ When recreating the functions, if there is a noticeable difference in FPS check 
 Crashes should not occur during regular, unexceptional use of the application. Major or noticeable glitches should be absent from the regular user experience within the master build. Any noticeable bugs should be noted in logs and fixed as soon as possible, or noted in the work-in-progress functions. Actual FPS tests are not currently implemented but have been brought up in team meetings.
 
 **Consistency**
-The application should consistently produce the same result for the same input and use cases. Any deviations from predictability should have clear and justified reasons.
+The application should consistently produce the same result for the same input and use cases. Any deviations from predictability should have clear and justified reasons. All methods for recreating our steps have been documented and can be found in the "CactiCouncil" file directory. 
 
 **Aethsteic Rigor**
 All in-game assets should be reused from the original source code. Aesthetic issues, if present, should not render the game unplayable, and all assets such as images and sounds should be functional.
