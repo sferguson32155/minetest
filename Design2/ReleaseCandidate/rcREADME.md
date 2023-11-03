@@ -39,7 +39,7 @@ Each Lua function must incorporate three test functions in the final product. Wh
 All Lua systems in the game will be swapped with our Native functions. The testing will ensure a seamless and lossless transition between the old and new game engines. 
 
 # Outline of Release Candidate Work
-Release Candidate Team Video: 
+Release Candidate Team Video: https://youtu.be/dlU3AWa-2MA
 
 ## Week 1 (10/7 - 10/13)
 This week there was a shift from the normal workflow. The team wanted to transition into more of a tool-based and documentation approach rather than function development. log_lua and log_native were our first steps into automation and allowed for all scripts beginning in lua_object and native_object to be run and their outputs to a log file.
@@ -123,6 +123,7 @@ Finished up tutorials and figured out how to output debug text in the logging fi
 - Design 2 Object's Class Checklist: https://docs.google.com/spreadsheets/d/1PM4jhVm7i4OwgGq1aDPfn8IWj7l7l0uh8i5fXMeRUhU/edit?usp=sharing
 - Design 2 Working Branch: https://github.com/sferguson32155/minetest/tree/sean-test-branch
 - Songyuhao Shi - Work Log: https://docs.google.com/spreadsheets/d/1qtSN0sl43u4A3n5VJuM3343Ox1RSD6h2bfjfHH4yiok/edit?usp=sharing
+- Release Candidate Team Video: https://youtu.be/dlU3AWa-2MA
 
 
 ## Citations
