@@ -74,7 +74,11 @@ Lots of collaboration with the entire CactiCouncil team. Onboarded our newest me
 * native_object_get_hp
 
 ### Chris - Added Functions:
-* 
+* lua_object_get_entity_name
+* lua_object_get_luaentity
+* lua_object_get_player_name
+* lua_object_override_day_night_ratio
+* lua_object_get_day_night_ratio
 
 ## Week 3 (10/21 - 10/27)
 Added timing capabilities to the logging system and started creating tutorials for our work so future members can view the work that we do.
@@ -84,7 +88,10 @@ Added timing capabilities to the logging system and started creating tutorials f
 * log_native_object
 
 ### Chris - Added Functions:
-* 
+* lua_object_hud_add
+* lua_object_hud_remove
+* lua_object_hud_change
+* lua_object_get
 
 ## Week 4 (10/28 - 11/3)
 Finished up tutorials and figured out how to output debug text in the logging files. Started adding default "test" param to previously completed functions to test valid input parameters rather than just an integer param.
@@ -94,7 +101,10 @@ Finished up tutorials and figured out how to output debug text in the logging fi
 * log_native_object
 
 ### Chris - Added Functions:
-* 
+* lua_object_hud_set_hotbar_itemcount
+* lua_object_hud_get_hotbar_itemcount
+* lua_object_hud_get_hotbar_image
+* lua_object_hud_set_hotbar_image
 
 ## Known Bugs/Issues
 * Logging requires editing of main.cpp and the file location of debug.txt. This is only an issue because it needs to be located in the world file to interact with the log command. This means that the world name must be hard-coded into the debug directory.
@@ -113,6 +123,7 @@ Finished up tutorials and figured out how to output debug text in the logging fi
 - Design 2 Object's Class Checklist: https://docs.google.com/spreadsheets/d/1PM4jhVm7i4OwgGq1aDPfn8IWj7l7l0uh8i5fXMeRUhU/edit?usp=sharing
 - Design 2 Working Branch: https://github.com/sferguson32155/minetest/tree/sean-test-branch
 - Songyuhao Shi - Work Log: https://docs.google.com/spreadsheets/d/1qtSN0sl43u4A3n5VJuM3343Ox1RSD6h2bfjfHH4yiok/edit?usp=sharing
+
 
 ## Citations
 [1] Noelene Callaghan (2016) Investigating the role of Minecraft in educational learning environments, Educational Media International, 53:4, 244-260, DOI: 10.1080/09523987.2016.1254877  
