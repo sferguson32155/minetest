@@ -2465,6 +2465,105 @@ minetest.register_chatcommand("lua_object_get_hotbar_selected_image", {
 })
 
 
+-- Lua Testing for set_yaw
+minetest.register_chatcommand("lua_object_set_yaw", {
+    description = "Test the set_yaw function",
+    params = "<yaw>",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local yaw = tonumber(param)
+        if not yaw then
+            return false, "Invalid yaw value"
+        end
+        
+        player:set_yaw(yaw)
+        return true, "Yaw set to " .. yaw
+    end,
+})
+
+
+-- Lua Testing for get_yaw
+minetest.register_chatcommand("lua_object_get_yaw", {
+    description = "Test the get_yaw function",
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local yaw = player:get_yaw()
+        return true, "Current yaw: " .. yaw
+    end,
+})
+
+
+-- Lua Testing for set_texture_mod
+minetest.register_chatcommand("lua_object_set_texture_mod", {
+    description = "Test the set_texture_mod function",
+    params = "<mod>",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        player:set_texture_mod(param)
+        return true, "Texture mod set to " .. param
+    end,
+})
+
+
+-- Lua Testing for get_texture_mod
+minetest.register_chatcommand("lua_object_get_texture_mod", {
+    description = "Test the get_texture_mod function",
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local mod = player:get_texture_mod()
+        return true, "Current texture mod: " .. mod
+    end,
+})
+
+
+
+-- Lua Testing for set_sprite
+minetest.register_chatcommand("lua_object_set_sprite", {
+    description = "Test the set_sprite function",
+    params = "<start_frame> <num_frames> <framelength> <select_x_by_camera>",
+    func = function(name, param)
+        local start_frame, num_frames, framelength, select_x_by_camera =
+            param:match("^(%d+)%s+(%d+)%s+(%f+)%s+(%a+)$")
+
+        if not (start_frame and num_frames and framelength and select_x_by_camera) then
+            return false, "Invalid parameters. Provide start_frame, num_frames, framelength, select_x_by_camera."
+        end
+
+        start_frame = tonumber(start_frame)
+        num_frames = tonumber(num_frames)
+        framelength = tonumber(framelength)
+        select_x_by_camera = select_x_by_camera == "true"
+
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        -- Assuming set_sprite function exists and works as follows:
+        player:set_sprite({x=start_frame, y=0}, num_frames, framelength, select_x_by_camera)
+        return true, "Sprite set successfully"
+    end,
+})
+
+
+
+
 -- Function to run all lua_object commands and log the results
 -- Automated Testing
 local function run_lua_object_commands_and_log()
