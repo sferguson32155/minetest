@@ -39,72 +39,59 @@ Each Lua function must incorporate three test functions in the final product. Wh
 All Lua systems in the game will be swapped with our Native functions. The testing will ensure a seamless and lossless transition between the old and new game engines. 
 
 # Outline of Release Candidate Work
-Release Candidate Team Video: https://youtu.be/dlU3AWa-2MA
+Release Candidate Team Video: https://www.youtube.com/watch?v=ZyoDgF9OFc8
 
-## Week 1 (10/7 - 10/13)
-This week there was a shift from the normal workflow. The team wanted to transition into more of a tool-based and documentation approach rather than function development. log_lua and log_native were our first steps into automation and allowed for all scripts beginning in lua_object and native_object to be run and their outputs to a log file.
-
-### Sean - Added Functions:
-* native_object_remove
-* native_object_get_pos
-* lua_object_send_mapblock
-* log_lua_object
-* log_native_object
-
-### Chris - Added Functions:
-* native_object_get_look_dir
-* native_object_get_look_pitch
-* native_object_get_look_yaw
-* native_object_get_look_vertical
-* native_object_get_look_vertical
-* lua_object_get_look_dir
-* lua_object_get_look_pitch
-* lua_object_get_look_yaw
-* lua_object_get_look_vertical
-* lua_object_get_look_vertical
-
-## Week 2 (10/14 - 10/20)
-Lots of collaboration with the entire CactiCouncil team. Onboarded our newest member Alice with mod creation and tasked her with finding new automation techniques and helped Erik in class debugging issues. Made sure automated testing worked with all functions. Consolidated more GitHubs and gave push permissions to all members.
+## Week 1 (11/4 - 11/10)
+This week, our teams main focus was grinding out additional native and lua functions, as well as focusing on the innovation showcase in December. Our team designed a demo for our showcase on December 7th. This demo will hopefully allow new coders and experienced coders alike to create their first block within Minetest (in Lua unfortunately). We also figured out a way to store debug information in the log output. This was an important milestone for the team as figuring out how to display log information that was relevant to the mod was a challenge.
 
 ### Sean - Added Functions:
-* native_object_get_pos
-* native_object_set_pos
-* native_object_move_to
-* native_object_set_hp
-* native_object_get_hp
+* log_time_lua_object
+* log_time_native_object
 
 ### Chris - Added Functions:
-* lua_object_get_entity_name
-* lua_object_get_luaentity
-* lua_object_get_player_name
-* lua_object_override_day_night_ratio
-* lua_object_get_day_night_ratio
+* lua_object_set_velocity
+* lua_object_add_velocity
+* lua_object_get_velocity
+* lua_object_set_acceleration
+* lua_object_get_acceleration
+* lua_object_set_rotation
+* lua_object_get_rotation
 
-## Week 3 (10/21 - 10/27)
-Added timing capabilities to the logging system and started creating tutorials for our work so future members can view the work that we do.
+## Week 2 (11/11 - 11/17)
+This week was focused on increasing testing coverage, Sean focused on native while Chris focused on lua.
 
-### Sean - Edited Functions:
-* log_lua_object
-* log_native_object
-
-### Chris - Added Functions:
-* lua_object_hud_add
-* lua_object_hud_remove
-* lua_object_hud_change
-* lua_object_get
-
-## Week 4 (10/28 - 11/3)
-Finished up tutorials and figured out how to output debug text in the logging files. Started adding default "test" param to previously completed functions to test valid input parameters rather than just an integer param.
-
-### Sean - Edited Functions:
-* log_lua_object
-* log_native_object
+### Sean - Added Functions:
+* native_object_get_inventory
+* native_object_get_wield_list
+* native_object_get_wield_index
+* native_object_get_wielded_item
+* native_object_set_wielded_item
+* native_object_set_eye_offset
+* native_object_get_eye_offset
 
 ### Chris - Added Functions:
-* lua_object_hud_set_hotbar_itemcount
-* lua_object_hud_get_hotbar_itemcount
-* lua_object_hud_get_hotbar_image
-* lua_object_hud_set_hotbar_image
+* lua_object_set_bone_position
+* lua_object_get_bone_position
+* lua_object_set_attach
+* lua_object_get_attach
+* lua_object_get_children
+* lua_object_set_detach
+* lua_object_set_properties
+* lua_object_get_properties
+* lua_object_is_player
+
+## Week 3 (11/18 - 11/21)
+Added time comparisons, reformatted object.lua, and added more lua tests for a total of 84% completion of lua testing.
+
+### Sean - Added Functions:
+* log_object
+
+### Chris - Added Functions:
+* lua_object_set_yaw
+* lua_object_get_yaw
+* lua_object_set_texture_mod
+* lua_object_get_texture_mod
+* lua_object_set_sprite
 
 ## Known Bugs/Issues
 * Logging requires editing of main.cpp and the file location of debug.txt. This is only an issue because it needs to be located in the world file to interact with the log command. This means that the world name must be hard-coded into the debug directory.
@@ -114,16 +101,17 @@ Finished up tutorials and figured out how to output debug text in the logging fi
 * Set Animation - Unknown Input Params (self, frame_range, frame_speed, frame_blend, frame_loop)
 * Set Local Animation - Unknown Input Params (self, idle, walk, dig, walk_while_dig, frame_speed)
 * Send Mapblock - Unknown test trigger
-* Set Sun - Input Param too Long (self, sun_paramters)
-* Set Moon - Input Param too Long (self, moon_paramters)
+* ~~Set Sun - Input Param too Long (self, sun_paramters)~~
+* ~~Set Moon - Input Param too Long (self, moon_paramters)~~
 * ~~Customized Pictures - Where to store/link custom images~~
+* Bone edit and animation edit requires 3rd person view of the character and the dev build does not support player models in single player or server support
 
 ## Important Links:
 - Minetest Native API Github: [https://github.com/cacticouncil/minetest](https://github.com/cacticouncil/minetest/tree/native-api)
 - Design 2 Object's Class Checklist: https://docs.google.com/spreadsheets/d/1PM4jhVm7i4OwgGq1aDPfn8IWj7l7l0uh8i5fXMeRUhU/edit?usp=sharing
 - Design 2 Working Branch: https://github.com/sferguson32155/minetest/tree/sean-test-branch
 - Songyuhao Shi - Work Log: https://docs.google.com/spreadsheets/d/1qtSN0sl43u4A3n5VJuM3343Ox1RSD6h2bfjfHH4yiok/edit?usp=sharing
-- Release Candidate Team Video: https://youtu.be/dlU3AWa-2MA
+- Production Release Team Video: https://www.youtube.com/watch?v=ZyoDgF9OFc8
 
 
 ## Citations
