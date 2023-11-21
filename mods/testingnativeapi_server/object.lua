@@ -1887,6 +1887,327 @@ minetest.register_chatcommand("lua_object_set_sprite", {
     end,
 })
 
+
+
+
+minetest.register_chatcommand("lua_object_set_bone_position", {
+    description = "Test the set_bone_position function",
+    params = "<bone> <position> <rotation>",
+    func = function(name, param)
+        local bone, pos_str, rot_str = param:match("^(%S+)%s+(%S+)%s+(%S+)$")
+        local position = minetest.string_to_pos(pos_str)
+        local rotation = minetest.string_to_pos(rot_str)
+        if not bone or not position or not rotation then
+            return false, "Invalid parameters (expected: 'bone position rotation')"
+        end
+        
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        player:set_bone_position(bone, position, rotation)
+        return true, "Bone position set for " .. bone
+    end,
+})
+
+
+
+minetest.register_chatcommand("lua_object_get_bone_position", {
+    description = "Test the get_bone_position function",
+    params = "<bone>",
+    func = function(name, bone)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local position, rotation = player:get_bone_position(bone)
+        if not position then
+            return false, "Bone not found or player not available"
+        end
+        
+        local pos_str = minetest.pos_to_string(position)
+        local rot_str = minetest.pos_to_string(rotation)
+        return true, "Bone position for " .. bone .. ": pos=" .. pos_str .. " rot=" .. rot_str
+    end,
+})
+
+
+
+minetest.register_chatcommand("lua_object_set_attach", {
+    description = "Test the set_attach function",
+    params = "<parent> <bone> <position> <rotation> <force_visible>",
+    func = function(name, param)
+        local parent_name, bone, pos_str, rot_str, force_visible_str = param:match("^(%S+)%s+(%S+)%s+(%S+)%s+(%S+)%s+(%S+)$")
+        local position = minetest.string_to_pos(pos_str)
+        local rotation = minetest.string_to_pos(rot_str)
+        local force_visible = force_visible_str == "true"
+        local parent = minetest.get_player_by_name(parent_name)
+        local player = minetest.get_player_by_name(name)
+        if not player or not parent then
+            return false, "Player or parent not found"
+        end
+
+        player:set_attach(parent, bone, position, rotation, force_visible)
+        return true, "Player attached to " .. parent_name
+    end,
+})
+
+
+minetest.register_chatcommand("lua_object_get_attach", {
+    description = "Test the get_attach function",
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local parent, bone, position, rotation, force_visible = player:get_attach()
+        if not parent then
+            return false, "Player is not attached"
+        end
+
+        local pos_str = minetest.pos_to_string(position)
+        local rot_str = minetest.pos_to_string(rotation)
+        return true, "Player attached to " .. parent:get_player_name() .. " at bone " .. bone .. " with position " .. pos_str .. " and rotation " .. rot_str
+    end,
+})
+
+
+minetest.register_chatcommand("lua_object_get_children", {
+    description = "Test the get_children function",
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local children = player:get_children()
+        if not children then
+            return false, "Player has no children"
+        end
+
+        local child_names = {}
+        for _, child in ipairs(children) do
+            table.insert(child_names, child:get_entity_name())
+        end
+        return true, "Children: " .. table.concat(child_names, ", ")
+    end,
+})
+
+
+minetest.register_chatcommand("lua_object_set_detach", {
+    description = "Test the set_detach function",
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        player:set_detach()
+        return true, "Player detached"
+    end,
+})
+
+
+
+minetest.register_chatcommand("lua_object_set_properties", {
+    description = "Test the set_properties function",
+    params = "<properties>",
+    func = function(name, param)
+        local properties = minetest.parse_json(param)
+        if not properties then
+            return false, "Invalid properties format"
+        end
+        
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        player:set_properties(properties)
+        return true, "Properties set"
+    end,
+})
+
+
+minetest.register_chatcommand("lua_object_get_properties", {
+    description = "Test the get_properties function",
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local properties = player:get_properties()
+        if not properties then
+            return false, "Failed to get properties"
+        end
+
+        local properties_str = minetest.write_json(properties)
+        return true, "Properties: " .. properties_str
+    end,
+})
+
+
+
+
+
+
+
+
+-- Lua Testing for is_player
+minetest.register_chatcommand("lua_object_is_player", {
+    description = "Test the is_player function",
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local is_player = player:is_player()
+        return true, "Is player: " .. tostring(is_player)
+    end,
+})
+
+-- Lua Testing for set_velocity
+minetest.register_chatcommand("lua_object_set_velocity", {
+    description = "Test the set_velocity function",
+    params = "<velocity>",
+    func = function(name, velocity)
+        local vel = minetest.string_to_pos(velocity)
+        if not vel then
+            return false, "Invalid velocity format"
+        end
+        
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        player:set_velocity(vel)
+        return true, "Velocity set to " .. minetest.pos_to_string(vel)
+    end,
+})
+
+
+-- Lua Testing for add_velocity
+minetest.register_chatcommand("lua_object_add_velocity", {
+    description = "Test the add_velocity function",
+    params = "<velocity>",
+    func = function(name, velocity)
+        local vel = minetest.string_to_pos(velocity)
+        if not vel then
+            return false, "Invalid velocity format"
+        end
+        
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        player:add_velocity(vel)
+        return true, "Additional velocity applied: " .. minetest.pos_to_string(vel)
+    end,
+})
+
+
+-- Lua Testing for get_velocity
+minetest.register_chatcommand("lua_object_get_velocity", {
+    description = "Test the get_velocity function",
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local velocity = player:get_velocity()
+        return true, "Current velocity: " .. minetest.pos_to_string(velocity)
+    end,
+})
+
+
+
+-- Lua Testing for set_acceleration
+minetest.register_chatcommand("lua_object_set_acceleration", {
+    description = "Test the set_acceleration function",
+    params = "<acceleration>",
+    func = function(name, acceleration)
+        local accel = minetest.string_to_pos(acceleration)
+        if not accel then
+            return false, "Invalid acceleration format"
+        end
+        
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        player:set_acceleration(accel)
+        return true, "Acceleration set to " .. minetest.pos_to_string(accel)
+    end,
+})
+
+
+
+-- Lua Testing for get_acceleration
+minetest.register_chatcommand("lua_object_get_acceleration", {
+    description = "Test the get_acceleration function",
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local acceleration = player:get_acceleration()
+        return true, "Current acceleration: " .. minetest.pos_to_string(acceleration)
+    end,
+})
+
+
+-- Lua Testing for set_rotation
+minetest.register_chatcommand("lua_object_set_rotation", {
+    description = "Test the set_rotation function",
+    params = "<rotation>",
+    func = function(name, rotation)
+        local rot = minetest.string_to_pos(rotation)
+        if not rot then
+            return false, "Invalid rotation format"
+        end
+        
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        player:set_rotation(rot)
+        return true, "Rotation set to " .. minetest.pos_to_string(rot)
+    end,
+})
+
+
+-- Lua Testing for get_rotation
+minetest.register_chatcommand("lua_object_get_rotation", {
+    description = "Test the get_rotation function",
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found"
+        end
+
+        local rotation = player:get_rotation()
+        if not rotation then
+            return false, "Unable to get rotation"
+        end
+
+        return true, "Current rotation: " .. minetest.pos_to_string(rotation)
+    end,
+})
+
+
+
+
 -- /*======== NATIVE FUNCTIONS ========*/
 
 
@@ -3691,6 +4012,12 @@ minetest.register_chatcommand("native_object_set_sprite", {
         return true, "Sprite set successfully"
     end,
 })
+
+
+
+
+
+
 
 -- /*======== TEST FUNCTIONS ========*/
 
