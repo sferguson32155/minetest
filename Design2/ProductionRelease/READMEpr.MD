@@ -1,4 +1,4 @@
-# Release Candidate for Minetest
+# Production Release for Minetest
 ## Overview:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Minecraft's adaptability, cost-effectiveness, and engaging gameplay have garnered interest from various individuals, leading to its application in educational settings. Minetest, an open-source counterpart to Minecraft, plays a significant role in helping individuals develop coding skills. As a sandbox game, Minetest offers a dynamic and interactive environment that enhances students' creativity, problem-solving, and collaboration skills. The game provides a customizable platform, enabling educators to design and tailor educational content such as the customization of facilities, land, and environment. This platform also addresses specific learning objectives and individual students' needs. The flexibility of Minetest is particularly advantageous when incorporating it into a wide range of STEM field subjects. Its open-source nature ensures free access for all schools, eliminating financial barriers that might exist with commercial alternatives. By integrating Minetest into the classroom, educators can offer a dynamic, immersive learning experience that promotes self-directed exploration, critical thinking, and real-world applications of subject matter [1]. Consequently, teachers can effectively bridge the gap between traditional teaching methods and the rapidly evolving world of digital technologies, better preparing students for the challenges and opportunities they will encounter in the 21st century.
 \
@@ -38,7 +38,7 @@ Each Lua function must incorporate three test functions in the final product. Wh
 **Internal Systems *(Source Code)***
 All Lua systems in the game will be swapped with our Native functions. The testing will ensure a seamless and lossless transition between the old and new game engines. 
 
-# Outline of Release Candidate Work
+# Outline of Production Release Work
 Release Candidate Team Video: https://www.youtube.com/watch?v=ZyoDgF9OFc8
 
 ## Week 1 (11/4 - 11/10)
