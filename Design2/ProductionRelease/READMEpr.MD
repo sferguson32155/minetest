@@ -102,7 +102,7 @@ Added time comparisons, reformatted object.lua, and added more lua tests for a t
 * Punch - Unknown Input Params (self, puncher, time from last punch, tool capabilities, direction)
 * ~~Set Animation - Unknown Input Params (self, frame_range, frame_speed, frame_blend, frame_loop)~~
 * ~~Set Local Animation - Unknown Input Params (self, idle, walk, dig, walk_while_dig, frame_speed)~~
-* Send Mapblock - Unknown test trigger
+* ~~Send Mapblock - Unknown test trigger~~
 * ~~Set Sun - Input Param too Long (self, sun_paramters)~~
 * ~~Set Moon - Input Param too Long (self, moon_paramters)~~
 * ~~Customized Pictures - Where to store/link custom images~~
