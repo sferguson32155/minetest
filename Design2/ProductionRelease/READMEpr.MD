@@ -93,6 +93,8 @@ Added time comparisons, reformatted object.lua, and added more lua tests for a t
 * lua_object_get_texture_mod
 * lua_object_set_sprite
 
+![alt text](https://raw.githubusercontent.com/sferguson32155/minetest/sean-test-branch/Design2/ProductionRelease/TimeCompareLuaNative.PNG)
+
 ## Known Bugs/Issues
 * Logging requires editing of main.cpp and the file location of debug.txt. This is only an issue because it needs to be located in the world file to interact with the log command. This means that the world name must be hard-coded into the debug directory.
 * ~~Native Tests - Not working, Linker error, new functions unrecognized~~
