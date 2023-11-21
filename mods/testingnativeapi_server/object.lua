@@ -1887,13 +1887,13 @@ minetest.register_chatcommand("lua_object_set_sprite", {
     end,
 })
 
-
-
-
 minetest.register_chatcommand("lua_object_set_bone_position", {
     description = "Test the set_bone_position function",
     params = "<bone> <position> <rotation>",
     func = function(name, param)
+        if param == "test" then
+            param = "arm (0,1,0) (0,90,0)"
+        end
         local bone, pos_str, rot_str = param:match("^(%S+)%s+(%S+)%s+(%S+)$")
         local position = minetest.string_to_pos(pos_str)
         local rotation = minetest.string_to_pos(rot_str)
@@ -1911,12 +1911,13 @@ minetest.register_chatcommand("lua_object_set_bone_position", {
     end,
 })
 
-
-
 minetest.register_chatcommand("lua_object_get_bone_position", {
     description = "Test the get_bone_position function",
     params = "<bone>",
     func = function(name, bone)
+        if param == "test" then
+            param = "arm"
+        end
         local player = minetest.get_player_by_name(name)
         if not player then
             return false, "Player not found"
@@ -1933,12 +1934,13 @@ minetest.register_chatcommand("lua_object_get_bone_position", {
     end,
 })
 
-
-
 minetest.register_chatcommand("lua_object_set_attach", {
     description = "Test the set_attach function",
     params = "<parent> <bone> <position> <rotation> <force_visible>",
     func = function(name, param)
+        if param == "test" then
+            param = "other_player_name arm (0,1,0) (0,0,0) true"
+        end
         local parent_name, bone, pos_str, rot_str, force_visible_str = param:match("^(%S+)%s+(%S+)%s+(%S+)%s+(%S+)%s+(%S+)$")
         local position = minetest.string_to_pos(pos_str)
         local rotation = minetest.string_to_pos(rot_str)
@@ -1954,10 +1956,12 @@ minetest.register_chatcommand("lua_object_set_attach", {
     end,
 })
 
-
 minetest.register_chatcommand("lua_object_get_attach", {
     description = "Test the get_attach function",
     func = function(name)
+        if param == "test" then
+            param = ""
+        end
         local player = minetest.get_player_by_name(name)
         if not player then
             return false, "Player not found"
@@ -1974,10 +1978,12 @@ minetest.register_chatcommand("lua_object_get_attach", {
     end,
 })
 
-
 minetest.register_chatcommand("lua_object_get_children", {
     description = "Test the get_children function",
     func = function(name)
+        if param == "test" then
+            param = ""
+        end
         local player = minetest.get_player_by_name(name)
         if not player then
             return false, "Player not found"
@@ -1996,10 +2002,12 @@ minetest.register_chatcommand("lua_object_get_children", {
     end,
 })
 
-
 minetest.register_chatcommand("lua_object_set_detach", {
     description = "Test the set_detach function",
     func = function(name)
+        if param == "test" then
+            param = ""
+        end
         local player = minetest.get_player_by_name(name)
         if not player then
             return false, "Player not found"
@@ -2010,12 +2018,13 @@ minetest.register_chatcommand("lua_object_set_detach", {
     end,
 })
 
-
-
 minetest.register_chatcommand("lua_object_set_properties", {
     description = "Test the set_properties function",
     params = "<properties>",
     func = function(name, param)
+        if param == "test" then
+            param = ""
+        end
         local properties = minetest.parse_json(param)
         if not properties then
             return false, "Invalid properties format"
@@ -2035,6 +2044,9 @@ minetest.register_chatcommand("lua_object_set_properties", {
 minetest.register_chatcommand("lua_object_get_properties", {
     description = "Test the get_properties function",
     func = function(name)
+        if param == "test" then
+            param = ""
+        end
         local player = minetest.get_player_by_name(name)
         if not player then
             return false, "Player not found"
@@ -2050,17 +2062,13 @@ minetest.register_chatcommand("lua_object_get_properties", {
     end,
 })
 
-
-
-
-
-
-
-
 -- Lua Testing for is_player
 minetest.register_chatcommand("lua_object_is_player", {
     description = "Test the is_player function",
     func = function(name)
+        if param == "test" then
+            param = ""
+        end
         local player = minetest.get_player_by_name(name)
         if not player then
             return false, "Player not found"
@@ -2076,6 +2084,9 @@ minetest.register_chatcommand("lua_object_set_velocity", {
     description = "Test the set_velocity function",
     params = "<velocity>",
     func = function(name, velocity)
+        if velocity == "test" then
+            velocity = "(0,-10,0)"
+        end
         local vel = minetest.string_to_pos(velocity)
         if not vel then
             return false, "Invalid velocity format"
@@ -2091,12 +2102,14 @@ minetest.register_chatcommand("lua_object_set_velocity", {
     end,
 })
 
-
 -- Lua Testing for add_velocity
 minetest.register_chatcommand("lua_object_add_velocity", {
     description = "Test the add_velocity function",
     params = "<velocity>",
     func = function(name, velocity)
+        if velocity == "test" then
+            velocity = "(0,-10,0)"
+        end
         local vel = minetest.string_to_pos(velocity)
         if not vel then
             return false, "Invalid velocity format"
@@ -2112,7 +2125,6 @@ minetest.register_chatcommand("lua_object_add_velocity", {
     end,
 })
 
-
 -- Lua Testing for get_velocity
 minetest.register_chatcommand("lua_object_get_velocity", {
     description = "Test the get_velocity function",
@@ -2127,13 +2139,14 @@ minetest.register_chatcommand("lua_object_get_velocity", {
     end,
 })
 
-
-
 -- Lua Testing for set_acceleration
 minetest.register_chatcommand("lua_object_set_acceleration", {
     description = "Test the set_acceleration function",
     params = "<acceleration>",
     func = function(name, acceleration)
+        if acceleration == "test" then
+            acceleration = "(0,-10,0)"
+        end
         local accel = minetest.string_to_pos(acceleration)
         if not accel then
             return false, "Invalid acceleration format"
@@ -2149,8 +2162,6 @@ minetest.register_chatcommand("lua_object_set_acceleration", {
     end,
 })
 
-
-
 -- Lua Testing for get_acceleration
 minetest.register_chatcommand("lua_object_get_acceleration", {
     description = "Test the get_acceleration function",
@@ -2165,12 +2176,14 @@ minetest.register_chatcommand("lua_object_get_acceleration", {
     end,
 })
 
-
 -- Lua Testing for set_rotation
 minetest.register_chatcommand("lua_object_set_rotation", {
     description = "Test the set_rotation function",
     params = "<rotation>",
     func = function(name, rotation)
+        if rotation == "test" then
+            rotation = "(0,-10,0)"
+        end
         local rot = minetest.string_to_pos(rotation)
         if not rot then
             return false, "Invalid rotation format"
@@ -2185,7 +2198,6 @@ minetest.register_chatcommand("lua_object_set_rotation", {
         return true, "Rotation set to " .. minetest.pos_to_string(rot)
     end,
 })
-
 
 -- Lua Testing for get_rotation
 minetest.register_chatcommand("lua_object_get_rotation", {
@@ -2204,9 +2216,6 @@ minetest.register_chatcommand("lua_object_get_rotation", {
         return true, "Current rotation: " .. minetest.pos_to_string(rotation)
     end,
 })
-
-
-
 
 -- /*======== NATIVE FUNCTIONS ========*/
 
@@ -4013,12 +4022,6 @@ minetest.register_chatcommand("native_object_set_sprite", {
     end,
 })
 
-
-
-
-
-
-
 -- /*======== TEST FUNCTIONS ========*/
 
 -- /*======== AUTOMATED TESTING ========*/
@@ -4272,3 +4275,57 @@ minetest.register_chatcommand("log_time_native_object", {
     func = run_native_object_commands_and_log_with_time,
 })
 
+-- Function to run commands and log execution time
+local function run_commands_and_log(prefix)
+    local log_file = io.open(minetest.get_worldpath() .. "/log_time.txt", "a")  -- Open a text file for appending
+
+    if not log_file then
+        minetest.log("Failed to open log file for writing.")
+        return
+    end
+
+    local total_commands = 0  
+    local passed_commands = 0 
+
+    local start_time_total = os.clock()  -- Record the start time for total execution
+
+    for command, command_info in pairs(minetest.registered_chatcommands) do
+        if string.match(command, "^" .. prefix) then
+            minetest.log("Running " .. prefix .. " command: " .. command)
+
+            local start_time = os.clock()  -- Record the start time
+            local success, result = pcall(command_info.func, "singleplayer", "test")
+            local end_time = os.clock()  -- Record the end time
+
+            local execution_time = end_time - start_time  -- Calculate the execution time
+
+            if success then
+                passed_commands = passed_commands + 1
+            end
+
+            total_commands = total_commands + 1
+        end
+    end
+
+    local end_time_total = os.clock()  -- Record the end time for total execution
+    local total_execution_time = end_time_total - start_time_total  -- Calculate the total execution time
+
+    log_file:write("Total Execution Time for " .. prefix .. " commands: " .. total_execution_time .. " seconds\n")
+    log_file:write(passed_commands .. "/" .. total_commands .. " Tests Passed\n")
+    log_file:close()
+    minetest.log("All " .. prefix .. " commands logged to log_time.txt")
+end
+
+-- Function to compare the execution time of lua_object and native_object commands
+minetest.register_chatcommand("log_time_object", {
+    description = "Run and log time comparison",
+    func = function()
+        minetest.after(0, function()
+            run_commands_and_log("lua_object_")
+        end)
+
+        minetest.after(0, function()
+            run_commands_and_log("native_object_")
+        end)
+    end,
+})
